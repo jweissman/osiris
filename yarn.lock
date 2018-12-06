@@ -13,6 +13,11 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
 
+"@types/node@10.5.6":
+  version "10.5.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.6.tgz#1640f021dd0eaf12e731e54198c12ad2e020dc8e"
+  integrity sha512-c5Z1j1ysgo4878ptz6gxLcgMfJ6Wf908R3l5KAGabr0XJ72ZFmOCgsaodPpNYTfp4iOrSwgTDvR/BxbFfB4zPQ==
+
 "@webassemblyjs/ast@1.3.1":
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.3.1.tgz#3081b4b3ff0af733aa5ba573af998f33711293f8"
@@ -1299,9 +1304,10 @@ clean-css@4.1.x:
   dependencies:
     source-map "0.5.x"
 
-clean-webpack-plugin@^0.1.19:
+clean-webpack-plugin@0.1.19:
   version "0.1.19"
   resolved "https://registry.yarnpkg.com/clean-webpack-plugin/-/clean-webpack-plugin-0.1.19.tgz#ceda8bb96b00fe168e9b080272960d20fdcadd6d"
+  integrity sha512-M1Li5yLHECcN2MahoreuODul5LkjohJGFxLPTjl3j1ttKrF5rgjZET1SJduuqxLAuT1gAPOdkhg03qcaaU1KeA==
   dependencies:
     rimraf "^2.6.1"
 
@@ -2020,9 +2026,10 @@ evp_bytestokey@^1.0.0, evp_bytestokey@^1.0.3:
     md5.js "^1.3.4"
     safe-buffer "^5.1.1"
 
-excalibur@^0.16.0:
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/excalibur/-/excalibur-0.16.0.tgz#2873ca9116ef5a434b1d8d97533bf55ae54eb129"
+excalibur@0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/excalibur/-/excalibur-0.18.0.tgz#41a4fc476188f9d27d7143a2992e309a989b4708"
+  integrity sha512-riFgGzYvhvOy9aBI0gP3dRaSU1p8/n22bSJhOARdxxHkupoOWIFA6kX+Up8W+nGwNPxN0be+OzkPxpC5SwRkXg==
 
 execa@^0.7.0:
   version "0.7.0"
@@ -2199,6 +2206,14 @@ figures@^2.0.0:
   resolved "https://registry.yarnpkg.com/figures/-/figures-2.0.0.tgz#3ab1a2d2a62c8bfb431a0c94cb797a2fce27c962"
   dependencies:
     escape-string-regexp "^1.0.5"
+
+file-loader@1.1.11:
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-1.1.11.tgz#6fe886449b0f2a936e43cabaac0cdbfb369506f8"
+  integrity sha512-TGR4HU7HUsGg6GCOPJnFk06RhWgEWFLAGWiT6rcD+GRC2keU3s9RGJ+b3Z6/U73jwwNb2gKLJ7YCrp+jvU4ALg==
+  dependencies:
+    loader-utils "^1.0.2"
+    schema-utils "^0.4.5"
 
 filename-regex@^2.0.0:
   version "2.0.1"
