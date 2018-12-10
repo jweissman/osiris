@@ -1,2 +1,2 @@
 
-export enum Orientation { Left, Right }
+export enum Orientation { Left, Up, Right, Down } //, Angle }

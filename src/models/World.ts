@@ -10,12 +10,12 @@ export class Colony {
 
 
 export class World {
-  static colors = [Color.Red, Color.Blue, Color.Viridian, Color.Magenta, Color.Chartreuse];
+  static colors = [Color.Red, Color.Blue, Color.Green] // Color.Viridian, Color.Magenta, Color.Chartreuse];
 
   color: Color = sample(World.colors).
-      darken(0.25).
-      desaturate(0.85);
-  skyColor: Color = sample(World.colors).
+      darken(0.1).
+      desaturate(0.8);
+  skyColor: Color = sample([ Color.Cyan, Color.Vermillion ] ). // Color.Rose //World.colors).
         lighten(0.15).
         desaturate(0.65) // sample([Color.Blue, Color.Rose,Color.Blue]).lighten(0.1).desaturate(0.8)
   colony: Colony = new Colony()

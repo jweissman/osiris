@@ -1,27 +1,23 @@
-import { Scene, Input, UIActor, Label, Vector } from "excalibur";
+import { Scene, Input, UIActor, Label, Vector, LockCameraToActorStrategy } from "excalibur";
 import { Game } from "../Game";
-import { Planet } from "../actors/planet";
+import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { TunnelView } from "../actors/TunnelView";
-import { MissionControlView } from "../actors/MissionControlView";
-import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea } from "../models/Structure";
-import { Building } from "../actors/Building";
+import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, LivingQuarters } from "../models/Structure";
+import { Building, DomeView, AccessTunnelView, CommonAreaView, TunnelView, MissionControlView, LivingQuartersView } from "../actors/Building";
 import { Hud } from "../actors/Hud";
-import { DomeView } from "../actors/DomeView";
-import { AccessTunnelView } from "../actors/AccessTunnelView";
-import { CommonAreaView } from "../actors/CommonAreaView";
-import { Buttons } from "excalibur/dist/Input";
+import { Citizen } from "../actors/Citizen";
+import { range } from "../Util";
+
 
 export class Construct extends Scene {
     private currentBuildingListIndex: number = 0
-
- 
 
     game: Game
     planet: Planet
     hud: Hud
     player: Player
     buildings: Building[] = []
+    people: Citizen[] = []
 
     dragging: boolean = false
     dragOrigin: Vector
@@ -46,10 +42,8 @@ export class Construct extends Scene {
 
 
         this.prepareNextBuilding()
-        // this.camera.zoom(2, 500)
-        // conso
-        this.camera.zoom(0.5)
-        this.camera.y = -this.planet.depth/2 //+ this.game.halfCanvasHeight
+        // this.camera.zoom(0.25)
+        // this.camera.y = 0 //-this.planet.depth/2
     }
 
     public onActivate() {
@@ -81,32 +75,31 @@ export class Construct extends Scene {
         this.game.input.pointers.primary.on('down', (e: Input.PointerDownEvent) => {
             if (e.button == Input.PointerButton.Left) {
                 const currentBuilding: Building = this.currentlyBuilding
-                let placementValid = !currentBuilding.overlapsAny()
-                if (currentBuilding && placementValid && currentBuilding.handleClick(e.pos)) {
-                    console.log("BUILD", { currentBuilding })
-                    this.planet.placeBuilding(currentBuilding)
-                    // this.hud.message(`built the ${currentBuilding.structure.name}`)
-                    this.prepareNextBuilding(e.pos)
+                if (currentBuilding) {
+                    let placementValid = !currentBuilding.overlapsAny()
+                    // console.log("placement valid?", { placementValid, currentBuilding })
+                    if (currentBuilding && placementValid && currentBuilding.handleClick(e.pos)) {
+                        // console.log("placed!")
+                        this.planet.placeBuilding(currentBuilding)
+                        this.prepareNextBuilding(e.pos)
+                    } else {
+                        // console.log("couldn't place?")
+                    }
                 }
             } else if (e.button === Input.PointerButton.Middle) {
-                // we could try to drag the camera around
                 this.dragging = true;
                 this.dragOrigin = e.pos
             }
         })
 
         this.game.input.pointers.primary.on('wheel', (e: Input.WheelEvent) => {
-            // console.log("wheel")
             let z = this.camera.getZoom()
-            let step = 0.25
-            let min = 0.25, max = 8
-            let vec = new Vector(e.x, e.y)
+            let step = 0.05
+            let min = 0.05, max = 8
             if (e.deltaY < 0) {
                 this.camera.zoom(Math.min(z + step, max))
-                // this.camera.move(vec, 250)
             } else if (e.deltaY > 0) {
                 this.camera.zoom(Math.max(z - step, min))
-                // this.camera.pos = vec
             }
         })
 
@@ -114,8 +107,8 @@ export class Construct extends Scene {
             if (e.key === Input.Keys.H) {
                 if (this.planet.buildings && this.planet.buildings[0]) {
                     this.camera.move(this.planet.buildings[0].pos, 500)
+                    this.camera.zoom(0.5, 1000)
                 }
-                // this.game.goToScene('simulate')
             }
         })
     }
@@ -134,19 +127,26 @@ export class Construct extends Scene {
     static requiredStructureList: Structure[] = [
         new MissionControl(),
         new MainTunnel(),
+        new AccessTunnel(),
+        new CommonArea(),
     ]
 
     static structureList: Structure[] = [
         new AccessTunnel(),
-        new CommonArea(),
+        new LivingQuarters(),
         new Dome(),
+        //new Dome(),
+        //new Dome(),
+        //new Dome(),
+        //new LivingQuarters(),
+        //new LivingQuarters(),
     ]
 
     private nextMissingRequiredStructure(): Structure {
         let requiredStructures: Structure[] = Construct.requiredStructureList
         let actualStructureNames: string[] = this.buildings.map(building => building.structure.name)
 
-        console.log({ actualStructureNames, requiredNames: requiredStructures.map(s => s.name) })
+        // console.log({ actualStructureNames, requiredNames: requiredStructures.map(s => s.name) })
         return requiredStructures.find(structure => !actualStructureNames.includes(structure.name))
     }
 
@@ -154,11 +154,36 @@ export class Construct extends Scene {
         let structure = Construct.structureList[this.currentBuildingListIndex % Construct.structureList.length]; 
         let nextMissing = this.nextMissingRequiredStructure();
         if (nextMissing) { structure = nextMissing; }
-        structure.origin = pos
-        this.hud.message(`Place ${structure.name}`)
-        let theNextOne = this.spawnBuilding(structure)
-        this.currentlyBuilding = theNextOne
-        this.currentBuildingListIndex += 1
+        else { this.currentBuildingListIndex += 1 }
+        this.currentlyBuilding = null // ?
+        if (structure) {
+            structure.origin = pos
+            this.hud.message(`Place ${structure.name}`)
+            let theNextOne = this.spawnBuilding(structure)
+            this.currentlyBuilding = theNextOne
+            // this.camera.pos = theNextOne.constrainCursor(this.player.pos) //camera.pos)
+            this.camera.pos = theNextOne.pos // move(theNextOne.pos, 250)
+            this.camera.zoom(structure.zoom, 250)
+        } else {
+            this.hud.message(`Welcome to OSIRIS`)
+
+            // spawn people?
+            for(let i in range(4)) this.spawnCitizen()
+            
+            // this.camera.addStrategy(new LockCameraToActorStrategy(this.people[0]))
+        }
+    }
+
+    protected spawnCitizen() {
+        let ctrl = this.planet.closestBuildingByType(this.player.pos, MissionControl) //bubuildings[0] //.pos
+        let dome = this.planet.closestBuildingByType(this.player.pos, Dome)
+        //buildings[1]
+        let citizen = new Citizen(ctrl, this.planet) //ctrl.x, ctrl.y)
+        citizen.work(Dome, MissionControl)
+        citizen.y = this.planet.getTop() + citizen.getHeight() / 3
+        this.people.push(citizen)
+        this.add(citizen)
+        // citizen.setZIndex(1000)
     }
 
     static structureViews: { [key: string]: typeof Building } = {
@@ -166,12 +191,14 @@ export class Construct extends Scene {
         MissionControlView, //: new MissionControlView()
         DomeView,
         AccessTunnelView,
-        CommonAreaView
+        CommonAreaView,
+        LivingQuartersView
     }
 
     protected spawnBuilding(structure: Structure): Building {
         console.log("spawn", { structure })
         let anotherBuilding = this.assembleBuildingFromStructure(structure)
+        anotherBuilding.reshape(anotherBuilding.constrainCursor(anotherBuilding.pos))
         this.add(anotherBuilding)
         this.buildings.push(anotherBuilding)
         return anotherBuilding
@@ -182,4 +209,4 @@ export class Construct extends Scene {
         let building = new View(structure, this.planet)
         return building;
     }
-}
+} 

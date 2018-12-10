@@ -1,6 +1,6 @@
 import { Game } from './Game';
 import { World } from './models/World';
-import { Construct } from './scenes/construct';
+import { Construct } from './scenes/Construct';
 
 const theWorld = new World();
 const game = new Game(theWorld);

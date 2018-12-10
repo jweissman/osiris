@@ -1,14 +1,43 @@
 import { Vector } from "excalibur";
 import { Building } from "./Building";
+import { MissionControl } from "../../models/Structure";
+import { range } from "../../Util";
+import { Slot } from "../../values/Slot";
+import { Orientation } from "../../values/Orientation";
 
 export class TunnelView extends Building {
     pickingOrigin: boolean = true
+
+    slots() {
+        let slotSize = 40
+        let slotCount = Math.floor((this.getHeight()-50) / slotSize)
+        let theSlots: Slot[] = []
+        for (let i of range(slotCount)) {
+            theSlots.push({
+                pos: new Vector(
+                    this.pos.x,
+                    100 + this.pos.y + i * slotSize
+                ),
+                facing: Orientation.Left
+            })
+
+            theSlots.push({
+                pos: new Vector(
+                    this.pos.x + this.getWidth(),
+                    100 + this.pos.y+ i * slotSize 
+                ),
+                facing: Orientation.Right
+            })
+        }
+        console.log({theSlots})
+        return theSlots;
+    } 
 
     handleClick(cursor: Vector) {
         // pick nearest mission ctrl as origin
         if (this.pickingOrigin) {
             let lastCtrl: Building = this.planet.closestBuildingByType(
-                this.pos, 'Mission Control'
+                this.pos, MissionControl // 'Mission Control'
             )
             this.pos.x = lastCtrl.x + lastCtrl.getWidth() / 2 - this.getWidth() / 2 //[0].x
             this.pickingOrigin = false;
@@ -22,7 +51,7 @@ export class TunnelView extends Building {
         if (this.pickingOrigin) {
             // snap to nearest mission ctrl?
             let lastCtrl: Building = this.planet.closestBuildingByType(
-                cursor, 'Mission Control'
+                cursor,  MissionControl //'Mission Control'
             )
             this.pos.x = lastCtrl.x + lastCtrl.getWidth() / 2 - this.getWidth() / 2 //[0].x
 

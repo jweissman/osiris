@@ -1,6 +1,6 @@
 import { Engine, DisplayMode, Loader } from 'excalibur';
 import { World } from './models/World';
-import { Resources } from './resources';
+import { Resources } from './Resources';
 
 export class Game extends Engine {
   constructor(public world: World) {
