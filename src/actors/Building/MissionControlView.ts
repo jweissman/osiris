@@ -2,8 +2,21 @@ import { Actor, Color, Vector } from "excalibur";
 import { Building } from "./Building";
 import { Planet } from "../Planet/Planet";
 import { Citizen } from "../Citizen";
+import { SSL_OP_TLS_BLOCK_PADDING_BUG } from "constants";
+import { Orientation } from "../../values/Orientation";
+import { Slot } from "../../values/Slot";
 
 export class MissionControlView extends Building {
+    hideBox = true
+
+    slots() {
+        let theSlots: Slot[] = []
+        theSlots.push({
+            pos: new Vector(this.pos.x + this.getWidth()/2, this.pos.y + this.getHeight()),
+            facing: Orientation.Down
+        })
+        return theSlots;
+    }
 
     constrainCursor(cursor: Vector): Vector {
         // cursor.x = this.x //.getTop()
@@ -23,7 +36,6 @@ export class MissionControlView extends Building {
 
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
-        super.draw(ctx, delta)
 
         let color = this.mainColor(); //Color.White //.darken(0.3)
 
@@ -38,6 +50,7 @@ export class MissionControlView extends Building {
         ctx.fillRect(flagX, flagY, 2, flagpoleHeight)
         ctx.fillRect(flagX, flagY, 10, 5)
 
+        super.draw(ctx, delta)
         // shadow?
         //ctx.fillStyle = this.color.darken(0.2).toRGBA()
         //ctx.fillRect(this.x, this.y, this.getHeight())

@@ -1,17 +1,19 @@
 import { Building } from "./Building";
 import { Color, Vector } from "excalibur";
 import { AccessTunnelView } from "./AccessTunnelView";
-import { Orientation } from "../../values/Orientation";
-import { AccessTunnel } from "../../models/Structure";
-import { range } from "../../Util";
+import { Orientation, flip } from "../../values/Orientation";
+import { AccessTunnel, Structure } from "../../models/Structure";
+import { range, closest, flatSingle } from "../../Util";
 import { Slot } from "../../values/Slot";
 
 export class CommonAreaView extends Building {
+    floorHeight: number = 5
+    edgeWidth: number = 2
     // maybe you can set height AND width of common area view??
 
     slots() {
         let theSlots = []
-        let slotY = this.getHeight() - 20 //3*(this.getHeight()/4)
+        let slotY = this.getHeight() - this.floorHeight
         let leftSlot: Slot = {
             pos: new Vector(this.pos.x, this.pos.y + slotY),
             facing: Orientation.Left,
@@ -26,60 +28,36 @@ export class CommonAreaView extends Building {
         return theSlots;
     }
 
-    constrainCursor(cursor) {
-        let newCursor = cursor.clone()
-        //let closest = this.planet.closestBuildingByType(
+    reshape(cursor) {
+        //let tunnel = this.planet.closestBuildingByType(
         //    cursor, AccessTunnel //'Access Tunnel'
         //)
 
         //// try to pick the cap??
-        //if (closest) {
-        //    if ((<AccessTunnelView>closest).facing === Orientation.Left) {
-        //        newCursor.x = closest.x - closest.getWidth() - this.getWidth()
-        //    } else {
-        //        newCursor.x = closest.x + closest.getWidth()
-        //    }
-        //    newCursor.y = closest.y - this.getHeight() + closest.getHeight() + 5 // closest.edgeSize // / 2
-        //}
-
-        return newCursor
+        this.alignToSlot(cursor);
+        //if (tunnel) {
+            //let theSlot = this.findSlot(cursor) // closest(cursor, tunnel.slots(), (s) => s.pos)
+            //if (theSlot) {
+            //    this.pos = theSlot.pos
+            //    // position us so our slot lines up?
+            //    let matchingSlot = this.slots().find(s => s.facing == flip(theSlot.facing))
+            //    let offset = this.pos.sub(matchingSlot.pos)
+            //    this.pos.addEqual(offset)
+            //}
+        // }
     }
 
-    reshape(cursor) {
-        let closest = this.planet.closestBuildingByType(
-            cursor, AccessTunnel //'Access Tunnel'
-        )
-
-        // try to pick the cap??
-        if (closest) {
-            if ((<AccessTunnelView>closest).facing === Orientation.Left) {
-                this.pos.x = closest.x - closest.getWidth() // - this.getWidth()
-            } else {
-                this.pos.x = closest.x + closest.getWidth()
-            }
-            this.pos.y = closest.y - this.getHeight() + closest.getHeight() + 5 // closest.edgeSize // / 2
-        }
+    protected validConnectingStructures(): (typeof Structure)[] {
+        return [ AccessTunnel ];
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
-        let edgeWidth = 4;
+    
 
-        // console.log("draw common area", { pos: this.pos, size: [ this.getWidth(), this.getHeight() ]})
-
-        let edge = this.edgeColor();
-        ctx.fillStyle = edge.toRGBA();
-        ctx.fillRect(this.pos.x, this.pos.y, this.getWidth(), this.getHeight())
-
-        let main = this.mainColor();
-        ctx.fillStyle = main.toRGBA();
-        ctx.fillRect(
-            this.pos.x + edgeWidth,
-            this.pos.y + edgeWidth,
-            this.getWidth() - edgeWidth * 2,
-            this.getHeight() - edgeWidth * 2
-        )
-
-    }
-
-    // colorBase() { return this.color.darken(0.8)}
+    //protected findSlot(pos: Vector): Slot {
+    //    let buildings = this.validConnectingStructures().map(structure =>
+    //        this.planet.closestBuildingByType(pos, structure)
+    //    )
+    //    let slotList = flatSingle(buildings.map(building => building.slots())) //.flat(1)
+    //    return closest(pos, slotList, (slot) => slot.pos)
+    //}
 }

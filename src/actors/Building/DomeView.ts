@@ -4,6 +4,7 @@ import { Citizen } from "../Citizen";
 
 // we're constrained to the surface, so...
 export class DomeView extends Building {
+    hideBox = true
 
 
     constrainCursor(cursor: Vector): Vector {
@@ -55,6 +56,8 @@ export class DomeView extends Building {
             ctx.fillStyle = produced.toRGBA();
             ctx.fillRect(this.x + 20 * index, this.y - 20, 18, 18)
         })
+
+        super.draw(ctx, delta)
     }
 
     colorBase() { return Color.White.darken(0.05); } // this.baseColor; }

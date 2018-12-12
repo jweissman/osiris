@@ -10,9 +10,9 @@ export class Citizen extends Actor {
     carrying: Color
 
     constructor(building: Building, protected planet: Planet) {
-        super(building.x + (Math.random()*10)-5,building.y,4,10,Color.White)
-        this.pos.y -= this.getHeight()
-        this.walkSpeed += (Math.random()*20)-10
+        super(building.x,building.y,4,10,Color.White)
+        // this.pos.y -= this.getHeight()
+        // this.walkSpeed += (Math.random()*20)-10
 
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
     }
@@ -39,12 +39,17 @@ export class Citizen extends Actor {
         return true
     }
 
-    walkTo(structure: typeof Structure, onArrival: (Building) => any) {
+    async walkTo(structure: typeof Structure, onArrival: (Building) => any) {
         let building = this.planet.closestBuildingByType(this.pos, structure)
-        return this.actions.moveTo(
-            building.x + building.getWidth()/2, 0,
+        console.log("walking to", { building })
+        await this.actions.moveTo(
+            building.nodes()[0].x, // + building.getWidth() / 2,
+            building.nodes()[0].y, // + building.getHeight() / 2,
+            //  0, 
             this.walkSpeed
-        ).asPromise().then(() => onArrival(building))
+        ).asPromise();
+        onArrival(building);
+        return true;
     }
 
     async patrol(structure: typeof Structure, otherStructure: typeof Structure, onArrival: (Building) => any) {

@@ -1,22 +1,15 @@
 import { Actor, Vector, InitializeEvent, CollisionType, Color, Label } from "excalibur";
 import { Planet } from "../Planet/Planet";
-import { Structure } from "../../models/Structure";
+import { Structure, AccessTunnel } from "../../models/Structure";
 // import { OffscreenCulling } from "excalibur";
 import * as ex from 'excalibur';
 import { Slot } from "../../values/Slot";
-import { Orientation } from "../../values/Orientation";
+import { Orientation, flip } from "../../values/Orientation";
 import { Citizen } from "../Citizen";
 import { Game } from "../../Game";
 import { Hud } from "../Hud";
-
-type Rectangle = {
-    x: number
-    y: number
-    width: number
-    height: number
-}
-
-// type WorkResult =  | StoreResource
+import { Rectangle } from "../../values/Rectangle";
+import { closest, flatSingle } from "../../Util";
 
 export class Building extends Actor {
     // isOffScreen() { return false; }
@@ -31,6 +24,11 @@ export class Building extends Actor {
     // constrain: boolean = false
     facing: Orientation = Orientation.Right
     edgeWidth: number = 4
+    hideBox: boolean = false
+
+    // parent: Building
+    childrenBuildings: Building[] = []
+    // parentSlot: Slot = null
 
     constructor(public structure: Structure, protected planet: Planet) {
         super(
@@ -83,6 +81,12 @@ export class Building extends Actor {
         return []
     }
 
+    nodes(): Vector[] {
+        return [
+            new Vector(this.pos.x + this.getWidth()/2, this.pos.y + this.getHeight())
+        ];
+    }
+
     interact(citizen: Citizen) {
         // should we give this citizen an item?
         // should we get a resource?
@@ -94,7 +98,27 @@ export class Building extends Actor {
         // super.draw(ctx, delta)
         //let debugBoxes = true;
         //if (debugBoxes) {
-        this.drawRect(ctx, this.aabb(), this.edgeWidth)
+        if (!this.hideBox) {
+            this.drawRect(ctx, this.aabb(), this.edgeWidth)
+        }
+
+        let debug = false;
+        if (debug) {
+        if (this.slots().length > 0) {
+            // draw slots?
+            this.slots().forEach((slot: Slot) => {
+                let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 10, height: 10 }
+                this.drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
+            })
+        }
+        if (this.nodes().length > 0) {
+            // draw slots?
+            this.nodes().forEach((node: Vector) => {
+                let rect: Rectangle = { x: node.x, y: node.y, width: 10, height: 10 }
+                this.drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
+            })
+        }
+    }
         //}
     }
 
@@ -112,14 +136,14 @@ export class Building extends Actor {
     protected capacity: number = 4
     protected produce(step: number) {}
 
-    protected drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 5) {
+    protected drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 5, color: Color = null) {
         let { x, y, width, height } = rectangle;
 
-        let edge = this.edgeColor();
+        let edge = color || this.edgeColor();
         ctx.fillStyle = edge.toRGBA();
         ctx.fillRect(x, y, width, height) // this.getWidth(), this.getHeight())
 
-        let main = this.mainColor();
+        let main = color || this.mainColor();
         ctx.fillStyle = main.toRGBA();
         ctx.fillRect(
             x + edgeWidth,
@@ -178,4 +202,42 @@ export class Building extends Actor {
         if (this.hover) { clr.a = 0.5 }
         return clr;
     }
+    ///
+
+    protected validConnectingStructures(): (typeof Structure)[] {
+        return [ ]; //AccessTunnel ];
+    }
+
+    protected findSlot(pos: Vector): Slot {
+        let buildings = this.validConnectingStructures().map(structure =>
+            this.planet.closestBuildingByType(pos, structure)
+        )
+        let slotList = flatSingle(buildings.map(building => building ? building.slots() : [])) //.flat(1)
+        // console.log("slot list", { slotList })
+        if (slotList.length > 0) {
+            return closest(pos, slotList, (slot) => slot.pos)
+        }
+    }
+
+    protected alignToSlot(cursor: Vector) {
+        let theSlot = this.findSlot(cursor) // closest(cursor, tunnel.slots(), (s) => s.pos)
+        if (theSlot) {
+            // position us so our slot lines up?
+            let matchingSlot = this.slots().find(s => s.facing == flip(theSlot.facing))
+            if (matchingSlot) {
+                // this.pos = theSlot.pos
+                let offset = theSlot.pos.sub(matchingSlot.pos)
+                this.pos.addEqual(offset)
+
+                // grm?
+                // this.facing = theSlot.facing
+                return theSlot;
+            }
+            // return theSlot;
+        }
+    }
+
+    //tree(): NavigationTree {
+    //    throw new Error("Method not implemented.");
+    //}
 }

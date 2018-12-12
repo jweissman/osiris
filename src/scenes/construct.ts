@@ -128,13 +128,15 @@ export class Construct extends Scene {
         new MissionControl(),
         new MainTunnel(),
         new AccessTunnel(),
-        new CommonArea(),
+        new LivingQuarters(),
+        new Dome(),
+        // new CommonArea(),
     ]
 
     static structureList: Structure[] = [
-        new AccessTunnel(),
-        new LivingQuarters(),
-        new Dome(),
+        // new AccessTunnel(),
+        //new LivingQuarters(),
+        //new Dome(),
         //new Dome(),
         //new Dome(),
         //new Dome(),
@@ -168,19 +170,21 @@ export class Construct extends Scene {
             this.hud.message(`Welcome to OSIRIS`)
 
             // spawn people?
-            for(let i in range(4)) this.spawnCitizen()
+            for(let i in range(1)) this.spawnCitizen()
             
             // this.camera.addStrategy(new LockCameraToActorStrategy(this.people[0]))
         }
     }
 
     protected spawnCitizen() {
-        let ctrl = this.planet.closestBuildingByType(this.player.pos, MissionControl) //bubuildings[0] //.pos
-        let dome = this.planet.closestBuildingByType(this.player.pos, Dome)
+        // let ctrl = this.planet.closestBuildingByType(this.player.pos, MissionControl) //bubuildings[0] //.pos
+        // let dome = this.planet.closestBuildingByType(this.player.pos, Dome)
+        let home = this.planet.closestBuildingByType(this.player.pos, LivingQuarters)
         //buildings[1]
-        let citizen = new Citizen(ctrl, this.planet) //ctrl.x, ctrl.y)
+        let citizen = new Citizen(home, this.planet) //ctrl.x, ctrl.y)
         citizen.work(Dome, MissionControl)
-        citizen.y = this.planet.getTop() + citizen.getHeight() / 3
+
+        // citizen.y = this.planet.getTop() + citizen.getHeight() / 3
         this.people.push(citizen)
         this.add(citizen)
         // citizen.setZIndex(1000)

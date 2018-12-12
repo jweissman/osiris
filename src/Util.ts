@@ -29,3 +29,5 @@ export function closest<T>(cursor: Vector, arr: Array<T>, getVector: (T) => Vect
       return minBy(matching, distanceToCursor)
    }
 }
+
+export const flatSingle = arr => [].concat(...arr);
