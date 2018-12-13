@@ -1,5 +1,5 @@
 import * as ex from 'excalibur';
-import { Actor, Color, Vector, Util } from 'excalibur';
+import { Actor, Color, Vector, Util, EdgeArea } from 'excalibur';
 import { Building } from '../Building';
 import { minBy, range } from '../../Util';
 import { Citizen } from '../Citizen';
@@ -7,18 +7,30 @@ import { Game } from '../../Game';
 import { Mountains } from './PlanetBackground';
 import { Structure, MissionControl } from '../../models/Structure';
 
-//class NavigationTree {
-//    constructor(root: Building) {
-//        // we take the root, add its nodes and follow
-//        // connections through slots...
-//        // this.root = root.nodes()[0]
-//    }
-//
-//    root() {
-//        this.root 
-//    }
-//
-//}
+
+class NavigationTree {
+   graph: Graph<Vector>
+
+   constructor(root: Building) {
+       // we take the root, add its nodes and follow
+       // connections through slots...
+       // this.root = root.nodes()[0]
+       this.graph = new Graph()
+
+       // we want to start adding nodes, exploring the building tree from here
+       // let's grab the root node, and extend out from there?
+       let nodes = root.nodes()
+       // we'll assume the root building is simple, that we need to follow its slots
+       // to find other subtrees?
+       this.graph.node(nodes[0])
+       this.graph.edge(nodes
+   }
+
+   //root() {
+   //    this.root 
+   //}
+
+}
 
 export class Planet extends Actor {
     buildings: Building[] = []
@@ -77,7 +89,8 @@ export class Planet extends Actor {
     pathBetween(source: Building, destination: Building) {
         // okay, so we want the general graph of connections
         // we can start wtih mission control...
-        // let navTree = this._navTree
+        let ctrl = this.buildings.find(building => building.structure instanceof MissionControl);
+        let navTree = new NavigationTree(ctrl) //this._navTree
         // navTree.shortestPath(source, destination)
 
     }
@@ -85,7 +98,6 @@ export class Planet extends Actor {
     // _navigationTree: NavigationTree
     // private get _navTree(): NavigationTree {
     //     // if (!this._navigationTree) {
-    //         let ctrl = this.buildings.find(building => building.structure instanceof MissionControl)
     //         this._navigationTree = ctrl.tree() //new NavigationTree(ctrl); //ctrl)
     //         // this._navigationTree
     //     // }

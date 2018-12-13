@@ -31,3 +31,5 @@ export function closest<T>(cursor: Vector, arr: Array<T>, getVector: (T) => Vect
 }
 
 export const flatSingle = arr => [].concat(...arr);
+
+export const deleteByValue = (arr, elem) => arr.filter(e => e !== elem)

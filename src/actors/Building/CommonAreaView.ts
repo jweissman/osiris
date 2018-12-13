@@ -14,50 +14,27 @@ export class CommonAreaView extends Building {
     slots() {
         let theSlots = []
         let slotY = this.getHeight() - this.floorHeight
-        let leftSlot: Slot = {
-            pos: new Vector(this.pos.x, this.pos.y + slotY),
-            facing: Orientation.Left,
-        }
+        let leftSlot: Slot = this.buildSlot(
+            this.pos.x,
+            this.pos.y + slotY,
+            Orientation.Left,
+        )
         theSlots.push(leftSlot)
 
-        let rightSlot: Slot = {
-            pos: new Vector(this.pos.x + this.getWidth(), this.pos.y + slotY),
-            facing: Orientation.Right,
-        }
+        let rightSlot: Slot = this.buildSlot(
+            this.pos.x + this.getWidth(),
+            this.pos.y + slotY,
+            Orientation.Right,
+        )
         theSlots.push(rightSlot)
         return theSlots;
     }
 
     reshape(cursor) {
-        //let tunnel = this.planet.closestBuildingByType(
-        //    cursor, AccessTunnel //'Access Tunnel'
-        //)
-
-        //// try to pick the cap??
         this.alignToSlot(cursor);
-        //if (tunnel) {
-            //let theSlot = this.findSlot(cursor) // closest(cursor, tunnel.slots(), (s) => s.pos)
-            //if (theSlot) {
-            //    this.pos = theSlot.pos
-            //    // position us so our slot lines up?
-            //    let matchingSlot = this.slots().find(s => s.facing == flip(theSlot.facing))
-            //    let offset = this.pos.sub(matchingSlot.pos)
-            //    this.pos.addEqual(offset)
-            //}
-        // }
     }
 
     protected validConnectingStructures(): (typeof Structure)[] {
         return [ AccessTunnel ];
     }
-
-    
-
-    //protected findSlot(pos: Vector): Slot {
-    //    let buildings = this.validConnectingStructures().map(structure =>
-    //        this.planet.closestBuildingByType(pos, structure)
-    //    )
-    //    let slotList = flatSingle(buildings.map(building => building.slots())) //.flat(1)
-    //    return closest(pos, slotList, (slot) => slot.pos)
-    //}
 }

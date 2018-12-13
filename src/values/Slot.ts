@@ -8,7 +8,7 @@ export type Slot = {
     facing: Orientation;
 
     // slot could have a parent, buildings could remember their slot, we could build a tree
-    // parent: Building; // the building which 'has' the slot
+    parent: Building; // the building which 'has' the slot
 
     // parentNode: Vector;
 };

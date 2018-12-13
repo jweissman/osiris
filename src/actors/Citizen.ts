@@ -42,12 +42,14 @@ export class Citizen extends Actor {
     async walkTo(structure: typeof Structure, onArrival: (Building) => any) {
         let building = this.planet.closestBuildingByType(this.pos, structure)
         console.log("walking to", { building })
+
         await this.actions.moveTo(
             building.nodes()[0].x, // + building.getWidth() / 2,
             building.nodes()[0].y, // + building.getHeight() / 2,
             //  0, 
             this.walkSpeed
         ).asPromise();
+
         onArrival(building);
         return true;
     }

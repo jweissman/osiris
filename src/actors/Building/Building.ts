@@ -12,23 +12,14 @@ import { Rectangle } from "../../values/Rectangle";
 import { closest, flatSingle } from "../../Util";
 
 export class Building extends Actor {
-    // isOffScreen() { return false; }
-
-    // isOffScreen: boolean = false
-
     built: boolean = false
     hover: boolean = false
-    // : boolean = false
-    // pickOriginFirst: boolean = false
-    // pickingOrigin: boolean = false
-    // constrain: boolean = false
+
     facing: Orientation = Orientation.Right
     edgeWidth: number = 4
     hideBox: boolean = false
 
-    // parent: Building
     childrenBuildings: Building[] = []
-    // parentSlot: Slot = null
 
     constructor(public structure: Structure, protected planet: Planet) {
         super(
@@ -41,19 +32,15 @@ export class Building extends Actor {
         this.anchor = new ex.Vector(0,0)
 
         console.log(`CREATE NEW ${structure.name}`, { origin: structure.origin, width: structure.width, height: structure.height })
-        this.setup(); //(structure, planet)
-        // this.collisionType = CollisionType.Fixed
+        this.setup();
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
         this.on('pointerenter', () => {
             this.hover = true
-            //this.baseColor = DomeView.basicColor.clone()
-            //this.baseColor.a = 0.5
         })
 
         this.on('pointerleave', () => {
             this.hover = false
-            //this.baseColor = DomeView.basicColor.clone()
         })
 
         this.collisionType = CollisionType.PreventCollision
@@ -102,19 +89,19 @@ export class Building extends Actor {
             this.drawRect(ctx, this.aabb(), this.edgeWidth)
         }
 
-        let debug = false;
+        let debug = true;
         if (debug) {
         if (this.slots().length > 0) {
             // draw slots?
             this.slots().forEach((slot: Slot) => {
-                let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 10, height: 10 }
+                let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 3, height: 3 }
                 this.drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
             })
         }
         if (this.nodes().length > 0) {
             // draw slots?
             this.nodes().forEach((node: Vector) => {
-                let rect: Rectangle = { x: node.x, y: node.y, width: 10, height: 10 }
+                let rect: Rectangle = { x: node.x, y: node.y, width: 4, height: 4 }
                 this.drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
             })
         }
@@ -213,6 +200,8 @@ export class Building extends Actor {
             this.planet.closestBuildingByType(pos, structure)
         )
         let slotList = flatSingle(buildings.map(building => building ? building.slots() : [])) //.flat(1)
+        // select slots that COULD match one of our faces?
+        slotList = slotList.filter((slot: Slot) => this.slots().some((ourSlot: Slot) => slot.facing === flip(ourSlot.facing)))
         // console.log("slot list", { slotList })
         if (slotList.length > 0) {
             return closest(pos, slotList, (slot) => slot.pos)
@@ -240,4 +229,12 @@ export class Building extends Actor {
     //tree(): NavigationTree {
     //    throw new Error("Method not implemented.");
     //}
+
+    protected buildSlot(x: number, y: number, facing: Orientation = Orientation.Right): Slot {
+        return {
+            pos: new Vector(x,y),
+            facing,
+            parent: this
+        }
+    }
 }

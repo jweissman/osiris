@@ -11,10 +11,31 @@ export class MissionControlView extends Building {
 
     slots() {
         let theSlots: Slot[] = []
-        theSlots.push({
-            pos: new Vector(this.pos.x + this.getWidth()/2, this.pos.y + this.getHeight()),
-            facing: Orientation.Down
-        })
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x + this.getWidth()/2,
+                this.pos.y + this.getHeight(),
+                Orientation.Down
+            )
+        )
+
+        let slotY = this.getHeight(); // / 2;
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x, this.pos.y + slotY,
+                Orientation.Left
+            )
+        )
+
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x + this.getWidth(),
+                this.pos.y + slotY,
+                Orientation.Right
+            )
+        )
+           
+
         return theSlots;
     }
 

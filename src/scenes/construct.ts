@@ -2,14 +2,24 @@ import { Scene, Input, UIActor, Label, Vector, LockCameraToActorStrategy } from 
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, LivingQuarters } from "../models/Structure";
+import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad } from "../models/Structure";
 import { Building, DomeView, AccessTunnelView, CommonAreaView, TunnelView, MissionControlView, LivingQuartersView } from "../actors/Building";
 import { Hud } from "../actors/Hud";
 import { Citizen } from "../actors/Citizen";
 import { range } from "../Util";
+import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
 
 
 export class Construct extends Scene {
+    static structureViews: { [key: string]: typeof Building } = {
+        TunnelView,
+        MissionControlView, //: new MissionControlView()
+        DomeView,
+        AccessTunnelView,
+        CommonAreaView,
+        LivingQuartersView,
+        SurfaceRoadView
+    }
     private currentBuildingListIndex: number = 0
 
     game: Game
@@ -29,17 +39,12 @@ export class Construct extends Scene {
 
         this.planet = new Planet(game.world.color);
         this.add(this.planet)
-
-        // let { structures } = this.game.world.colony
-        // console.log("building structures...")
-        // structures.forEach((structure: Structure) => this.spawnBuilding(structure))
-
+  
         this.player = new Player()
         this.add(this.player)
 
         this.hud = new Hud();
         this.add(this.hud)
-
 
         this.prepareNextBuilding()
         // this.camera.zoom(0.25)
@@ -126,22 +131,20 @@ export class Construct extends Scene {
 
     static requiredStructureList: Structure[] = [
         new MissionControl(),
+
+        new SurfaceRoad(),
+        new Dome(),
         new MainTunnel(),
         new AccessTunnel(),
         new LivingQuarters(),
-        new Dome(),
         // new CommonArea(),
     ]
 
     static structureList: Structure[] = [
-        // new AccessTunnel(),
+        //new AccessTunnel(),
         //new LivingQuarters(),
-        //new Dome(),
-        //new Dome(),
-        //new Dome(),
-        //new Dome(),
-        //new LivingQuarters(),
-        //new LivingQuarters(),
+        //new AccessTunnel(),
+        //new CommonArea(),
     ]
 
     private nextMissingRequiredStructure(): Structure {
@@ -190,14 +193,7 @@ export class Construct extends Scene {
         // citizen.setZIndex(1000)
     }
 
-    static structureViews: { [key: string]: typeof Building } = {
-        TunnelView,
-        MissionControlView, //: new MissionControlView()
-        DomeView,
-        AccessTunnelView,
-        CommonAreaView,
-        LivingQuartersView
-    }
+
 
     protected spawnBuilding(structure: Structure): Building {
         console.log("spawn", { structure })

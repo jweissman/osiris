@@ -59,3 +59,11 @@ export class LivingQuarters extends Structure {
     width: number = 80
     height: number = 60
 }
+
+export class SurfaceRoad extends Structure {
+    name: string = 'Surface Road'
+    description: string = 'go for a walk'
+    view: string = 'SurfaceRoadView'
+    width: number = 20
+    height: number = 8
+}

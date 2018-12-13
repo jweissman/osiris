@@ -14,19 +14,24 @@ export class AccessTunnelView extends Building {
 
     slots() {
         // left slot -- right slot
-        let theSlots = [];
+        let theSlots: Slot[] = [];
         let slotY = this.getHeight() / 2;
 
 
-        theSlots.push({
-            pos: new Vector(this.pos.x, this.pos.y + slotY),
-            facing: Orientation.Left
-        })
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x, this.pos.y + slotY,
+                Orientation.Left
+            )
+        )
 
-        theSlots.push({
-            pos: new Vector(this.pos.x + this.getWidth(), this.pos.y + slotY),
-            facing: Orientation.Right
-        })
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x + this.getWidth(),
+                this.pos.y + slotY,
+                Orientation.Right
+            )
+        )
 
         return theSlots;
     } 

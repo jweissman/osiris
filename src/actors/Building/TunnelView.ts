@@ -14,29 +14,30 @@ export class TunnelView extends Building {
         let theSlots: Slot[] = []
 
         // one at the top pointing up??
-        theSlots.push({
-            pos: new Vector(this.pos.x + this.getWidth()/2, this.pos.y),
-            facing: Orientation.Up
-        })
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x + this.getWidth()/2,
+                this.pos.y,
+                Orientation.Up
+            )
+        )
 
         for (let i of range(slotCount)) {
-            theSlots.push({
-                pos: new Vector(
+            theSlots.push(
+                this.buildSlot(
                     this.pos.x,
-                    100 + this.pos.y + i * slotSize
-                ),
-                facing: Orientation.Left,
-                // parent: this
-            })
+                    100 + this.pos.y + i * slotSize,
+                    Orientation.Left
+                )
+            )
 
-            theSlots.push({
-                pos: new Vector(
+            theSlots.push(
+                this.buildSlot(
                     this.pos.x + this.getWidth(),
-                    100 + this.pos.y+ i * slotSize 
-                ),
-                facing: Orientation.Right,
-                // parent: this
-            })
+                    100 + this.pos.y + i * slotSize,
+                    Orientation.Right,
+                )
+            )
         }
         // console.log({theSlots})
         return theSlots;
