@@ -48,17 +48,17 @@ export class Planet extends Actor {
     draw(ctx: CanvasRenderingContext2D, delta) {
         super.draw(ctx, delta)
         // let navTree = this.buildNavTree()
-        if (this.navTree) {
-            let edges = this.navTree.graph.edgeList()
-            // console.log("draw edges", { edges })
-            edges.forEach((edge: [Vector, Vector]) => {
-                let [a,b] = edge
-                ctx.beginPath()
-                ctx.moveTo(a.x,a.y)
-                ctx.lineTo(b.x,b.y)
-                ctx.stroke() //Color.White.toRGBA())
-            })
-        }
+        // if (this.navTree) {
+        //     let edges = this.navTree.graph.edgeList()
+        //     // console.log("draw edges", { edges })
+        //     edges.forEach((edge: [Vector, Vector]) => {
+        //         let [a,b] = edge
+        //         ctx.beginPath()
+        //         ctx.moveTo(a.x,a.y)
+        //         ctx.lineTo(b.x,b.y)
+        //         ctx.stroke() //Color.White.toRGBA())
+        //     })
+        // }
     }
 
     placeBuilding(building: Building) {

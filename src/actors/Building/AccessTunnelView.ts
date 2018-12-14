@@ -1,10 +1,8 @@
 import { Building } from "./Building";
 import { Vector } from "excalibur";
-import { Orientation, flip } from "../../values/Orientation";
+import { Orientation } from "../../values/Orientation";
 import { MainTunnel, CommonArea, LivingQuarters } from "../../models/Structure";
-import { closest } from "../../Util";
 import { Slot } from "../../values/Slot";
-import { SSL_OP_TLS_BLOCK_PADDING_BUG } from "constants";
 
 export class AccessTunnelView extends Building {
     edgeWidth: number = 1

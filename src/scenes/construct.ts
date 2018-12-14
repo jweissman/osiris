@@ -43,7 +43,12 @@ export class Construct extends Scene {
         this.player = new Player()
         this.add(this.player)
 
-        this.hud = new Hud();
+        this.hud = new Hud('hi', (structure) => {
+            if (this.currentlyBuilding) {
+                this.remove(this.currentlyBuilding)
+            }
+            this.startConstructing(structure)
+        });
         this.add(this.hud)
 
         this.prepareNextBuilding()
@@ -160,6 +165,10 @@ export class Construct extends Scene {
         let nextMissing = this.nextMissingRequiredStructure();
         if (nextMissing) { structure = nextMissing; }
         else { this.currentBuildingListIndex += 1 }
+        this.startConstructing(structure, pos)
+    }
+
+    startConstructing(structure: Structure, pos: Vector = new Vector(0,0)) {
         this.currentlyBuilding = null // ?
         if (structure) {
             structure.origin = pos
@@ -185,7 +194,7 @@ export class Construct extends Scene {
         let home = this.planet.closestBuildingByType(this.player.pos, LivingQuarters)
         //buildings[1]
         let citizen = new Citizen(home, this.planet) //ctrl.x, ctrl.y)
-        citizen.work(Dome, LivingQuarters)
+        citizen.work(Dome, MissionControl) // LivingQuarters)
 
         // citizen.y = this.planet.getTop() + citizen.getHeight() / 3
         this.people.push(citizen)

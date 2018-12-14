@@ -39,7 +39,6 @@ export class TunnelView extends Building {
         this.slotHeights().forEach(y1 => {
             let btm = g.findOrCreate(new Vector(x,y1), measureDistance)
 
-            // from the bottom, edge out to slots (but this misses the first one?)
             let left = g.findOrCreate(new Vector(x-halfWidth,y1), measureDistance)
             g.edge(left,btm)
 
@@ -48,7 +47,6 @@ export class TunnelView extends Building {
         });
 
         for (let child of this.childrenBuildings) {
-            // let levelNode = g.findOrCreateByProximity(new Vector(x, child.parentSlot.pos.y), measureDistance)
             let slot = g.findOrCreate(child.parentSlot.pos, measureDistance)
             let childNode = g.findOrCreate(child.nodes()[0], measureDistance)
             g.edge(childNode, slot)

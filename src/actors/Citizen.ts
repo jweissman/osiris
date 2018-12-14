@@ -22,15 +22,15 @@ export class Citizen extends Actor {
             ctx.fillStyle = this.carrying.toRGBA()
             ctx.fillRect(this.x+4, this.y-3, 5, 5)
         }
-        if (this.path) {
-            ctx.strokeStyle = Color.Blue.lighten(0.5).toRGBA()
-            ctx.beginPath()
-            ctx.moveTo(this.path[0].x, this.path[0].y)
-            this.path.forEach((step) => {
-                ctx.lineTo(step.x,step.y)
-            })
-            ctx.stroke()
-        }
+        // if (this.path) {
+        //     ctx.strokeStyle = Color.Blue.lighten(0.5).toRGBA()
+        //     ctx.beginPath()
+        //     ctx.moveTo(this.path[0].x, this.path[0].y)
+        //     this.path.forEach((step) => {
+        //         ctx.lineTo(step.x,step.y)
+        //     })
+        //     ctx.stroke()
+        // }
     }
 
     carry(c: Color) {

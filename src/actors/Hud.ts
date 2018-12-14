@@ -1,5 +1,5 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Dome, Structure, AccessTunnel, CommonArea } from "../models/Structure";
+import { Dome, Structure, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad } from "../models/Structure";
 
 export class Hud extends UIActor {
     label: Label
@@ -10,40 +10,48 @@ export class Hud extends UIActor {
         this.label.color = Color.White
         this.add(this.label)
 
-        // create html fragment for building palette?
-        //let menu = document.createElement('div')
-        //let button = document.createElement('button')
-        //button.textContent = 'dome'
-        //menu.appendChild(button)
-        //menu.style.position = 'absolute'
-        //menu.style.top = `${this._engine.canvas.clientTop}`
-        // this.add(menu.getRootNode())
-
-        // this._makePalette()
+        this._makePalette(onBuildingSelect)
     }
     protected _paletteElement: HTMLDivElement
     protected _paletteButton
 
-    protected _makePalette() {
+    protected _makePalette(fn: (Structure) => any) {
         this._paletteElement = document.createElement('div') 
         this._paletteElement.style.position = 'absolute'
         document.body.appendChild(this._paletteElement)
 
         // buttons
-        let structures = [Dome, AccessTunnel, CommonArea];
+        let structures = [
+            Dome, AccessTunnel, CommonArea,
+            LivingQuarters, SurfaceRoad,
+        ];
         structures.forEach((structure: typeof Structure) => {
-            let _paletteButton = document.createElement('button')
-            _paletteButton.textContent = `create ${structure.name}`
-            _paletteButton.style.display = 'block'
+            let s = new structure()
+            let _paletteButton = this.buttonFactory(s);
             this._paletteElement.appendChild(
                 _paletteButton
             )
 
+
             _paletteButton.onclick = (e) => {
-                console.log(`create ${structure.name}`)
+                // console.log(`${structure.name}`)
+                fn(s) //new structure())
                 e.stopPropagation()
             }
         });
+    }
+
+    private buttonFactory(s: Structure) {
+        let _paletteButton = document.createElement('button');
+        _paletteButton.textContent = `${s.name}`;
+        _paletteButton.style.display = 'block';
+        _paletteButton.style.fontSize = '13pt';
+        _paletteButton.style.fontFamily = 'Helvetica';
+        _paletteButton.style.padding = '8px';
+        _paletteButton.style.width = '100px';
+        _paletteButton.style.background = Color.White.darken(0.08).toRGBA();
+        _paletteButton.style.color = Color.Black.lighten(0.16).toRGBA();
+        return _paletteButton;
     }
 
     message(text: string) { this.label.text = text }
@@ -52,8 +60,8 @@ export class Hud extends UIActor {
         super.draw(ctx, delta)
 
         if (this._paletteElement) {
-            let canvasHeight = this._engine.canvasHeight / window.devicePixelRatio;
-            let canvasWidth = this._engine.canvasWidth / window.devicePixelRatio;
+            // let canvasHeight = this._engine.canvasHeight / window.devicePixelRatio;
+            // let canvasWidth = this._engine.canvasWidth / window.devicePixelRatio;
 
             let left = ctx.canvas.offsetLeft;
             let top = ctx.canvas.offsetTop;
@@ -64,4 +72,5 @@ export class Hud extends UIActor {
 
         }
     }
+
 }

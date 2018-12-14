@@ -47,9 +47,7 @@ export class Graph<T> {
     }
 
     public union(otherGraph: Graph<T>) {
-    //    let g: Graph<T> = new Graph()
        otherGraph.edgeList().forEach(([a,b]) => this.edge(a,b))
-    //    this.edgeList().forEach(([a,b]) => g.edge(a,b))
     }
 
     public edgeList(): [T,T][] {

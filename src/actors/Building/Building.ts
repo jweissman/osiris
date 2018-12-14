@@ -1,13 +1,11 @@
-import { Actor, Vector, InitializeEvent, CollisionType, Color, Label } from "excalibur";
+import { Actor, Vector, CollisionType, Color, Label } from "excalibur";
 import { Planet } from "../Planet/Planet";
-import { Structure, AccessTunnel } from "../../models/Structure";
-// import { OffscreenCulling } from "excalibur";
+import { Structure } from "../../models/Structure";
 import * as ex from 'excalibur';
 import { Slot } from "../../values/Slot";
 import { Orientation, flip } from "../../values/Orientation";
 import { Citizen } from "../Citizen";
 import { Game } from "../../Game";
-import { Hud } from "../Hud";
 import { Rectangle } from "../../values/Rectangle";
 import { closest, flatSingle, measureDistance } from "../../Util";
 import { Graph } from "../../values/Graph";
@@ -56,7 +54,7 @@ export class Building extends Actor {
         return cursor.clone();
     } 
     reshape(cursor: Vector): void {
-        // by default just follow the mouse?
+        // by default just follow the mouse
         this.pos = cursor.clone()
 
     }
@@ -79,10 +77,9 @@ export class Building extends Actor {
     }
 
     graph(supergraph: Graph<Vector> = new Graph()): Graph<Vector> {
-        let g = supergraph //: Graph<Vector> = new Graph()
-        // assemble subgraph?
+        let g = supergraph
+        // assemble subgraph
         let nodes = this.nodes()
-        // let rootNode = nodes[0]
         let rootNode = g.findOrCreate(nodes[0], measureDistance)
         for (let child of this.childrenBuildings) {
             let slot = g.findOrCreate(child.parentSlot.pos, measureDistance)
@@ -93,9 +90,6 @@ export class Building extends Actor {
 
             child.graph(g)
         }
-        //let tolerance = 5
-        //let root = nodes[0]
-
         return g
     }
 
@@ -108,13 +102,11 @@ export class Building extends Actor {
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         // super.draw(ctx, delta)
-        //let debugBoxes = true;
-        //if (debugBoxes) {
         if (!this.hideBox) {
             this.drawRect(ctx, this.aabb(), this.edgeWidth)
         }
 
-        let debug = true;
+        let debug = false;
         if (debug) {
             if (this.slots().length > 0) {
                 // draw slots
@@ -165,7 +157,6 @@ export class Building extends Actor {
     }
 
     protected aabb(): Rectangle {
-        // this.getGeometry()
         return {
             x: this.pos.x,
             y: this.pos.y,
@@ -182,7 +173,6 @@ export class Building extends Actor {
             rect1.y < rect2.y + rect2.height &&
             rect1.y + rect1.height > rect2.y
         )
-        // console.log('overlaps?', { rect1, rect2, doesOverlap })
         return(!!doesOverlap);
     }
 
@@ -191,12 +181,12 @@ export class Building extends Actor {
     }
 
     protected edgeColor(): Color {
-        let edge = this.processedColor().lighten(0.5); // : this.color.
+        let edge = this.processedColor().lighten(0.5);
         return edge;
     }
 
-    protected mainColor(): Color { //} = this.color.darken(0.2)
-        let main = this.processedColor().darken(0.08); // : this.color.
+    protected mainColor(): Color {
+        let main = this.processedColor().darken(0.08);
         return main;
     }
 
@@ -213,46 +203,37 @@ export class Building extends Actor {
         if (this.hover) { clr.a = 0.5 }
         return clr;
     }
-    ///
 
     protected validConnectingStructures(): (typeof Structure)[] {
-        return [ ]; //AccessTunnel ];
+        return [ ];
     }
 
     protected findSlot(pos: Vector): Slot {
         let buildings = this.validConnectingStructures().map(structure =>
             this.planet.closestBuildingByType(pos, structure)
         )
-        let slotList = flatSingle(buildings.map(building => building ? building.slots() : [])) //.flat(1)
-        // select slots that COULD match one of our faces?
+        let slotList = flatSingle(buildings.map(building => building ? building.slots() : []))
+        // select slots that COULD match one of our faces
         slotList = slotList.filter((slot: Slot) => this.slots().some((ourSlot: Slot) => slot.facing === flip(ourSlot.facing)))
-        // console.log("slot list", { slotList })
         if (slotList.length > 0) {
             return closest(pos, slotList, (slot) => slot.pos)
         }
     }
 
     protected alignToSlot(cursor: Vector) {
-        let theSlot = this.findSlot(cursor) // closest(cursor, tunnel.slots(), (s) => s.pos)
+        let theSlot = this.findSlot(cursor)
         if (theSlot) {
-            // position us so our slot lines up?
+            // position us so our slot lines up
             let matchingSlot = this.slots().find(s => s.facing == flip(theSlot.facing))
             if (matchingSlot) {
                 let offset = theSlot.pos.sub(matchingSlot.pos)
                 this.pos.addEqual(offset)
 
                 this.parentSlot = theSlot;
-                // theSlot.parent.childrenBuildings.push(this)
-
                 return theSlot;
             }
-            // return theSlot;
         }
     }
-
-    //tree(): NavigationTree {
-    //    throw new Error("Method not implemented.");
-    //}
 
     protected buildSlot(x: number, y: number, facing: Orientation = Orientation.Right): Slot {
         return {
