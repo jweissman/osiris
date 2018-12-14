@@ -19,6 +19,7 @@ export class Building extends Actor {
     edgeWidth: number = 4
     hideBox: boolean = false
 
+    parentSlot: Slot
     childrenBuildings: Building[] = []
 
     constructor(public structure: Structure, protected planet: Planet) {
@@ -69,8 +70,10 @@ export class Building extends Actor {
     }
 
     nodes(): Vector[] {
+        let x = this.pos.x + this.getWidth()/2;
+        let y = this.pos.y + this.getHeight()
         return [
-            new Vector(this.pos.x + this.getWidth()/2, this.pos.y + this.getHeight())
+            new Vector(Math.floor(x), Math.floor(y))
         ];
     }
 
@@ -91,22 +94,21 @@ export class Building extends Actor {
 
         let debug = true;
         if (debug) {
-        if (this.slots().length > 0) {
-            // draw slots?
-            this.slots().forEach((slot: Slot) => {
-                let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 3, height: 3 }
-                this.drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
-            })
+            if (this.slots().length > 0) {
+                // draw slots
+                this.slots().forEach((slot: Slot) => {
+                    let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 3, height: 3 }
+                    this.drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
+                })
+            }
+            if (this.nodes().length > 0) {
+                // draw nodes
+                this.nodes().forEach((node: Vector) => {
+                    let rect: Rectangle = { x: node.x, y: node.y, width: 4, height: 4 }
+                    this.drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
+                })
+            }
         }
-        if (this.nodes().length > 0) {
-            // draw slots?
-            this.nodes().forEach((node: Vector) => {
-                let rect: Rectangle = { x: node.x, y: node.y, width: 4, height: 4 }
-                this.drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
-            })
-        }
-    }
-        //}
     }
 
     step: number = 0
@@ -214,12 +216,12 @@ export class Building extends Actor {
             // position us so our slot lines up?
             let matchingSlot = this.slots().find(s => s.facing == flip(theSlot.facing))
             if (matchingSlot) {
-                // this.pos = theSlot.pos
                 let offset = theSlot.pos.sub(matchingSlot.pos)
                 this.pos.addEqual(offset)
 
-                // grm?
-                // this.facing = theSlot.facing
+                this.parentSlot = theSlot;
+                // theSlot.parent.childrenBuildings.push(this)
+
                 return theSlot;
             }
             // return theSlot;

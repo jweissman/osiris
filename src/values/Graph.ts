@@ -1,7 +1,8 @@
 export class Graph<T> {
     private empty: boolean = true
-    private nodes: T[] = []
+    public nodes: T[] = []
     private edges: { [key: number]: number[] } = {}
+    private edgesInverse: { [key: number]: number[] } = {}
 
     public isEmpty(): boolean {
         return this.empty;
@@ -12,6 +13,7 @@ export class Graph<T> {
     public node(newNode: T) {
         this.empty = false;
         if (!this.contains(newNode)) {
+            console.log("create new node", { newNode })
             this.nodes.push(newNode)
         }
     }
@@ -21,6 +23,7 @@ export class Graph<T> {
     }
 
     public edge(src: T, dst: T) {
+        console.log("edge from", { src, dst })
         this.node(src)
         this.node(dst)
 
@@ -28,17 +31,42 @@ export class Graph<T> {
         this.edges[s] = this.edges[s] || []
         this.edges[s].push(d)
 
-        this.edges[d] = this.edges[d] || []
-        this.edges[d].push(s)
+        this.edgesInverse[d] = this.edgesInverse[d] || []
+        this.edgesInverse[d].push(s)
+    }
+
+    public union(otherGraph: Graph<T>) {
+    //    let g: Graph<T> = new Graph()
+       otherGraph.edgeList().forEach(([a,b]) => this.edge(a,b))
+    //    this.edgeList().forEach(([a,b]) => g.edge(a,b))
+    }
+
+    public edgeList(): [T,T][] {
+        let theEdges = []
+        for (let node of this.nodes) {
+            let index = this.indexOf(node)
+            if (this.edges[index]) {
+                for (let otherIndex of this.edges[index]) {
+                    let otherNode = this.nodes[otherIndex]
+                    if (!theEdges.includes([otherNode, node])) {
+                        theEdges.push([node, otherNode])
+                    }
+                }
+            }
+        }
+        return theEdges
     }
 
     public adjacent(testNode: T): T[] {
-        let vertex = this.edges[this.indexOf(testNode)] || []
-        return vertex.map((index) => this.nodes[index])
+        let index = this.indexOf(testNode)
+        let vertex = this.adjacentIndices(index)
+        return vertex.map((n) => this.nodes[n])
     }
 
     private adjacentIndices(testNodeIndex: number): number[] {
-        let vertex = this.edges[testNodeIndex] || []
+        let es = this.edges[testNodeIndex] || []
+        let esInv = this.edgesInverse[testNodeIndex] || []
+        let vertex = [...es, ...esInv ]
         return vertex
     }
 
@@ -87,7 +115,7 @@ export class Graph<T> {
         return visited
     }
 
-    public shortestPath(src: T, dst: T): T[] {
+    public shortestPath(src: T, dst: T, maxStep: number = 32): T[] {
         let prevStep = {}
         let dstIndex = this.indexOf(dst)
         this.bfs(src, (prev, curr) => {
@@ -96,8 +124,9 @@ export class Graph<T> {
         })
         let path = []
         let curr = dstIndex
-        let steps = 0, maxStep = 128
-        while (!path.includes(this.indexOf(src)) && steps < maxStep) {
+        let steps = 0
+        let srcIndex = this.indexOf(src)
+        while (!path.includes(srcIndex) && steps < maxStep) {
             path.push(curr)
             curr = prevStep[curr]
             steps += 1

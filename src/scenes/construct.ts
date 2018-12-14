@@ -185,7 +185,7 @@ export class Construct extends Scene {
         let home = this.planet.closestBuildingByType(this.player.pos, LivingQuarters)
         //buildings[1]
         let citizen = new Citizen(home, this.planet) //ctrl.x, ctrl.y)
-        citizen.work(Dome, MissionControl)
+        citizen.work(Dome, LivingQuarters)
 
         // citizen.y = this.planet.getTop() + citizen.getHeight() / 3
         this.people.push(citizen)

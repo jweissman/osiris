@@ -3,38 +3,14 @@ import { Actor, Color, Vector, Util, EdgeArea } from 'excalibur';
 import { Building } from '../Building';
 import { minBy, range } from '../../Util';
 import { Citizen } from '../Citizen';
-import { Game } from '../../Game';
 import { Mountains } from './PlanetBackground';
 import { Structure, MissionControl } from '../../models/Structure';
-
-
-class NavigationTree {
-   graph: Graph<Vector>
-
-   constructor(root: Building) {
-       // we take the root, add its nodes and follow
-       // connections through slots...
-       // this.root = root.nodes()[0]
-       this.graph = new Graph()
-
-       // we want to start adding nodes, exploring the building tree from here
-       // let's grab the root node, and extend out from there?
-       let nodes = root.nodes()
-       // we'll assume the root building is simple, that we need to follow its slots
-       // to find other subtrees?
-       this.graph.node(nodes[0])
-       this.graph.edge(nodes
-   }
-
-   //root() {
-   //    this.root 
-   //}
-
-}
+import { NavigationTree } from './NavigationTree';
 
 export class Planet extends Actor {
     buildings: Building[] = []
     citizens: Citizen[]
+    navTree: NavigationTree
 
     constructor(
         // public effectiveY: number,
@@ -69,8 +45,30 @@ export class Planet extends Actor {
         this.add(theLayer);
     }
 
+    draw(ctx: CanvasRenderingContext2D, delta) {
+        super.draw(ctx, delta)
+        // let navTree = this.buildNavTree()
+        if (this.navTree) {
+            let edges = this.navTree.graph.edgeList()
+            // console.log("draw edges", { edges })
+            edges.forEach((edge: [Vector, Vector]) => {
+                let [a,b] = edge
+                ctx.beginPath()
+                ctx.moveTo(a.x,a.y)
+                ctx.lineTo(b.x,b.y)
+                ctx.stroke() //Color.White.toRGBA())
+            })
+        }
+    }
+
     placeBuilding(building: Building) {
         building.built = true
+        // whew
+        if (building.parentSlot) {
+            building.parentSlot.parent.childrenBuildings.push(building)
+            // rebuild nav?
+            this.buildNavTree()
+        }
         this.buildings.push(building);
     }
 
@@ -86,25 +84,34 @@ export class Planet extends Actor {
         }
     }
 
-    pathBetween(source: Building, destination: Building) {
+    pathBetween(origin: Vector, destination: Building): Vector[] {
         // okay, so we want the general graph of connections
         // we can start wtih mission control...
-        let ctrl = this.buildings.find(building => building.structure instanceof MissionControl);
-        let navTree = new NavigationTree(ctrl) //this._navTree
+        // console.log({ navGraph: this.navTree })
+        if (!this.navTree) { this.buildNavTree() }
+        // navTree.edgeToClosest(origin)
+        let srcNode = this.navTree.closestNode(origin)
+        let dest = destination.nodes()[0]
+        let destNode = this.navTree.closestNode(dest)
+        // if (!dest) { throw new Error("Building does not ")}
+        let path = this.navTree.seekPath(srcNode, destNode) //destination.nodes()[0])
+        // console.log("PATH", { path })
+        // path.unshift(s)
+        // path.push(dest)
+        return path
+
+        // hopefully the dest node is in the tree?
+        // navTree.shortestPath
         // navTree.shortestPath(source, destination)
 
     }
 
-    // _navigationTree: NavigationTree
-    // private get _navTree(): NavigationTree {
-    //     // if (!this._navigationTree) {
-    //         this._navigationTree = ctrl.tree() //new NavigationTree(ctrl); //ctrl)
-    //         // this._navigationTree
-    //     // }
-    //     return this._navigationTree;
-    // }
+    private buildNavTree() {
+        let ctrl = this.buildings.find(building => building.structure instanceof MissionControl);
+        if (ctrl) {
+        this.navTree = new NavigationTree(ctrl) //this._navTree
+        // return navTree
+        }
+    }
 
-    //update(ctx, delta) {
-    //    super.update(ctx, delta)
-    //}
 }

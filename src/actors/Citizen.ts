@@ -1,28 +1,35 @@
-import { Actor, Color, Util, Traits } from "excalibur";
-import { Game } from "../Game";
+import { Actor, Color, Traits, Vector } from "excalibur";
 import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
 import { Structure } from "../models/Structure";
 
 export class Citizen extends Actor {
     walkSpeed: number = 150
-
-    carrying: Color
+    carrying: Color = null
+    path: Vector[] = []
 
     constructor(building: Building, protected planet: Planet) {
-        super(building.x,building.y,4,10,Color.White)
+        super(building.nodes()[0].x,building.nodes()[0].y,4,10,Color.White)
         // this.pos.y -= this.getHeight()
         // this.walkSpeed += (Math.random()*20)-10
 
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
     }
 
-    draw(ctx, delta) {
-        // this.setZIndex(10)
+    draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta)
         if (this.carrying) {
             ctx.fillStyle = this.carrying.toRGBA()
             ctx.fillRect(this.x+4, this.y-3, 5, 5)
+        }
+        if (this.path) {
+            ctx.strokeStyle = Color.Blue.lighten(0.5).toRGBA()
+            ctx.beginPath()
+            ctx.moveTo(this.path[0].x, this.path[0].y)
+            this.path.forEach((step) => {
+                ctx.lineTo(step.x,step.y)
+            })
+            ctx.stroke()
         }
     }
 
@@ -39,19 +46,38 @@ export class Citizen extends Actor {
         return true
     }
 
+    glideTo(pos: Vector) {
+        return this.actions.moveTo(pos.x, pos.y, this.walkSpeed).asPromise()
+    }
+
     async walkTo(structure: typeof Structure, onArrival: (Building) => any) {
         let building = this.planet.closestBuildingByType(this.pos, structure)
         console.log("walking to", { building })
 
-        await this.actions.moveTo(
-            building.nodes()[0].x, // + building.getWidth() / 2,
-            building.nodes()[0].y, // + building.getHeight() / 2,
-            //  0, 
-            this.walkSpeed
-        ).asPromise();
+        let path = this.planet.pathBetween(this.pos.clone(), building)
+        console.log("lookup path", path)
 
-        onArrival(building);
+        // this.path = path;
+        if (path.length > 0) {
+            this.path = path
+            await Promise.all(
+                path.map(step => this.glideTo(step))
+            )
+            this.path = null
+            onArrival(building);
+        }
+
         return true;
+
+        // await this.actions.moveTo(
+        //     building.nodes()[0].x, // + building.getWidth() / 2,
+        //     building.nodes()[0].y, // + building.getHeight() / 2,
+        //     //  0, 
+        //     this.walkSpeed
+        // ).asPromise();
+
+        // onArrival(building);
+        // return true;
     }
 
     async patrol(structure: typeof Structure, otherStructure: typeof Structure, onArrival: (Building) => any) {

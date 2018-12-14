@@ -36,6 +36,21 @@ describe('Graph', () => {
         })
     })
 
+    describe('union', () => {
+        it('adds graphs together', () => {
+            let graph = new Graph()
+            graph.edge('hello', 'there')
+            let anotherGraph = new Graph()
+            anotherGraph.edge('there', 'world')
+            graph.union(anotherGraph)
+            expect(graph.edgeList()).toEqual([
+                ['hello', 'there'],
+                ['there', 'world']
+            ])
+
+        })
+    })
+
     describe('measurements', () => {
         it('can count nodes', () => {
             let graph = new Graph()
@@ -45,10 +60,22 @@ describe('Graph', () => {
             graph.node('world')
             expect(graph.size).toEqual(3)
         })
+
+        it('can report all edges', () => {
+            let graph = new Graph()
+            graph.edge('a', 'b')
+            graph.edge('a', 'c')
+            graph.edge('c', 'd')
+            expect(graph.edgeList()).toEqual([
+                ['a', 'b'],
+                ['a', 'c'],
+                ['c', 'd']
+            ])
+        })
     })
 
     describe('traversal', () => {
-        let graph = new Graph();
+        let graph: Graph<string> = new Graph();
         beforeEach(() => {
             //
             //  A ----> B -----> C ----> D

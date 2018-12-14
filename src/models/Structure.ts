@@ -14,16 +14,16 @@ export class MissionControl extends Structure {
     name: string = 'Mission Control';
     description: string = 'Keeping everything on track';
     view: string = 'MissionControlView';
-    width: number = 60;
-    height: number = 14;
-    zoom = 0.1
+    width: number = 90;
+    height: number = 24;
+    zoom = 0.5
 }
 
 export class MainTunnel extends Structure {
     name: string = 'Main Tunnel';
     description: string = 'Elevating';
     view: string = 'TunnelView';
-    width: number = 40;
+    width: number = 30;
     height: number = 100;
     zoom = 0.25
 }
@@ -32,8 +32,9 @@ export class Dome extends Structure {
     name: string = 'Biodome';
     description: string = 'Biome sweet biome';
     view: string = 'DomeView';
-    width: number = 80;
-    height: number = 60;
+    width: number = 60;
+    height: number = 50;
+    zoom = 0.2
 }
 
 export class AccessTunnel extends Structure {
