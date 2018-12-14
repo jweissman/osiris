@@ -10,8 +10,9 @@ export class NavigationTree {
        // we take the root, add its nodes and follow
        // connections through slots...
        // this.root = root.nodes()[0]
-       this.graph = new Graph()
-       this.buildNav(root)
+       this.graph = root.graph() // this.buildNav(root) //new Graph()
+
+    //    this.buildNav(root)
        console.log('nav graph', { g: this.graph})
    }
 
@@ -40,36 +41,4 @@ export class NavigationTree {
        }
        return false
    }
-
-   buildNav(root: Building) {
-       console.log("BUILD NAV FOR", { structure: root.structure.name })
-        // does this building have a complex graph already?
-        // we can just add it...
-        let nodes = root.nodes()
-        // we'll assume the root building is simple, that we need to follow its slots
-        // to find other subtrees?
-        let tolerance = 6
-        let rootNode = nodes[0]
-            let closeRoot = this.closestNode(rootNode)
-            if (closeRoot && closeRoot.distance(rootNode) < tolerance) { rootNode = closeRoot; }
-        // this.graph.node(rootNode) //nodes[0])
-        for (let child of root.childrenBuildings) {
-
-            // we need to know which slot they took, to draw the edge to the node
-            let slot = child.parentSlot.pos
-            let closeSlot = this.closestNode(slot)
-            if (closeSlot && closeSlot.distance(slot) < tolerance) { slot = closeSlot; }
-            this.graph.edge(rootNode, slot)
-
-            // and then the slot to the child node
-            let childNode = child.nodes()[0]
-            this.graph.edge(slot, childNode)
-
-            // and recurse for each child building?
-            //    let childNode
-            this.buildNav(child)
-
-        }
-    }
-
 }

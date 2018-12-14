@@ -9,7 +9,8 @@ import { Citizen } from "../Citizen";
 import { Game } from "../../Game";
 import { Hud } from "../Hud";
 import { Rectangle } from "../../values/Rectangle";
-import { closest, flatSingle } from "../../Util";
+import { closest, flatSingle, measureDistance } from "../../Util";
+import { Graph } from "../../values/Graph";
 
 export class Building extends Actor {
     built: boolean = false
@@ -73,8 +74,29 @@ export class Building extends Actor {
         let x = this.pos.x + this.getWidth()/2;
         let y = this.pos.y + this.getHeight()
         return [
-            new Vector(Math.floor(x), Math.floor(y))
+            new Vector(Math.floor(x), Math.floor(y)-4)
         ];
+    }
+
+    graph(supergraph: Graph<Vector> = new Graph()): Graph<Vector> {
+        let g = supergraph //: Graph<Vector> = new Graph()
+        // assemble subgraph?
+        let nodes = this.nodes()
+        // let rootNode = nodes[0]
+        let rootNode = g.findOrCreate(nodes[0], measureDistance)
+        for (let child of this.childrenBuildings) {
+            let slot = g.findOrCreate(child.parentSlot.pos, measureDistance)
+            g.edge(rootNode, slot)
+
+            let childNode = g.findOrCreate(child.nodes()[0], measureDistance)
+            g.edge(slot, childNode)
+
+            child.graph(g)
+        }
+        //let tolerance = 5
+        //let root = nodes[0]
+
+        return g
     }
 
     interact(citizen: Citizen) {

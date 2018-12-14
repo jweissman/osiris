@@ -1,3 +1,5 @@
+import { minBy } from "../Util";
+
 export class Graph<T> {
     private empty: boolean = true
     public nodes: T[] = []
@@ -20,6 +22,15 @@ export class Graph<T> {
 
     public contains(testNode: T) {
         return this.nodes.includes(testNode)
+    }
+
+    public findOrCreate(testNode: T, measure: (a: T, b: T) => number, tolerance: number = 5): T {
+        let nodes = this.dfs();
+        let closest = minBy(nodes, (node: T) => measure(testNode, node))
+        if (closest && measure(closest, testNode) < tolerance) {
+            return closest;
+        }
+        return testNode;
     }
 
     public edge(src: T, dst: T) {
@@ -115,7 +126,7 @@ export class Graph<T> {
         return visited
     }
 
-    public shortestPath(src: T, dst: T, maxStep: number = 32): T[] {
+    public shortestPath(src: T, dst: T, maxStep: number = 256): T[] {
         let prevStep = {}
         let dstIndex = this.indexOf(dst)
         this.bfs(src, (prev, curr) => {

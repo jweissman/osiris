@@ -33,3 +33,21 @@ export function closest<T>(cursor: Vector, arr: Array<T>, getVector: (T) => Vect
 export const flatSingle = arr => [].concat(...arr);
 
 export const deleteByValue = (arr, elem) => arr.filter(e => e !== elem)
+
+export function eachCons(a, n) {
+  var r = []
+  for (var i = 0; i < a.length - n + 1; i++) {
+    r.push(_ecRange(a, i, n))
+  }
+  return r
+}
+
+function _ecRange (a, i, n) {
+  var r = []
+  for (var j = 0; j < n; j++) {
+    r.push(a[i + j])
+  }
+  return r
+}
+
+export const measureDistance = (a: Vector, b: Vector) => a.distance(b)
