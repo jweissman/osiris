@@ -6,6 +6,8 @@ import { SurfaceRoad } from "../../models/Structure";
 
 // we're constrained to the surface, so...
 export class DomeView extends Building {
+    productionTime = 800
+    productColor = Color.Green
     hideBox = true
 
     slots() {
@@ -43,23 +45,6 @@ export class DomeView extends Building {
         // this.pos = cursor // x = cursor.x
     }
 
-    interact(citizen: Citizen) {
-        // give actor a green block?
-        if (this.product.length > 0) {
-            citizen.carry(Color.Green)
-            this.product.pop()
-        }
-        return true
-        // this.structure.interaction
-    }
-
-    produce(step: number) {
-        if (step % 100 === 0) {
-            this.product.push(Color.Green)
-        }
-    }
-
-
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         // super.draw(ctx, delta)
 
@@ -77,11 +62,6 @@ export class DomeView extends Building {
         ctx.closePath()
         ctx.fillStyle = color.toRGBA()
         ctx.fill()
-
-        this.product.forEach((produced, index) => {
-            ctx.fillStyle = produced.toRGBA();
-            ctx.fillRect(this.x + 20 * index, this.y - 20, 18, 18)
-        })
 
         super.draw(ctx, delta)
     }

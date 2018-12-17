@@ -1,10 +1,10 @@
 import { Actor, Color, Traits, Vector } from "excalibur";
 import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
-import { Structure } from "../models/Structure";
+import { Structure, MissionControl, Laboratory, Mine, Dome } from "../models/Structure";
 
 export class Citizen extends Actor {
-    walkSpeed: number = 250
+    walkSpeed: number = 50
     carrying: Color = null
     path: Vector[] = []
 
@@ -38,8 +38,8 @@ export class Citizen extends Actor {
         return this.actions.moveTo(pos.x, pos.y, this.walkSpeed).asPromise()
     }
 
-    async walkTo(structure: typeof Structure, onArrival: (Building) => any) {
-        let building = this.planet.closestBuildingByType(this.pos, structure)
+    async walkTo(building: Building, onArrival: (Building) => any) {
+        // let building = this.planet.closestBuildingByType(this.pos, structure)
 
         let path = this.planet.pathBetween(this.pos.clone(), building)
 
@@ -55,16 +55,31 @@ export class Citizen extends Actor {
         return true;
     }
 
-    async patrol(structure: typeof Structure, otherStructure: typeof Structure, onArrival: (Building) => any) {
-        await this.walkTo(structure, onArrival)
-        await this.walkTo(otherStructure, onArrival)
+    //async patrol(structure: typeof Structure, otherStructure: typeof Structure, onArrival: (Building) => any) {
+    //    await this.walkTo(structure, onArrival)
+    //    await this.walkTo(otherStructure, onArrival)
+    //    // this.patrol(structure, otherStructure, onArrival)
+    //}
 
-        this.patrol(structure, otherStructure, onArrival)
-    }
+    async work() {
+        let ctrl = this.planet.closestBuildingByType(this.pos, [MissionControl])
+        let shop = this.planet.closestBuildingByType(this.pos,
+            [Dome, Mine, Laboratory],
+            (building) => building.product.length > 0
+        )
+        // tryInteract = (b) => if (!b.interact(this))
 
-    work(workshop: typeof Structure, store: typeof Structure) {
-        this.patrol(workshop, store, (building: Building) => {
-            building.interact(this)
-        })
+        if (shop && ctrl) {
+            await this.walkTo(shop, (b) => b.interact(this))
+            await this.walkTo(ctrl, (b) => b.interact(this))
+            console.log("worked!!")
+        } else {
+            console.log("i guess i can try again?")
+        }
+        setTimeout(() => this.work(), 4000)
+        //workshop: typeof Structure, store: typeof Structure) {
+        // this.patrol(workshop, store, (building: Building) => {
+            // building.interact(this)
+        // })
     }
 }

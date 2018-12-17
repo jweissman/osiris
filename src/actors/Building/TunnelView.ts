@@ -107,6 +107,7 @@ export class TunnelView extends Building {
     } 
 
     validConnectingStructures() { return [ MissionControl ] }
+    validConnectingDirections() { return [ Orientation.Down ] }
 
     handleClick(cursor: Vector) {
         // pick nearest mission ctrl as origin

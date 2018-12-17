@@ -19,7 +19,7 @@ export class MissionControlView extends Building {
             )
         )
 
-        let slotY = this.getHeight(); // / 2;
+        let slotY = this.getHeight();
         theSlots.push(
             this.buildSlot(
                 this.pos.x, this.pos.y + slotY,
@@ -51,7 +51,10 @@ export class MissionControlView extends Building {
     }
 
     interact(citizen: Citizen) {
-        citizen.drop()
+        let resource = citizen.drop()
+        console.log("citizen gathered resource", { resource })
+        // citizen.work()
+
         return true
     }
 

@@ -1,11 +1,11 @@
 import { Building } from "./Building";
 import { Vector } from "excalibur";
 import { Orientation } from "../../values/Orientation";
-import { MainTunnel, CommonArea, LivingQuarters } from "../../models/Structure";
+import { MainTunnel, CommonArea, LivingQuarters, Laboratory, Mine } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 
 export class AccessTunnelView extends Building {
-    edgeWidth: number = 1
+    edgeWidth: number = 0.4
 
     pickingOrigin: boolean = true
     facing: Orientation = Orientation.Left
@@ -14,7 +14,6 @@ export class AccessTunnelView extends Building {
         // left slot -- right slot
         let theSlots: Slot[] = [];
         let slotY = this.getHeight() / 2;
-
 
         theSlots.push(
             this.buildSlot(
@@ -60,15 +59,6 @@ export class AccessTunnelView extends Building {
     reshape(cursor: Vector) {
 
         if (this.pickingOrigin) {
-            // let theSlot: Slot = this.findSlot(cursor);
-
-            // let { facing, pos } = theSlot;
-            // this.pos = pos
-            // let matching = this.slots().find(s => s.facing == flip(facing))
-
-            // let offset = this.pos.sub(matching.pos)
-            // this.pos.addEqual(offset)
-
             let theSlot = this.alignToSlot(cursor)
             this.facing = theSlot.facing
 
@@ -87,7 +77,13 @@ export class AccessTunnelView extends Building {
     }
 
     validConnectingStructures() {
-        return [ MainTunnel, CommonArea, LivingQuarters ];
+        return [
+            MainTunnel,
+            CommonArea,
+            LivingQuarters,
+            Laboratory,
+            Mine
+        ];
     }
 
 }

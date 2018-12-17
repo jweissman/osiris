@@ -1,14 +1,11 @@
 import { Building } from "./Building";
-import { Color, Vector } from "excalibur";
-import { AccessTunnelView } from "./AccessTunnelView";
-import { Orientation, flip } from "../../values/Orientation";
-import { AccessTunnel, Structure } from "../../models/Structure";
-import { range, closest, flatSingle } from "../../Util";
+import { Orientation } from "../../values/Orientation";
+import { AccessTunnel, Structure, CommonArea, Laboratory, LivingQuarters, Mine, Kitchen, Mess } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 
 export class CommonAreaView extends Building {
-    floorHeight: number = 5
-    edgeWidth: number = 2
+    floorHeight: number = 8
+    edgeWidth: number = 1
     // maybe you can set height AND width of common area view??
 
     slots() {
@@ -35,6 +32,6 @@ export class CommonAreaView extends Building {
     }
 
     protected validConnectingStructures(): (typeof Structure)[] {
-        return [ AccessTunnel ];
+        return [ AccessTunnel, CommonArea, Mine, Laboratory, LivingQuarters, Mess, Kitchen ];
     }
 }

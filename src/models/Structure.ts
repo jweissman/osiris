@@ -34,8 +34,8 @@ export class Dome extends Structure {
     name: string = 'Biodome';
     description: string = 'Biome sweet biome';
     view: string = 'DomeView';
-    width: number = 60 * sizeFactor
-    height: number = 50 * sizeFactor
+    width: number = 90 * sizeFactor
+    height: number = 60 * sizeFactor
     // zoom = 0.2
 }
 
@@ -44,7 +44,7 @@ export class AccessTunnel extends Structure {
     description: string = 'in the hallway'
     view: string = 'AccessTunnelView'
     width: number = 10 * sizeFactor
-    height: number = 9 * sizeFactor
+    height: number = 15 * sizeFactor
 }
 
 export class CommonArea extends Structure {
@@ -71,3 +71,51 @@ export class SurfaceRoad extends Structure {
     width: number = 20 * sizeFactor
     height: number = 8 * sizeFactor
 }
+
+export class Laboratory extends Structure {
+    name: string = 'Research Lab'
+    description: string = 'learn some things'
+    view: string = 'LabView'
+    width: number = 100 * sizeFactor
+    height: number = 40 * sizeFactor
+}
+
+export class Mine extends Structure {
+    name: string = 'Omnium Mine'
+    description: string = 'ore else'
+    view: string = 'MineView'
+    width: number = 200 * sizeFactor
+    height: number = 200 * sizeFactor
+}
+
+export class Kitchen extends Structure {
+    name: string = 'Kitchen'
+    description: string = 'veg -> meals'
+    view: string = 'KitchenView'
+    width: number = 240 * sizeFactor
+    height: number = 100 * sizeFactor
+}
+
+export class Mess extends Structure {
+    name: string = 'Mess Hall'
+    description: string = 'consume meals'
+    view: string = 'MessView'
+    width: number = 400 * sizeFactor
+    height: number = 100 * sizeFactor
+}
+
+//export class Workshop extends Structure {
+//    name: string = 'Workshop'
+//    description: string = 'manual'
+//    view: string = 'WorkshopView'
+//    width: number = 120 * sizeFactor
+//    height: number = 80 * sizeFactor
+//}
+//
+//export class Factory extends Structure {
+//    name: string = 'Factory'
+//    description: string = 'assembly'
+//    view: string = 'FactoryView'
+//}
+
+// lab, mine, warehouse/storage, kitchen, workshop, factory

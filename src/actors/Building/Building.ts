@@ -11,6 +11,7 @@ import { closest, flatSingle, measureDistance } from "../../Util";
 import { Graph } from "../../values/Graph";
 
 export class Building extends Actor {
+    label: Label
     built: boolean = false
     hover: boolean = false
 
@@ -22,7 +23,10 @@ export class Building extends Actor {
     childrenBuildings: Building[] = []
 
     product: Color[] = []
+
     capacity: number = 4
+    productColor: Color = null
+    productionTime: number = 500
 
     constructor(public structure: Structure, protected planet: Planet) {
         super(
@@ -48,7 +52,8 @@ export class Building extends Actor {
 
         this.collisionType = CollisionType.PreventCollision
 
-        this.add(new Label(this.structure.name))
+        this.label = new Label(this.structure.name, 0, 0, 'Helvetica')
+        this.label.color = Color.White
     }
 
     setup(): void {}
@@ -61,6 +66,8 @@ export class Building extends Actor {
         this.pos = cursor.clone()
 
     }
+
+    afterConstruct(): void {}
 
     // response is whether we're 'done'
     // (in general this would be true, unless you need special handling
@@ -98,9 +105,20 @@ export class Building extends Actor {
 
     interact(citizen: Citizen) {
         // should we give this citizen an item?
+        if (this.product.length > 0) {
+            citizen.carry(this.productColor.clone())
+            this.product.pop()
+            // return true
+        }
         // should we get a resource?
         // etc
         return true
+    }
+
+    protected produce(step: number) {
+        if (this.productColor && step % this.productionTime === 0) {
+            this.product.push(this.productColor) //Color.Blue)
+        }
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
@@ -109,7 +127,16 @@ export class Building extends Actor {
             this.drawRect(ctx, this.aabb(), this.edgeWidth)
         }
 
-        let debug = false;
+        this.product.forEach((produced, index) => {
+            ctx.fillStyle = produced.desaturate(0.3).lighten(0.2).toRGBA();
+            ctx.fillRect(this.x + 20 * index, this.y - 20, 18, 18)
+        })
+
+        this.label.pos = this.getCenter()//this.label.getWidth() //ctx.measureText()
+        this.label.pos.x -= ctx.measureText(this.structure.name).width / 2 //bthis.label.getWidth()
+        this.label.draw(ctx, delta)
+
+        let debug = true;
         if (debug) {
             if (this.slots().length > 0) {
                 // draw slots
@@ -138,7 +165,7 @@ export class Building extends Actor {
         this.step += 1
     }
 
-    protected produce(step: number) {}
+    // protected produce(step: number) {}
 
     protected drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 5, color: Color = null) {
         let { x, y, width, height } = rectangle;
@@ -209,13 +236,27 @@ export class Building extends Actor {
         return [ ];
     }
 
+    protected validConnectingDirections(): Orientation[] {
+        return [
+            Orientation.Up,
+            Orientation.Down,
+            Orientation.Left,
+            Orientation.Right
+        ]
+    }
+
     protected findSlot(pos: Vector): Slot {
         let buildings = this.validConnectingStructures().map(structure =>
-            this.planet.closestBuildingByType(pos, structure)
+            this.planet.closestBuildingByType(pos, [structure])
         )
         let slotList = flatSingle(buildings.map(building => building ? building.slots() : []))
-        // select slots that COULD match one of our faces
-        slotList = slotList.filter((slot: Slot) => this.slots().some((ourSlot: Slot) => slot.facing === flip(ourSlot.facing)))
+
+
+        // select slots that COULD match one of our faces (and do so 'legally'...)
+        slotList = slotList.filter((slot: Slot) => 
+            this.validConnectingDirections().includes(slot.facing) &&
+              this.slots().some((ourSlot: Slot) => slot.facing === flip(ourSlot.facing))
+        )
         if (slotList.length > 0) {
             return closest(pos, slotList, (slot) => slot.pos)
         }

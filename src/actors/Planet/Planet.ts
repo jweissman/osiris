@@ -4,13 +4,14 @@ import { Building } from '../Building';
 import { minBy, range } from '../../Util';
 import { Citizen } from '../Citizen';
 import { Mountains } from './PlanetBackground';
-import { Structure, MissionControl } from '../../models/Structure';
+import { Structure, MissionControl, LivingQuarters } from '../../models/Structure';
 import { NavigationTree } from './NavigationTree';
 
 export class Planet extends Actor {
     buildings: Building[] = []
-    citizens: Citizen[]
+    citizens: Citizen[] = []
     navTree: NavigationTree
+    currentlyConstructing: Building = null
 
     constructor(
         // public effectiveY: number,
@@ -47,18 +48,19 @@ export class Planet extends Actor {
 
     draw(ctx: CanvasRenderingContext2D, delta) {
         super.draw(ctx, delta)
-        // let navTree = this.buildNavTree()
-        // if (this.navTree) {
-        //     let edges = this.navTree.graph.edgeList()
-        //     // console.log("draw edges", { edges })
-        //     edges.forEach((edge: [Vector, Vector]) => {
-        //         let [a,b] = edge
-        //         ctx.beginPath()
-        //         ctx.moveTo(a.x,a.y)
-        //         ctx.lineTo(b.x,b.y)
-        //         ctx.stroke() //Color.White.toRGBA())
-        //     })
-        // }
+       if (this.currentlyConstructing) {
+           this.currentlyConstructing.draw(ctx, delta)
+       }
+        this.buildings.forEach(building => building.draw(ctx, delta))
+
+        this.citizens.forEach(citizen => citizen.draw(ctx, delta))
+    }
+
+    update(engine, delta) {
+        super.update(engine, delta)
+
+        this.buildings.forEach(building => building.update(engine, delta))
+        this.citizens.forEach(citizen => citizen.update(engine, delta))
     }
 
     placeBuilding(building: Building) {
@@ -70,12 +72,27 @@ export class Planet extends Actor {
             this.buildNavTree()
         }
         this.buildings.push(building);
+        building.afterConstruct()
+    }
+
+    populate() {
+        // let ctrl = this.planet.closestBuildingByType(this.player.pos, MissionControl) //bubuildings[0] //.pos
+        // let dome = this.planet.closestBuildingByType(this.player.pos, Dome)
+        let home = this.closestBuildingByType(new Vector(0,0), [LivingQuarters])
+        console.log("populating", { home })
+        //buildings[1]
+        let citizen = new Citizen(home, this) //ctrl.x, ctrl.y)
+        citizen.work() //Dome, MissionControl) // LivingQuarters)
+
+        // citizen.y = this.planet.getTop() + citizen.getHeight() / 3
+        this.citizens.push(citizen)
     }
 
 
-    closestBuildingByType(cursor: Vector, structureType: typeof Structure): Building {
+    closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = ()=>true): Building {
         let matching = this.buildings.filter(building => 
-            building.structure instanceof structureType //.name === structureName
+            structureTypes.some(structureType => (building.structure instanceof structureType)) &&
+              predicate(building)
         )
 
         if (matching && matching.length > 0) {
@@ -85,32 +102,18 @@ export class Planet extends Actor {
     }
 
     pathBetween(origin: Vector, destination: Building): Vector[] {
-        // okay, so we want the general graph of connections
-        // we can start wtih mission control...
-        // console.log({ navGraph: this.navTree })
         if (!this.navTree) { this.buildNavTree() }
-        // navTree.edgeToClosest(origin)
         let srcNode = this.navTree.closestNode(origin)
         let dest = destination.nodes()[0]
         let destNode = this.navTree.closestNode(dest)
-        // if (!dest) { throw new Error("Building does not ")}
-        let path = this.navTree.seekPath(srcNode, destNode) //destination.nodes()[0])
-        // console.log("PATH", { path })
-        // path.unshift(s)
-        // path.push(dest)
+        let path = this.navTree.seekPath(srcNode, destNode)
         return path
-
-        // hopefully the dest node is in the tree?
-        // navTree.shortestPath
-        // navTree.shortestPath(source, destination)
-
     }
 
     private buildNavTree() {
         let ctrl = this.buildings.find(building => building.structure instanceof MissionControl);
         if (ctrl) {
-        this.navTree = new NavigationTree(ctrl) //this._navTree
-        // return navTree
+            this.navTree = new NavigationTree(ctrl)
         }
     }
 
