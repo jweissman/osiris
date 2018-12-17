@@ -205,7 +205,7 @@ export class Construct extends Scene {
 
 
     protected spawnBuilding(structure: Structure): Building {
-        console.log("spawn", { structure })
+        // console.log("spawn", { structure })
         let anotherBuilding = this.assembleBuildingFromStructure(structure)
         anotherBuilding.reshape(anotherBuilding.constrainCursor(anotherBuilding.pos))
         this.add(anotherBuilding)

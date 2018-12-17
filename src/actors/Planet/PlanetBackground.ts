@@ -31,7 +31,7 @@ export class Mountains extends PlanetBackground {
                 });
             }
         }
-        console.log({ peaks: this.peaks });
+        // console.log({ peaks: this.peaks });
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {

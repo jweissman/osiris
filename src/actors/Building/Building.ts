@@ -21,6 +21,9 @@ export class Building extends Actor {
     parentSlot: Slot
     childrenBuildings: Building[] = []
 
+    product: Color[] = []
+    capacity: number = 4
+
     constructor(public structure: Structure, protected planet: Planet) {
         super(
           structure.origin.x, // + 20,
@@ -31,7 +34,7 @@ export class Building extends Actor {
         )
         this.anchor = new ex.Vector(0,0)
 
-        console.log(`CREATE NEW ${structure.name}`, { origin: structure.origin, width: structure.width, height: structure.height })
+        // console.log(`CREATE NEW ${structure.name}`, { origin: structure.origin, width: structure.width, height: structure.height })
         this.setup();
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
@@ -135,8 +138,6 @@ export class Building extends Actor {
         this.step += 1
     }
 
-    protected product: Color[] = []
-    protected capacity: number = 4
     protected produce(step: number) {}
 
     protected drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 5, color: Color = null) {

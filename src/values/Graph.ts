@@ -15,7 +15,6 @@ export class Graph<T> {
     public node(newNode: T) {
         this.empty = false;
         if (!this.contains(newNode)) {
-            console.log("create new node", { newNode })
             this.nodes.push(newNode)
         }
     }
@@ -34,7 +33,6 @@ export class Graph<T> {
     }
 
     public edge(src: T, dst: T) {
-        console.log("edge from", { src, dst })
         this.node(src)
         this.node(dst)
 
