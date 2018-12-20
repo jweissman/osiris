@@ -9,6 +9,7 @@ import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
 import { closest, flatSingle, measureDistance } from "../../Util";
 import { Graph } from "../../values/Graph";
+import { ResourceBlock, blockColor } from "../../models/Economy";
 
 export class Building extends Actor {
     label: Label
@@ -22,10 +23,14 @@ export class Building extends Actor {
     parentSlot: Slot
     childrenBuildings: Building[] = []
 
-    product: Color[] = []
+    // input: Color[] = []
+    product: ResourceBlock[] = []
 
     capacity: number = 4
-    productColor: Color = null
+    consumes: ResourceBlock = null
+    produces: ResourceBlock = null
+    // consumeColor: Color = null
+    // productColor: Color = null
     productionTime: number = 500
 
     constructor(public structure: Structure, protected planet: Planet) {
@@ -106,18 +111,22 @@ export class Building extends Actor {
     interact(citizen: Citizen) {
         // should we give this citizen an item?
         if (this.product.length > 0) {
-            citizen.carry(this.productColor.clone())
+            citizen.carry(this.produces) //productColor.clone())
             this.product.pop()
             // return true
         }
         // should we get a resource?
         // etc
-        return true
+        // return true
     }
 
     protected produce(step: number) {
-        if (this.productColor && step % this.productionTime === 0) {
-            this.product.push(this.productColor) //Color.Blue)
+        if (this.produces && step % this.productionTime === 0) {
+            let shouldProduce = true;
+            if (shouldProduce) {
+                this.product.push(this.produces) //Color.Blue)
+                console.log("PRODUCE", { produces: this.produces, product: this.product })
+            }
         }
     }
 
@@ -128,7 +137,7 @@ export class Building extends Actor {
         }
 
         this.product.forEach((produced, index) => {
-            ctx.fillStyle = produced.desaturate(0.3).lighten(0.2).toRGBA();
+            ctx.fillStyle = blockColor(produced).desaturate(0.3).lighten(0.2).toRGBA();
             ctx.fillRect(this.x + 20 * index, this.y - 20, 18, 18)
         })
 
@@ -158,21 +167,22 @@ export class Building extends Actor {
     step: number = 0
     update(engine: Game, delta: number) {
         super.update(engine, delta)
-
-        if (this.built && this.step % 10 === 0 && this.product.length < this.capacity) {
-            this.produce(this.step);
+        if (this.step % 10 === 0) {
+            let tryProduce = this.built && this.produces && this.product.length < this.capacity;
+            if (tryProduce) {
+                this.produce(this.step);
+            }
         }
         this.step += 1
     }
 
-    // protected produce(step: number) {}
 
     protected drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 5, color: Color = null) {
         let { x, y, width, height } = rectangle;
 
         let edge = color || this.edgeColor();
         ctx.fillStyle = edge.toRGBA();
-        ctx.fillRect(x, y, width, height) // this.getWidth(), this.getHeight())
+        ctx.fillRect(x, y, width, height)
 
         let main = color || this.mainColor();
         ctx.fillStyle = main.toRGBA();

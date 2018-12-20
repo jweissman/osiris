@@ -1,8 +1,10 @@
 import { CommonAreaView } from '.'
 import { Color, Vector } from 'excalibur';
+import { ResourceBlock } from '../../models/Economy';
 
 export class MineView extends CommonAreaView {
-    productColor = Color.Red
+    produces = ResourceBlock.Ore
+    // productColor = Color.Red
     productionTime = 1000
     floorHeight = 150
 

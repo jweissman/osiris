@@ -167,59 +167,24 @@ export class Construct extends Scene {
         // else { this.currentBuildingListIndex += 1 }
         if (structure) {
             this.startConstructing(structure, pos)
+        } else {
+            this.hud.message(`Welcome to OSIRIS`)
         }
     }
 
     startConstructing(structure: Structure, pos: Vector = new Vector(0, 0)) {
-        // this.currentlyBuilding = null // ?
-        // this.remove(this.currentlyBuilding)
-        // if (structure) {
         structure.origin = pos
         this.hud.message(`Place ${structure.name}`)
         let theNextOne = this.spawnBuilding(structure)
-        //this.add(theNextOne)
         this.planet.currentlyConstructing = theNextOne
-        // this.camera.pos = theNextOne.constrainCursor(this.player.pos) //camera.pos)
-        this.camera.pos = theNextOne.pos // move(theNextOne.pos, 250)
+        this.camera.pos = theNextOne.pos
         this.camera.zoom(structure.zoom, 250)
-        // }
-        //else {
-        //    this.hud.message(`Welcome to OSIRIS`)
 
-        //    // spawn people?
-        //    //for(let i in range(5))
-        //    this.spawnCitizen()
-        //    
-        //    // this.camera.addStrategy(new LockCameraToActorStrategy(this.people[0]))
-        //}
     }
 
-    //public populate() {
-    //    this.spawnCitizen()
-    //}
-
-    //protected spawnCitizen() {
-    //    // let ctrl = this.planet.closestBuildingByType(this.player.pos, MissionControl) //bubuildings[0] //.pos
-    //    // let dome = this.planet.closestBuildingByType(this.player.pos, Dome)
-    //    let home = this.planet.closestBuildingByType(this.player.pos, [LivingQuarters])
-    //    //buildings[1]
-    //    let citizen = new Citizen(home, this.planet) //ctrl.x, ctrl.y)
-    //    citizen.work() //Dome, MissionControl) // LivingQuarters)
-
-    //    // citizen.y = this.planet.getTop() + citizen.getHeight() / 3
-    //    // this.people.push(citizen)
-    //    this.add(citizen)
-    //    // citizen.setZIndex(1000)
-    //}
-
-
-
     protected spawnBuilding(structure: Structure): Building {
-        // console.log("spawn", { structure })
         let anotherBuilding = this.assembleBuildingFromStructure(structure)
         anotherBuilding.reshape(anotherBuilding.constrainCursor(anotherBuilding.pos))
-        // this.add(anotherBuilding)
-        // this.buildings.push(anotherBuilding)
         return anotherBuilding
     }
     

@@ -3,11 +3,13 @@ import { Building } from "./Building";
 import { Citizen } from "../Citizen";
 import { Orientation } from "../../values/Orientation";
 import { SurfaceRoad } from "../../models/Structure";
+import { ResourceBlock } from "../../models/Economy";
 
 // we're constrained to the surface, so...
 export class DomeView extends Building {
-    productionTime = 800
-    productColor = Color.Green
+    productionTime = 300
+    produces = ResourceBlock.Food
+    // productColor = Color.Green
     hideBox = true
 
     slots() {
@@ -34,20 +36,12 @@ export class DomeView extends Building {
         return theSlots;
     } 
 
-    // constrainCursor(cursor: Vector): Vector {
-    //     // cursor.x = this.x //.getTop()
-    //     cursor.y = this.planet.getTop() - this.getHeight() + 4; //Math.max(planet.getTop() + 100, cursor.y)
-    //     return cursor;
-    // }
 
     reshape(cursor: Vector) {
         this.alignToSlot(cursor)
-        // this.pos = cursor // x = cursor.x
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
-        // super.draw(ctx, delta)
-
         let color: Color = this.mainColor()
 
         ctx.beginPath()

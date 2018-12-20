@@ -75,16 +75,11 @@ export class Planet extends Actor {
         building.afterConstruct()
     }
 
-    populate() {
-        // let ctrl = this.planet.closestBuildingByType(this.player.pos, MissionControl) //bubuildings[0] //.pos
-        // let dome = this.planet.closestBuildingByType(this.player.pos, Dome)
-        let home = this.closestBuildingByType(new Vector(0,0), [LivingQuarters])
+    populate(pos: Vector) {
+        let home = this.closestBuildingByType(pos, [LivingQuarters])
         console.log("populating", { home })
-        //buildings[1]
-        let citizen = new Citizen(home, this) //ctrl.x, ctrl.y)
-        citizen.work() //Dome, MissionControl) // LivingQuarters)
-
-        // citizen.y = this.planet.getTop() + citizen.getHeight() / 3
+        let citizen = new Citizen(home, this)
+        citizen.work()
         this.citizens.push(citizen)
     }
 
