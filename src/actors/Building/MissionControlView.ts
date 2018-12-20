@@ -50,12 +50,12 @@ export class MissionControlView extends Building {
         this.pos.y -= this.getHeight() - 2 // + 1
     }
 
-    interact(citizen: Citizen) {
+    async interact(citizen: Citizen) {
         let resource = citizen.drop()
         console.log("citizen gathered resource", { resource })
         // citizen.work()
 
-        return true
+        // return true
     }
 
 

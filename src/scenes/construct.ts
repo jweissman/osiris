@@ -2,7 +2,7 @@ import { Scene, Input, UIActor, Label, Vector, LockCameraToActorStrategy } from 
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad } from "../models/Structure";
+import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad, Kitchen, Mess } from "../models/Structure";
 import { Building, DomeView, AccessTunnelView, CommonAreaView, TunnelView, MissionControlView, LivingQuartersView } from "../actors/Building";
 import { Hud } from "../actors/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
@@ -39,15 +39,18 @@ export class Construct extends Scene {
         MessView,
     }
     ////
-    static requiredStructureList: Structure[] = [
-        new MissionControl(),
+    static requiredStructureList: Array<typeof Structure> = [
+        MissionControl,
 
-        new SurfaceRoad(),
-        new Dome(),
-        new MainTunnel(),
-        new AccessTunnel(),
-        new LivingQuarters(),
-        // new CommonArea(),
+        SurfaceRoad,
+        Dome,
+        MainTunnel,
+        AccessTunnel,
+        Kitchen,
+        Mess,
+        LivingQuarters,
+        
+        //CommonArea,
     ]
 
     public onInitialize(game: Game) {
@@ -152,7 +155,7 @@ export class Construct extends Scene {
 
 
     private nextMissingRequiredStructure(): Structure {
-        let requiredStructures: Structure[] = Construct.requiredStructureList
+        let requiredStructures: Structure[] = Construct.requiredStructureList.map(s => new s())
         let actualStructureNames: string[] = this.buildings.map(building => building.structure.name)
 
         // console.log({ actualStructureNames, requiredNames: requiredStructures.map(s => s.name) })

@@ -5,13 +5,28 @@ import { Structure, MissionControl, Laboratory, Mine, Dome, Kitchen } from "../m
 import { ResourceBlock, blockColor } from "../models/Economy";
 
 export class Citizen extends Actor {
-    walkSpeed: number = 200
+    walkSpeed: number = 600
     carrying: ResourceBlock = null
     path: Vector[] = []
+
+    workInProgress: boolean = false
+    workStarted: number
+    workDuration: number
+    progress: number
 
     constructor(building: Building, protected planet: Planet) {
         super(building.nodes()[0].x,building.nodes()[0].y,4,10,Color.White)
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
+    }
+
+    update(engine, delta) {
+        super.update(engine, delta)
+
+        // check wip
+        if (this.workInProgress) {
+            let now = (new Date()).getTime()
+            this.progress = (now - this.workStarted) / this.workDuration //0.5
+        }
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
@@ -19,6 +34,22 @@ export class Citizen extends Actor {
         if (this.carrying) {
             ctx.fillStyle = blockColor(this.carrying).toRGBA()
             ctx.fillRect(this.x+4, this.y-3, 5, 5)
+        }
+
+        if (this.workInProgress) {
+            let pw = 10, ph = 3
+            let px = this.x - pw/2, py = this.y - 10;
+            // draw progress bar?
+            ctx.strokeStyle = Color.White.toRGBA()
+            // ctx.stroke(20)
+            ctx.strokeRect(px, py, pw, ph)
+
+            ctx.fillStyle = Color.Violet.darken(0.9).toRGBA()
+            ctx.fillRect(px, py, pw, ph)
+            ctx.fillStyle = Color.Violet.toRGBA()
+            ctx.fillRect(px, py, this.progress * pw, ph)
+
+            this.vel.x += (Math.random())-0.5 // * 10.0)
         }
     }
 
@@ -39,7 +70,17 @@ export class Citizen extends Actor {
         return this.actions.moveTo(pos.x, pos.y, this.walkSpeed).asPromise()
     }
 
-    async walkTo(building: Building, onArrival: (Building) => any) {
+    async progressBar(duration: number) {
+        console.log("PROGRESS BAR")
+        this.workInProgress = true
+        this.workStarted = (new Date()).getTime()
+        this.workDuration = duration
+        await new Promise((resolve, reject) => setTimeout(resolve, duration));
+        console.log("PROGRESS BAR DONE!")
+        this.workInProgress = false
+    }
+
+    async walkTo(building: Building) { //}, onArrival: (Building) => any) {
         // let building = this.planet.closestBuildingByType(this.pos, structure)
 
         let path = this.planet.pathBetween(this.pos.clone(), building)
@@ -50,7 +91,7 @@ export class Citizen extends Actor {
                 path.map(step => this.glideTo(step))
             )
             this.path = null
-            onArrival(building);
+            // onArrival(building);
         }
 
         return true;
@@ -71,7 +112,8 @@ export class Citizen extends Actor {
             if (sinks.length > 0) {
                 let theSink = this.planet.closestBuildingByType(this.pos, sinks)
                 if (theSink) {
-                    await this.walkTo(theSink, (b) => b.interact(this))
+                    await this.walkTo(theSink) //, async (b) => await b.interact(this))
+                    await theSink.interact(this)
                     console.log("delivered to sink!")
                 }
             } else {
@@ -79,17 +121,25 @@ export class Citizen extends Actor {
             }
         } else {
             let source = this.planet.closestBuildingByType(this.pos,
-                [Dome], //, Mine, Laboratory],
+                [Dome, Mine, Laboratory],
                 (building) => building.product.length > 0
             )
 
             if (source) {
-                await this.walkTo(source, (b) => b.interact(this))
+                await this.walkTo(source) //, async (b) => await b.interact(this))
+                await source.interact(this)
                 console.log("gathered from source!!")
             } else {
-                console.log("i guess i can try again?")
+                console.log("i guess i can try again? (sleep for a bit first)")
+        await new Promise((resolve, reject) => setTimeout(resolve, 3000));
+                //etTimeout(() => this.work(), 500)
             }
         }
-        setTimeout(() => this.work(), 50)
+
+        // console.log("DONE WORK")
+        // this.work()
+        setTimeout(() => this.work(), 100)
+        // await new Promise((resolve, reject) => setTimeout(resolve, 500));
+        // await this.work()
     }
 }

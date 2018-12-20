@@ -8,7 +8,7 @@ import { ResourceBlock } from "../../models/Economy";
 // we're constrained to the surface, so...
 export class DomeView extends Building {
     productionTime = 300
-    produces = ResourceBlock.Food
+    // produces = ResourceBlock.Food
     // productColor = Color.Green
     hideBox = true
 

@@ -27,8 +27,7 @@ export class Building extends Actor {
     product: ResourceBlock[] = []
 
     capacity: number = 4
-    consumes: ResourceBlock = null
-    produces: ResourceBlock = null
+
     // consumeColor: Color = null
     // productColor: Color = null
     productionTime: number = 500
@@ -108,20 +107,33 @@ export class Building extends Actor {
         return g
     }
 
-    interact(citizen: Citizen) {
+    get produces() { return this.structure.produces }
+    get consumes() { return this.structure.consumes }
+
+    async interact(citizen: Citizen) {
+        console.log("interact!!!")
         // should we give this citizen an item?
         if (this.product.length > 0) {
+            console.log("we have production to give away")
             citizen.carry(this.produces) //productColor.clone())
             this.product.pop()
             // return true
+        } else {
+            console.log("we check to see if we can consume", { consumes: this.consumes, carrying: citizen.carrying})
+            // is the citizen carrying a raw material we can process?
+            if (this.consumes && citizen.carrying === this.consumes) { //consumeColor) {
+                // now we need to await this thing being processed
+                await citizen.progressBar(4000)
+                //  citizen.carrying
+
+                // change it in place?
+                citizen.carry(this.produces)
+            }
         }
-        // should we get a resource?
-        // etc
-        // return true
     }
 
     protected produce(step: number) {
-        if (this.produces && step % this.productionTime === 0) {
+        if (this.produces && !this.consumes && step % this.productionTime === 0) {
             let shouldProduce = true;
             if (shouldProduce) {
                 this.product.push(this.produces) //Color.Blue)
@@ -131,7 +143,6 @@ export class Building extends Actor {
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
-        // super.draw(ctx, delta)
         if (!this.hideBox) {
             this.drawRect(ctx, this.aabb(), this.edgeWidth)
         }

@@ -91,7 +91,7 @@ export class Planet extends Actor {
         )
 
         if (matching && matching.length > 0) {
-            let distanceToCursor = (vec) => cursor.distance(vec)
+            let distanceToCursor = (building) => cursor.distance(building.nodes()[0])
             return minBy(matching, distanceToCursor)
         }
     }
