@@ -8,10 +8,11 @@ import { Graph } from "../../values/Graph";
 
 export class TunnelView extends Building {
     pickingOrigin: boolean = true
+    edgeWidth = 2
 
     nodes(): Vector[] {
         let x = this.pos.x + this.getWidth()/2;
-        let y = this.pos.y // + this.getHeight()
+        let y = this.pos.y
         return [
             new Vector(Math.floor(x), y) //, Math.floor(y)-4)
         ];
@@ -19,9 +20,6 @@ export class TunnelView extends Building {
 
     graph(supergraph: Graph<Vector> = new Graph()): Graph<Vector> {
         let g = supergraph;
-        // super.graph(g)
-        // okay, so we need to connect our 'line' of nodes together
-        // we don't necessarily need to care if there IS a child node there
 
         let halfWidth = this.getWidth()/2
         let x = this.pos.x + halfWidth
@@ -53,7 +51,6 @@ export class TunnelView extends Building {
 
             child.graph(g)
         }
-        //  this.s
 
         return g;
     }
@@ -71,11 +68,8 @@ export class TunnelView extends Building {
     }
 
     slots() {
-        // let slotSize = 40
-        // let slotCount = Math.floor((this.getHeight()-60) / slotSize)
         let theSlots: Slot[] = []
 
-        // one at the top pointing up??
         theSlots.push(
             this.buildSlot(
                 this.pos.x + this.getWidth()/2,
@@ -84,11 +78,10 @@ export class TunnelView extends Building {
             )
         )
 
-        for (let y of this.slotHeights()) { //range(slotCount)) {
+        for (let y of this.slotHeights()) {
             theSlots.push(
                 this.buildSlot(
                     this.pos.x, y,
-                    // 100 + this.pos.y + i * slotSize,
                     Orientation.Left
                 )
             )
@@ -97,12 +90,10 @@ export class TunnelView extends Building {
                 this.buildSlot(
                     this.pos.x + this.getWidth(),
                     y,
-                    // 100 + this.pos.y + i * slotSize,
                     Orientation.Right,
                 )
             )
         }
-        // console.log({theSlots})
         return theSlots;
     } 
 
@@ -110,44 +101,16 @@ export class TunnelView extends Building {
     validConnectingDirections() { return [ Orientation.Down ] }
 
     handleClick(cursor: Vector) {
-        // pick nearest mission ctrl as origin
         if (this.pickingOrigin) {
-            //let theSlot = this.findSlot(cursor);
-            ////let lastCtrl: Building = this.planet.closestBuildingByType(
-            ////    this.pos, MissionControl // 'Mission Control'
-            ////)
-            //if (theSlot) {
-            //    this.pos = theSlot.pos
-            //    // let missionControlWidth = new MissionControl().width
-            //    // this.pos.x = slot.pos.x + missionControlWidth / 2 - this.getWidth() / 2 //[0].x
-            //    let matchingSlot = this.slots().find(s => s.facing == flip(theSlot.facing))
-            //    if (matchingSlot) {
-            //        let offset = this.pos.sub(matchingSlot.pos)
-            //        this.pos.addEqual(offset)
-
-                    this.pickingOrigin = false;
-                    return false;
-            //    }
-            //}
+            this.pickingOrigin = false;
+            return false;
         }
         return true;
     }
 
-    // picking a depth for a tunnel first?
     constrainCursor(cursor: Vector): Vector {
         if (this.pickingOrigin) {
-
             this.alignToSlot(cursor)
-            //let theSlot = this.findSlot(cursor);
-            //if (theSlot) {
-            //    this.pos = theSlot.pos
-            //}
-            // snap to nearest mission ctrl?
-            //let lastCtrl: Building = this.planet.closestBuildingByType(
-            //    cursor, MissionControl //'Mission Control'
-            //)
-            //this.pos.x = lastCtrl.x + lastCtrl.getWidth() / 2 - this.getWidth() / 2 //[0].x
-
         } else {
             // we're determining depth of tunnel
             cursor.y = Math.max(this.planet.getTop() + 100, cursor.y)
@@ -162,22 +125,6 @@ export class TunnelView extends Building {
           this.setHeight(cursor.y - this.planet.getTop())
         }
     }
-
-    // draw(ctx: CanvasRenderingContext2D) {
-    //     let depth = this.getHeight()
-    //     let width = this.getWidth()
-    //     let edgeWidth = 4
-
-    //     let edgeColor = this.edgeColor()
-    //     let mainColor = this.mainColor()
-
-    //     ctx.fillStyle = edgeColor.toRGBA()
-    //     ctx.fillRect(this.x, this.y, width, depth)
-
-    //     if (this.pickingOrigin) { mainColor.a = 0.5 }
-    //     ctx.fillStyle = mainColor.toRGBA()
-    //     ctx.fillRect(this.x + edgeWidth, this.y, width - edgeWidth*2, depth)
-    // }
 
     colorBase() { return this.color.darken(0.2); }
 }

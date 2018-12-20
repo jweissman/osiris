@@ -1,23 +1,26 @@
 import { Vector } from 'excalibur';
 import { ResourceBlock } from './Economy';
+import { Scale } from '../values/Scale';
 
 // let sizeFactor = 0.85
 
-let minorUnit = 8  //* sizeFactor
-let majorUnit = 16 //* sizeFactor
+let minorUnit = Scale.minor.first  //* sizeFactor
+let majorUnit = Scale.major.first //* sizeFactor
 
 // let megaUnit = 16 * majorUnit
+const { major, minor } = Scale
 
 export class Structure {
-    name: string = '(default structure name)';
-    description: string = '(default structure description)';
-    view: string = '<add a default structure (room) view>';
+    name: string = '(structure name)';
+    description: string = '(structure description)';
+    view: string = '<structure (room) view>';
     width: number = 10 //* sizeFactor
     height: number = 10 //* sizeFactor
     zoom: number = 1 // 0.1 //.25
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
+    productionTime: number = 100
 
     constructor(public origin: Vector = new Vector(0, 0)) { }
 }
@@ -26,8 +29,8 @@ export class MissionControl extends Structure {
     name: string = 'Mission Control';
     description: string = 'Keeping everything on track';
     view: string = 'MissionControlView';
-    width: number = 10 * majorUnit
-    height: number = 3 * majorUnit
+    width: number = major.third // 10 * majorUnit
+    height: number = minor.third //3 * majorUnit
     zoom = 0.1
 }
 
@@ -35,8 +38,8 @@ export class MainTunnel extends Structure {
     name: string = 'Main Tunnel';
     description: string = 'Elevating';
     view: string = 'TunnelView';
-    width: number = 2 * majorUnit
-    height: number = 10 * majorUnit //150 // * sizeFactor
+    width: number = major.second // 2 * majorUnit
+    height: number = major.eighth // 10 * majorUnit //150 // * sizeFactor
     zoom = 0.25
 }
 
@@ -46,8 +49,8 @@ export class Dome extends Structure {
     produces = ResourceBlock.Food
 
     view: string = 'DomeView';
-    width: number = 10 * majorUnit
-    height: number = 8 * majorUnit
+    width: number = major.sixth // 10 * majorUnit
+    height: number = major.third //8 * majorUnit
     zoom = 0.2
 }
 
@@ -55,8 +58,8 @@ export class AccessTunnel extends Structure {
     name: string = 'Corridor'
     description: string = 'in the hallway'
     view: string = 'AccessTunnelView'
-    width: number = 10 * minorUnit
-    height: number = 3 * minorUnit
+    width: number = minor.fifth // 10 * minorUnit
+    height: number = minor.first //1 * minorUnit
     zoom = 0.5
 }
 
@@ -64,8 +67,8 @@ export class CommonArea extends Structure {
     name: string = 'Commons'
     description: string = 'hallway cap'
     view: string = 'CommonAreaView'
-    width: number = 8 * majorUnit
-    height: number = 5 * majorUnit
+    width: number = major.eighth //8 * majorUnit
+    height: number = major.fifth //5 * majorUnit
 
 }
 
@@ -73,16 +76,16 @@ export class LivingQuarters extends Structure {
     name: string = 'Quarters'
     description: string = 'sleepy time'
     view: string = 'LivingQuartersView'
-    width: number = 3 * majorUnit
-    height: number = 5 * majorUnit
+    width: number = major.third //minor.seventh // 3 * majorUnit
+    height: number = major.fifth //5 * majorUnit
 }
 
 export class SurfaceRoad extends Structure {
     name: string = 'Road'
     description: string = 'go for a walk'
     view: string = 'SurfaceRoadView'
-    width: number = 5 * minorUnit
-    height: number = 1 * minorUnit
+    width: number = minor.fifth // 5 * minorUnit
+    height: number = minor.first // 1 * minorUnit
 }
 
 export class Laboratory extends Structure {
@@ -90,8 +93,8 @@ export class Laboratory extends Structure {
     description: string = 'learn some things'
     produces = ResourceBlock.Data
     view: string = 'LabView'
-    width: number = 11 * majorUnit
-    height: number = 5 * majorUnit
+    width: number = major.sixth // 11 * majorUnit
+    height: number = major.fifth // 5 * majorUnit
 }
 
 
@@ -101,25 +104,27 @@ export class Kitchen extends Structure {
     consumes = ResourceBlock.Food
     produces = ResourceBlock.Meal
     view: string = 'KitchenView'
-    width: number = 4 * majorUnit
-    height: number = 5 * majorUnit
+    width: number = major.fourth // 4 * majorUnit
+    height: number = major.fifth //5 * majorUnit
 }
 
 export class Mess extends Structure {
     name: string = 'Mess'
     description: string = 'consume meals'
     view: string = 'MessView'
-    width: number = 6 * majorUnit
-    height: number = 5 * majorUnit
+    width: number = major.sixth //6 * majorUnit
+    height: number = major.fifth //5 * majorUnit
 }
 
+// a mine is maybe a wide structure that you
+// can gradually dig deeper??
 export class Mine extends Structure {
     name: string = 'Mine'
     description: string = 'ore else'
     produces = ResourceBlock.Ore
     view: string = 'MineView'
-    width: number = 20 * majorUnit
-    height: number = 20 * majorUnit
+    width: number = major.eighth // 20 * majorUnit
+    height: number = 3 * major.sixth //20 * majorUnit
 }
 //export class Workshop extends Structure {
 //    name: string = 'Workshop'
@@ -136,3 +141,17 @@ export class Mine extends Structure {
 //}
 
 // lab, mine, warehouse/storage, kitchen, workshop, factory
+
+// huge octagonal generating station with four 'slots'
+// for sub-structures (add-ons) which auto-generate data/ore
+// for the central 'power' slot ...
+// ...you can build either...
+// ...a mini black hole or mini sun
+// (the sun takes ore and the hole takes data?)
+export class PowerPlant extends Structure {
+    name: string = 'Power Plant'
+    description: string = 'sunny day'
+    view: string = 'PowerPlantView'
+    width: number = major.eighth //30 * majorUnit
+    height: number = major.eighth // 30 * majorUnit
+}

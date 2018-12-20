@@ -3,9 +3,10 @@ import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
 import { Structure, MissionControl, Laboratory, Mine, Dome, Kitchen } from "../models/Structure";
 import { ResourceBlock, blockColor } from "../models/Economy";
+import { Game } from "../Game";
 
 export class Citizen extends Actor {
-    walkSpeed: number = 600
+    walkSpeed: number = Game.citizenSpeed
     carrying: ResourceBlock = null
     path: Vector[] = []
 

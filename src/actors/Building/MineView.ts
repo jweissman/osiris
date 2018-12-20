@@ -1,11 +1,9 @@
 import { CommonAreaView } from '.'
 import { Color, Vector } from 'excalibur';
 import { ResourceBlock } from '../../models/Economy';
+import { AccessTunnel } from '../../models/Structure';
 
 export class MineView extends CommonAreaView {
-    // produces = ResourceBlock.Ore
-    // productColor = Color.Red
-    // productionTime = 1000
     floorHeight = 150
 
     nodes(): Vector[] {
@@ -15,4 +13,6 @@ export class MineView extends CommonAreaView {
             new Vector(Math.floor(x), Math.floor(y)-4)
         ];
     }
+
+    validConnectingStructures() { return [ AccessTunnel ]}
 }

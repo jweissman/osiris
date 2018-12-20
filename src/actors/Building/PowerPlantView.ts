@@ -1,18 +1,22 @@
-import { Building } from "./Building";
-import { Orientation } from "../../values/Orientation";
-import { AccessTunnel, Structure, CommonArea, Laboratory, LivingQuarters, Mine, Kitchen, Mess } from "../../models/Structure";
+import { Building } from ".";
+import { AccessTunnel } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
+import { Orientation } from "../../values/Orientation";
 import { Vector } from "excalibur";
 
-export class CommonAreaView extends Building {
-    floorHeight: number = 8
-    edgeWidth: number = 1
+export class PowerPlantView extends Building {
     showLabel = true
-    // maybe you can set height AND width of common area view??
+
+    validConnectingStructures() { return [ AccessTunnel ]}
+
+    draw(ctx, delta) {
+        // octagon...
+        super.draw(ctx, delta)
+    }
 
     slots() {
         let theSlots = []
-        let slotY = this.getHeight() - this.floorHeight
+        let slotY = this.getHeight() / 2
         let leftSlot: Slot = this.buildSlot(
             this.pos.x,
             this.pos.y + slotY,
@@ -29,19 +33,17 @@ export class CommonAreaView extends Building {
         return theSlots;
     }
 
-    nodes(): Vector[] {
+   nodes(): Vector[] {
         let x = this.pos.x + this.getWidth()/2;
-        let y = this.pos.y + this.getHeight()-this.floorHeight
+        let y = this.pos.y + this.getHeight()/2 //-this.floorHeight
         return [
             new Vector(Math.floor(x), Math.floor(y)) //-16)
         ];
     }
-  
+
     reshape(cursor) {
         this.alignToSlot(cursor);
     }
 
-    protected validConnectingStructures(): (typeof Structure)[] {
-        return [ AccessTunnel, CommonArea, Laboratory, LivingQuarters, Mess, Kitchen ];
-    }
+
 }

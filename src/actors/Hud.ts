@@ -1,14 +1,16 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Dome, Structure, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad, Mine, Laboratory, Kitchen, Mess } from "../models/Structure";
+import { Dome, Structure, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad, Mine, Laboratory, Kitchen, Mess, PowerPlant } from "../models/Structure";
 
 export class Hud extends UIActor {
+    label: Label
+    protected _paletteElement: HTMLDivElement
     static structuresForPalette = [
         Dome, AccessTunnel, CommonArea,
         LivingQuarters, SurfaceRoad,
         Laboratory, Mine,
         Kitchen, Mess,
+        PowerPlant
     ];
-    label: Label
     constructor(message = 'welcome to osiris', protected onBuildingSelect = null) {
         super(0, 0);
         this.label = new Label(message, 10, 32, 'Helvetica')
@@ -18,14 +20,26 @@ export class Hud extends UIActor {
 
         this._makePalette(onBuildingSelect)
     }
-    protected _paletteElement: HTMLDivElement
+
+
+    message(text: string) { this.label.text = text }
+
+    draw(ctx: CanvasRenderingContext2D, delta: number) {
+        super.draw(ctx, delta)
+
+        if (this._paletteElement) {
+            let left = ctx.canvas.offsetLeft;
+            let top = ctx.canvas.offsetTop;
+            this._paletteElement.style.left = `${left + 20}px`;
+            this._paletteElement.style.top = `${top + 100}px`;
+        }
+    }
 
     protected _makePalette(fn: (Structure) => any) {
         this._paletteElement = document.createElement('div') 
         this._paletteElement.style.position = 'absolute'
         document.body.appendChild(this._paletteElement)
 
-        // buttons
         Hud.structuresForPalette.forEach((structure: typeof Structure) => {
             let s = new structure()
             let _paletteButton = this.buttonFactory(s);
@@ -33,11 +47,9 @@ export class Hud extends UIActor {
                 _paletteButton
             )
 
-
             _paletteButton.onclick = (e) => {
-                // console.log(`${structure.name}`)
-                fn(s) //new structure())
-                e.stopPropagation()
+                fn(s)
+                // e.stopPropagation()
             }
         });
     }
@@ -54,18 +66,4 @@ export class Hud extends UIActor {
         paletteButton.style.color = Color.Black.lighten(0.16).toRGBA();
         return paletteButton;
     }
-
-    message(text: string) { this.label.text = text }
-
-    draw(ctx: CanvasRenderingContext2D, delta: number) {
-        super.draw(ctx, delta)
-
-        if (this._paletteElement) {
-            let left = ctx.canvas.offsetLeft;
-            let top = ctx.canvas.offsetTop;
-            this._paletteElement.style.left = `${left + 20}px`;
-            this._paletteElement.style.top = `${top + 100}px`;
-        }
-    }
-
 }

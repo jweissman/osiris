@@ -15,26 +15,18 @@ export class Building extends Actor {
     label: Label
     built: boolean = false
     hover: boolean = false
-
+    showLabel: boolean = false
     facing: Orientation = Orientation.Right
     edgeWidth: number = 4
     hideBox: boolean = false
-
     parentSlot: Slot
     childrenBuildings: Building[] = []
-
-    // input: Color[] = []
     product: ResourceBlock[] = []
-
     capacity: number = 4
-
-    // consumeColor: Color = null
-    // productColor: Color = null
-    productionTime: number = 500
 
     constructor(public structure: Structure, protected planet: Planet) {
         super(
-          structure.origin.x, // + 20,
+          structure.origin.x,
           structure.origin.y,
           structure.width,
           structure.height,
@@ -42,7 +34,6 @@ export class Building extends Actor {
         )
         this.anchor = new ex.Vector(0,0)
 
-        // console.log(`CREATE NEW ${structure.name}`, { origin: structure.origin, width: structure.width, height: structure.height })
         this.setup();
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
@@ -60,22 +51,65 @@ export class Building extends Actor {
         this.label.color = Color.White
     }
 
+
+    draw(ctx: CanvasRenderingContext2D, delta: number) {
+        if (!this.hideBox) {
+            this.drawRect(ctx, this.aabb(), this.edgeWidth)
+        }
+
+        this.product.forEach((produced, index) => {
+            ctx.fillStyle = blockColor(produced).desaturate(0.3).lighten(0.2).toRGBA();
+            ctx.fillRect(this.x + 20 * index, this.y - 20, 18, 18)
+        })
+
+        if (this.showLabel) {
+            this.label.pos = this.getCenter()
+            this.label.pos.x -= ctx.measureText(this.structure.name).width / 2
+            this.label.draw(ctx, delta)
+        }
+
+        let debug = false;
+        if (debug) {
+            if (this.slots().length > 0) {
+                // draw slots
+                this.slots().forEach((slot: Slot) => {
+                    let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 3, height: 3 }
+                    this.drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
+                })
+            }
+            if (this.nodes().length > 0) {
+                // draw nodes
+                this.nodes().forEach((node: Vector) => {
+                    let rect: Rectangle = { x: node.x, y: node.y, width: 4, height: 4 }
+                    this.drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
+                })
+            }
+        }
+    }
+
+    step: number = 0
+    update(engine: Game, delta: number) {
+        super.update(engine, delta)
+        if (this.step % 10 === 0) {
+            let tryProduce = this.built && this.produces && this.product.length < this.capacity;
+            if (tryProduce) {
+                this.produce(this.step);
+            }
+        }
+        this.step += 1
+    }
+
     setup(): void {}
 
     constrainCursor(cursor: Vector): Vector {
         return cursor.clone();
     } 
     reshape(cursor: Vector): void {
-        // by default just follow the mouse
         this.pos = cursor.clone()
-
     }
 
     afterConstruct(): void {}
 
-    // response is whether we're 'done'
-    // (in general this would be true, unless you need special handling
-    // -- multiple clicks for some reason...)
     handleClick(cursor: Vector): boolean { return true; }
 
     slots(): Slot[] {
@@ -109,24 +143,15 @@ export class Building extends Actor {
 
     get produces() { return this.structure.produces }
     get consumes() { return this.structure.consumes }
+    get productionTime() { return this.structure.productionTime }
 
     async interact(citizen: Citizen) {
-        console.log("interact!!!")
-        // should we give this citizen an item?
         if (this.product.length > 0) {
-            console.log("we have production to give away")
-            citizen.carry(this.produces) //productColor.clone())
+            citizen.carry(this.produces)
             this.product.pop()
-            // return true
         } else {
-            console.log("we check to see if we can consume", { consumes: this.consumes, carrying: citizen.carrying})
-            // is the citizen carrying a raw material we can process?
-            if (this.consumes && citizen.carrying === this.consumes) { //consumeColor) {
-                // now we need to await this thing being processed
-                await citizen.progressBar(4000)
-                //  citizen.carrying
-
-                // change it in place?
+            if (this.consumes && citizen.carrying === this.consumes) {
+                await citizen.progressBar(this.productionTime)
                 citizen.carry(this.produces)
             }
         }
@@ -136,57 +161,11 @@ export class Building extends Actor {
         if (this.produces && !this.consumes && step % this.productionTime === 0) {
             let shouldProduce = true;
             if (shouldProduce) {
-                this.product.push(this.produces) //Color.Blue)
+                this.product.push(this.produces)
                 console.log("PRODUCE", { produces: this.produces, product: this.product })
             }
         }
     }
-
-    draw(ctx: CanvasRenderingContext2D, delta: number) {
-        if (!this.hideBox) {
-            this.drawRect(ctx, this.aabb(), this.edgeWidth)
-        }
-
-        this.product.forEach((produced, index) => {
-            ctx.fillStyle = blockColor(produced).desaturate(0.3).lighten(0.2).toRGBA();
-            ctx.fillRect(this.x + 20 * index, this.y - 20, 18, 18)
-        })
-
-        this.label.pos = this.getCenter()//this.label.getWidth() //ctx.measureText()
-        this.label.pos.x -= ctx.measureText(this.structure.name).width / 2 //bthis.label.getWidth()
-        this.label.draw(ctx, delta)
-
-        let debug = true;
-        if (debug) {
-            if (this.slots().length > 0) {
-                // draw slots
-                this.slots().forEach((slot: Slot) => {
-                    let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 3, height: 3 }
-                    this.drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
-                })
-            }
-            if (this.nodes().length > 0) {
-                // draw nodes
-                this.nodes().forEach((node: Vector) => {
-                    let rect: Rectangle = { x: node.x, y: node.y, width: 4, height: 4 }
-                    this.drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
-                })
-            }
-        }
-    }
-
-    step: number = 0
-    update(engine: Game, delta: number) {
-        super.update(engine, delta)
-        if (this.step % 10 === 0) {
-            let tryProduce = this.built && this.produces && this.product.length < this.capacity;
-            if (tryProduce) {
-                this.produce(this.step);
-            }
-        }
-        this.step += 1
-    }
-
 
     protected drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 5, color: Color = null) {
         let { x, y, width, height } = rectangle;
@@ -230,7 +209,7 @@ export class Building extends Actor {
     }
 
     protected edgeColor(): Color {
-        let edge = this.processedColor().lighten(0.5);
+        let edge = this.processedColor().lighten(0.85);
         return edge;
     }
 

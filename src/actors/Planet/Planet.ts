@@ -17,7 +17,7 @@ export class Planet extends Actor {
         // public effectiveY: number,
         public color: Color,
         public width: number = 2000000,
-        public depth: number = 100000,
+        public depth: number = 1000000,
         ) {
         super(0, depth/2, width, depth, color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
@@ -28,7 +28,7 @@ export class Planet extends Actor {
         this.createLayer(yBase, crustHeight, this.color.lighten(0.25))
 
 
-        let layerCount = 20
+        let layerCount = 10
         let layerHeight = depth / layerCount 
         for (let i of range(layerCount)) {
             this.createLayer(

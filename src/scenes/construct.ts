@@ -10,6 +10,7 @@ import { LabView } from "../actors/Building/LabView";
 import { MineView } from "../actors/Building/MineView";
 import { MessView } from "../actors/Building/MessView";
 import { KitchenView } from "../actors/Building/KitchenView";
+import { PowerPlantView } from "../actors/Building/PowerPlantView";
 
 
 export class Construct extends Scene {
@@ -37,6 +38,7 @@ export class Construct extends Scene {
         MineView,
         KitchenView,
         MessView,
+        PowerPlantView
     }
     ////
     static requiredStructureList: Array<typeof Structure> = [
@@ -71,7 +73,8 @@ export class Construct extends Scene {
         this.add(this.hud)
 
         this.prepareNextBuilding()
-        // this.camera.zoom(0.25)
+        this.camera.zoom(0.001)
+        this.camera.zoom(2, 10000)
         // this.camera.y = 0 //-this.planet.depth/2
     }
 
