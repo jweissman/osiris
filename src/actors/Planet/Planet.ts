@@ -6,7 +6,7 @@ import { Citizen } from '../Citizen';
 import { Mountains } from './PlanetBackground';
 import { Structure, MissionControl, LivingQuarters } from '../../models/Structure';
 import { NavigationTree } from './NavigationTree';
-import { Hud } from '../Hud';
+import { Hud } from '../Hud/Hud';
 import { ResourceBlock } from '../../models/Economy';
 
 export class Planet extends Actor {

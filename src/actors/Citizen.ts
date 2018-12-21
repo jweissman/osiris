@@ -1,7 +1,7 @@
 import { Actor, Color, Traits, Vector } from "excalibur";
 import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
-import { Structure, MissionControl, Laboratory, Mine, Dome, Kitchen } from "../models/Structure";
+import { Structure, MissionControl, Laboratory, Mine, Dome, Kitchen, Study, Refinery } from "../models/Structure";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
 
@@ -104,8 +104,15 @@ export class Citizen extends Actor {
             // console.log("carrying", this.carrying)
             let item: ResourceBlock = this.carrying;
             let sinks = []
+
+            // what structure consumes what i'm carrying?
+            // could check in a list
             if (ResourceBlock[item] === 'Food') {
                 sinks = [Kitchen]
+            } else if (ResourceBlock[item] === 'Hypothesis') {
+                sinks = [Laboratory]
+            } else if (ResourceBlock[item] === 'Ore') {
+                sinks = [Refinery]
             } else {
                 sinks = [MissionControl]
             }
@@ -113,23 +120,21 @@ export class Citizen extends Actor {
             if (sinks.length > 0) {
                 let theSink = this.planet.closestBuildingByType(this.pos, sinks)
                 if (theSink) {
-                    await this.walkTo(theSink) //, async (b) => await b.interact(this))
+                    await this.walkTo(theSink)
                     await theSink.interact(this)
-                    // console.log("delivered to sink!")
                 }
             } else {
                 console.log("nowhere to deliver it", this.carrying)
             }
         } else {
             let source = this.planet.closestBuildingByType(this.pos,
-                [Dome, Mine, Laboratory],
+                [Dome, Mine, Study],
                 (building) => building.product.length > 0
             )
 
             if (source) {
-                await this.walkTo(source) //, async (b) => await b.interact(this))
+                await this.walkTo(source)
                 await source.interact(this)
-                // console.log("gathered from source!!")
             } else {
                 console.log("i guess i can try again? (sleep for a bit first)")
         await new Promise((resolve, reject) => setTimeout(resolve, 3000));

@@ -1,60 +1,22 @@
-import { Label, UIActor, Color, Actor } from "excalibur";
-import { Dome, Structure, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad, Mine, Laboratory, Kitchen, Mess, PowerPlant } from "../models/Structure";
-import { Game } from "../Game";
-import { ResourceBlock, blockColor } from "../models/Economy";
-
-class ResourceListEntry extends Actor {
-    icon: Actor
-    count: Label
-    constructor(x: number, y: number, resourceBlock: ResourceBlock, protected value: number) {
-        super(x,y,10,10) // 10,10,blockColor(resourceBlock))
-        let icon = new Actor(x, y, 10, 10, blockColor(resourceBlock)) //ResourceBlock.Meal))
-        this.add(icon)
-        this.count = new Label(`x${value}`, x + 10, y + 8, 'Helvetica')
-        this.count.fontSize = 12
-        this.count.color = Color.White
-        this.add(this.count)
-    }
-
-    credit(amt: number) {
-        this.value += amt
-        this.count.text = `x${this.value}`
-    }
-}
-
-class ResourcesList extends Actor {
-    entries: { [block in ResourceBlock]: ResourceListEntry } = {
-        [ResourceBlock.Meal]: null,
-        [ResourceBlock.Food]: null,
-        [ResourceBlock.Ore]: null,
-        [ResourceBlock.Data]: null,
-    }
-    constructor(x: number, y: number) {
-        super(x, y, 60, 60, Color.DarkGray.darken(0.8))
-        let rx0 = -8, ry0 = -10
-        let resources = [ResourceBlock.Meal, ResourceBlock.Data, ResourceBlock.Ore]
-        resources.forEach((resource, index) => {
-            let rx = rx0, ry = ry0 + index * 10
-            let entry = new ResourceListEntry(rx,ry,resource,0)
-            this.add(entry)
-            this.entries[resource] = entry
-        })
-    }
-
-    increment(resource: ResourceBlock) {
-        this.entries[resource].credit(1)
-    }
-}
+import { Label, UIActor, Color } from "excalibur";
+import { Dome, Structure, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad, Mine, Laboratory, Kitchen, Mess, PowerPlant, Study, Refinery } from "../../models/Structure";
+import { Game } from "../../Game";
+import { ResourceBlock } from "../../models/Economy";
+import { ResourcesList } from "./ResourcesList";
 
 export class Hud extends UIActor {
     label: Label
     resources: ResourcesList
     protected _paletteElement: HTMLDivElement
     static structuresForPalette = [
-        Dome, AccessTunnel, CommonArea,
-        LivingQuarters, SurfaceRoad,
-        Laboratory, Mine,
-        Kitchen, Mess,
+        AccessTunnel, CommonArea,
+        SurfaceRoad,
+
+        LivingQuarters, 
+        Dome, Kitchen, Mess,
+
+        Study, Laboratory,
+        Mine, Refinery,
         PowerPlant
     ];
     constructor(game: Game, message = 'welcome to osiris', protected onBuildingSelect = null) {
@@ -111,14 +73,15 @@ export class Hud extends UIActor {
 
     private buttonFactory(s: Structure) {
         let bg = Color.DarkGray.darken(0.8) //.desaturate(0.25) //.toRGBA()
+        bg.a = 0.6
         let fg = Color.Blue.lighten(0.8).desaturate(0.55) //.toRGBA()
         let paletteButton = document.createElement('button');
         paletteButton.textContent = `${s.name}`;
         paletteButton.style.display = 'block';
-        paletteButton.style.fontSize = '12pt';
+        paletteButton.style.fontSize = '10pt';
 
         paletteButton.style.fontFamily = 'Helvetica';
-        paletteButton.style.fontWeight = '700';
+        paletteButton.style.fontWeight = '600';
         paletteButton.style.padding = '8px';
         paletteButton.style.width = '130px';
         paletteButton.style.textTransform = 'uppercase'

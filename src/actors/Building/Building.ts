@@ -90,12 +90,12 @@ export class Building extends Actor {
     step: number = 0
     update(engine: Game, delta: number) {
         super.update(engine, delta)
-        if (this.step % 10 === 0) {
+        // if (this.step % 100 === 0) {
             let tryProduce = this.built && this.produces && this.product.length < this.capacity;
             if (tryProduce) {
                 this.produce(this.step);
             }
-        }
+        // }
         this.step += 1
     }
 

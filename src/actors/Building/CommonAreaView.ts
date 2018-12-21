@@ -1,6 +1,6 @@
 import { Building } from "./Building";
 import { Orientation } from "../../values/Orientation";
-import { AccessTunnel, Structure, CommonArea, Laboratory, LivingQuarters, Mine, Kitchen, Mess } from "../../models/Structure";
+import { AccessTunnel, Structure, CommonArea, Laboratory, LivingQuarters, Mine, Kitchen, Mess, Study } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 import { Vector } from "excalibur";
 
@@ -42,6 +42,14 @@ export class CommonAreaView extends Building {
     }
 
     protected validConnectingStructures(): (typeof Structure)[] {
-        return [ AccessTunnel, CommonArea, Laboratory, LivingQuarters, Mess, Kitchen ];
+        return [
+            AccessTunnel,
+            CommonArea,
+            Laboratory,
+            LivingQuarters,
+            Mess,
+            Kitchen,
+            Study,
+        ];
     }
 }

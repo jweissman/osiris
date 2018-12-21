@@ -20,7 +20,7 @@ export class Structure {
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
-    productionTime: number = 100
+    productionTime: number = 500
 
     constructor(public origin: Vector = new Vector(0, 0)) { }
 }
@@ -52,6 +52,7 @@ export class Dome extends Structure {
     width: number = major.sixth // 10 * majorUnit
     height: number = major.third //8 * majorUnit
     zoom = 0.2
+    // productionTime = 500
 }
 
 export class AccessTunnel extends Structure {
@@ -59,7 +60,7 @@ export class AccessTunnel extends Structure {
     description: string = 'in the hallway'
     view: string = 'AccessTunnelView'
     width: number = minor.fifth // 10 * minorUnit
-    height: number = minor.first //1 * minorUnit
+    height: number = minor.third //1 * minorUnit
     zoom = 0.5
 }
 
@@ -91,10 +92,12 @@ export class SurfaceRoad extends Structure {
 export class Laboratory extends Structure {
     name: string = 'Lab'
     description: string = 'learn some things'
+    consumes = ResourceBlock.Hypothesis
     produces = ResourceBlock.Data
     view: string = 'LabView'
     width: number = major.sixth // 11 * majorUnit
     height: number = major.fifth // 5 * majorUnit
+    productionTime = 6500
 }
 
 
@@ -106,6 +109,7 @@ export class Kitchen extends Structure {
     view: string = 'KitchenView'
     width: number = major.fourth // 4 * majorUnit
     height: number = major.fifth //5 * majorUnit
+    productionTime = 2000
 }
 
 export class Mess extends Structure {
@@ -126,6 +130,28 @@ export class Mine extends Structure {
     width: number = major.eighth // 20 * majorUnit
     height: number = 3 * major.sixth //20 * majorUnit
 }
+
+export class Study extends Structure {
+    name: string = 'Study'
+    description: string = 'reflect'
+    view: string = 'StudyView'
+    width = major.third
+    height = major.fifth
+    produces = ResourceBlock.Hypothesis
+    productionTime = 1000
+}
+
+export class Refinery extends Structure {
+    name = 'Refinery'
+    description = 'flotate'
+    consumes = ResourceBlock.Ore
+    produces = ResourceBlock.Mineral
+    view = 'RefineryView'
+    width = major.fifth
+    height = major.fifth
+    productionTime = 9000
+}
+
 //export class Workshop extends Structure {
 //    name: string = 'Workshop'
 //    description: string = 'manual'

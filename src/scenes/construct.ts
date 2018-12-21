@@ -4,13 +4,15 @@ import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
 import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad, Kitchen, Mess } from "../models/Structure";
 import { Building, DomeView, AccessTunnelView, CommonAreaView, TunnelView, MissionControlView, LivingQuartersView } from "../actors/Building";
-import { Hud } from "../actors/Hud";
+import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
 import { LabView } from "../actors/Building/LabView";
 import { MineView } from "../actors/Building/MineView";
 import { MessView } from "../actors/Building/MessView";
 import { KitchenView } from "../actors/Building/KitchenView";
 import { PowerPlantView } from "../actors/Building/PowerPlantView";
+import { StudyView } from "../actors/Building/StudyView";
+import { RefineryView } from "../actors/Building/RefineryView";
 
 
 export class Construct extends Scene {
@@ -38,7 +40,9 @@ export class Construct extends Scene {
         MineView,
         KitchenView,
         MessView,
-        PowerPlantView
+        PowerPlantView,
+        StudyView,
+        RefineryView,
     }
     ////
     static requiredStructureList: Array<typeof Structure> = [
