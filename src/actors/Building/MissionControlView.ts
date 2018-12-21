@@ -5,6 +5,7 @@ import { Citizen } from "../Citizen";
 import { SSL_OP_TLS_BLOCK_PADDING_BUG } from "constants";
 import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
+import { ResourceBlock } from "../../models/Economy";
 
 export class MissionControlView extends Building {
     hideBox = true
@@ -52,7 +53,10 @@ export class MissionControlView extends Building {
 
     async interact(citizen: Citizen) {
         let resource = citizen.drop()
-        console.log("citizen gathered resource", { resource })
+        if (resource) { //} instanceof ResourceBlock) {
+            // console.log("citizen gathered resource", { resource })
+            this.planet.gather(resource)
+        }
         // citizen.work()
 
         // return true

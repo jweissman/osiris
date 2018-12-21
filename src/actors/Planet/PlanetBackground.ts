@@ -13,20 +13,20 @@ export class Mountains extends PlanetBackground {
         height: number;
     }[] = [];
     onInitialize() {
-        let peakCount = 30; // Math.floor(this.getWidth() / 2000)
-        let peakHeight = 1000;
+        let peakCount = 20; // Math.floor(this.getWidth() / 2000)
+        let peakHeight = 3000;
         // let mtnWidth = 180
         // figure out mountain peaks?
         // let yBase = this.pos.y //-1000 //this.pos.y //this.getHeight()
         let xOff = this.getWidth() / 2;
         let peakDistance = this.getWidth() / peakCount;
-        for (let times of range(10)) {
+        for (let times of range(5)) {
             let heightRange = 100*times;
             let drift = 3 * times * (peakDistance / 2);
             for (let i of range(peakCount)) { //} / 2)) {
                 this.peaks.push({
                     x: -xOff + i * peakDistance + ((Math.random() * drift) - (drift / 2)),
-                    height: Math.max(10, peakHeight + ((Math.random() * heightRange)-(heightRange/2))) //(Util.randomIntInRange(-160,160))
+                    height: Math.max(10, 1000 + (Math.random()*peakHeight) + ((Math.random() * heightRange)-(heightRange/2))) //(Util.randomIntInRange(-160,160))
                     // y = yBase - peakHeight
                 });
             }

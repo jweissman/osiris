@@ -58,19 +58,20 @@ export class Construct extends Scene {
     public onInitialize(game: Game) {
         this.game = game
 
-        this.planet = new Planet(game.world.color);
-        this.add(this.planet)
-  
-        this.player = new Player()
-        this.add(this.player)
 
-        this.hud = new Hud('hi', (structure) => {
+        this.hud = new Hud(game, 'hi', (structure) => {
             //if (this.currentlyBuilding) {
             //    this.remove(this.currentlyBuilding)
             //}
             this.startConstructing(structure)
         });
         this.add(this.hud)
+
+        this.planet = new Planet(this.hud, game.world.color);
+        this.add(this.planet)
+  
+        this.player = new Player()
+        this.add(this.player)
 
         this.prepareNextBuilding()
         this.camera.zoom(0.001)

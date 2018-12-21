@@ -6,14 +6,18 @@ import { Citizen } from '../Citizen';
 import { Mountains } from './PlanetBackground';
 import { Structure, MissionControl, LivingQuarters } from '../../models/Structure';
 import { NavigationTree } from './NavigationTree';
+import { Hud } from '../Hud';
+import { ResourceBlock } from '../../models/Economy';
 
 export class Planet extends Actor {
+    
     buildings: Building[] = []
     citizens: Citizen[] = []
     navTree: NavigationTree
     currentlyConstructing: Building = null
 
     constructor(
+        public hud: Hud,
         // public effectiveY: number,
         public color: Color,
         public width: number = 2000000,
@@ -63,6 +67,11 @@ export class Planet extends Actor {
         this.citizens.forEach(citizen => citizen.update(engine, delta))
     }
 
+    gather(resource: ResourceBlock): any {
+        this.hud.resourceGathered(resource)
+        // throw new Error("Method not implemented.");
+    }
+
     placeBuilding(building: Building) {
         building.built = true
         // whew
@@ -77,7 +86,7 @@ export class Planet extends Actor {
 
     populate(pos: Vector) {
         let home = this.closestBuildingByType(pos, [LivingQuarters])
-        console.log("populating", { home })
+        // console.log("populating", { home })
         let citizen = new Citizen(home, this)
         citizen.work()
         this.citizens.push(citizen)

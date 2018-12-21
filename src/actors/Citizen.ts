@@ -58,13 +58,13 @@ export class Citizen extends Actor {
         this.carrying = c;
     }
 
-    drop() {
+    drop(): ResourceBlock {
         if (this.carrying) {
             let c = this.carrying; //.clone();
             this.carrying = null;
             return c
         }
-        return true
+        return null
     }
 
     glideTo(pos: Vector) {
@@ -72,12 +72,12 @@ export class Citizen extends Actor {
     }
 
     async progressBar(duration: number) {
-        console.log("PROGRESS BAR")
+        // console.log("PROGRESS BAR")
         this.workInProgress = true
         this.workStarted = (new Date()).getTime()
         this.workDuration = duration
         await new Promise((resolve, reject) => setTimeout(resolve, duration));
-        console.log("PROGRESS BAR DONE!")
+        // console.log("PROGRESS BAR DONE!")
         this.workInProgress = false
     }
 
@@ -101,7 +101,7 @@ export class Citizen extends Actor {
 
     async work() {
         if (this.carrying) {
-            console.log("carrying", this.carrying)
+            // console.log("carrying", this.carrying)
             let item: ResourceBlock = this.carrying;
             let sinks = []
             if (ResourceBlock[item] === 'Food') {
@@ -115,7 +115,7 @@ export class Citizen extends Actor {
                 if (theSink) {
                     await this.walkTo(theSink) //, async (b) => await b.interact(this))
                     await theSink.interact(this)
-                    console.log("delivered to sink!")
+                    // console.log("delivered to sink!")
                 }
             } else {
                 console.log("nowhere to deliver it", this.carrying)
@@ -129,7 +129,7 @@ export class Citizen extends Actor {
             if (source) {
                 await this.walkTo(source) //, async (b) => await b.interact(this))
                 await source.interact(this)
-                console.log("gathered from source!!")
+                // console.log("gathered from source!!")
             } else {
                 console.log("i guess i can try again? (sleep for a bit first)")
         await new Promise((resolve, reject) => setTimeout(resolve, 3000));
