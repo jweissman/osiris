@@ -52,7 +52,7 @@ export class Dome extends Structure {
     width: number = major.sixth // 10 * majorUnit
     height: number = major.third //8 * majorUnit
     zoom = 0.2
-    // productionTime = 500
+    productionTime = 5000
 }
 
 export class AccessTunnel extends Structure {
@@ -138,7 +138,7 @@ export class Study extends Structure {
     width = major.third
     height = major.fifth
     produces = ResourceBlock.Hypothesis
-    productionTime = 1000
+    productionTime = 2000
 }
 
 export class Refinery extends Structure {
@@ -150,6 +150,14 @@ export class Refinery extends Structure {
     width = major.fifth
     height = major.fifth
     productionTime = 9000
+}
+
+export class Ladder extends Structure {
+    name = 'Ladder'
+    description = 'connect vertically'
+    view = 'LadderView'
+    width = minor.third
+    height = major.third
 }
 
 //export class Workshop extends Structure {
@@ -178,6 +186,6 @@ export class PowerPlant extends Structure {
     name: string = 'Power Plant'
     description: string = 'sunny day'
     view: string = 'PowerPlantView'
-    width: number = major.eighth //30 * majorUnit
-    height: number = major.eighth // 30 * majorUnit
+    width: number = 2 * major.eighth //30 * majorUnit
+    height: number = 2 * major.eighth // 30 * majorUnit
 }

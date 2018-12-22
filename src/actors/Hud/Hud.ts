@@ -19,10 +19,11 @@ export class Hud extends UIActor {
         Mine, Refinery,
         PowerPlant
     ];
-    constructor(game: Game, message = 'welcome to osiris', protected onBuildingSelect = null) {
-        super(0, 0);
-        this.label = new Label(message, 20, game.canvasHeight - 64, 'Helvetica')
-        this.label.fontSize = 32
+    constructor(game: Game, message = 'hello', protected onBuildingSelect = null) {
+        super(0, 0, game.canvasWidth, game.canvasHeight);
+
+        this.label = new Label(message, 20, game.canvasHeight - 64, 'Verdana')
+        this.label.fontSize = 24
         this.label.color = Color.White
         this.add(this.label)
 

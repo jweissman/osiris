@@ -1,10 +1,22 @@
 import { CommonAreaView } from ".";
+import { range } from "../../Util";
 
 export class LivingQuartersView extends CommonAreaView {
-    // edgeWidth: number = 2
     afterConstruct() {
-        // console.log("AFTER CONSTRUCT LIVING QUARTERS")
+        this.spawnCitizen()
+    }
+
+    protected spawnCitizen() {
         setTimeout(() => this.planet.populate(this.pos), 100)
     }
+
+
+    levelUp() {
+        super.levelUp()
+        for (let i in range(this.level)) {
+            this.spawnCitizen()
+        }
+    }
+
 
 }

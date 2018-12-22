@@ -137,7 +137,7 @@ export class Citizen extends Actor {
                 await source.interact(this)
             } else {
                 console.log("i guess i can try again? (sleep for a bit first)")
-        await new Promise((resolve, reject) => setTimeout(resolve, 3000));
+        await new Promise((resolve, reject) => setTimeout(resolve, 15000));
                 //etTimeout(() => this.work(), 500)
             }
         }

@@ -179,7 +179,7 @@ export class Construct extends Scene {
         if (structure) {
             this.startConstructing(structure, pos)
         } else {
-            this.hud.message(`Welcome to OSIRIS`)
+            this.hud.message(`Welcome to OSIRIS!`)
         }
     }
 

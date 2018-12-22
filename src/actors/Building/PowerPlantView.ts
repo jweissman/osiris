@@ -2,7 +2,7 @@ import { Building } from ".";
 import { AccessTunnel } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 import { Orientation } from "../../values/Orientation";
-import { Vector } from "excalibur";
+import { Vector, Polygon } from "excalibur";
 
 export class PowerPlantView extends Building {
     showLabel = true

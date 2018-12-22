@@ -12,7 +12,9 @@ import { Graph } from "../../values/Graph";
 import { ResourceBlock, blockColor } from "../../models/Economy";
 
 export class Building extends Actor {
-    label: Label
+    nameLabel: Label
+    levelLabel: Label
+
     built: boolean = false
     hover: boolean = false
     showLabel: boolean = false
@@ -23,6 +25,8 @@ export class Building extends Actor {
     childrenBuildings: Building[] = []
     product: ResourceBlock[] = []
     capacity: number = 4
+
+    level: number = 1
 
     constructor(public structure: Structure, protected planet: Planet) {
         super(
@@ -41,14 +45,29 @@ export class Building extends Actor {
             this.hover = true
         })
 
+        // this.on('pointerdown', () => {
+        //     console.log("CLICKED BUILDING", { building: this })
+        //     this.levelUp();
+        // })
+
         this.on('pointerleave', () => {
             this.hover = false
         })
 
         this.collisionType = CollisionType.PreventCollision
 
-        this.label = new Label(this.structure.name, 0, 0, 'Helvetica')
-        this.label.color = Color.White
+        this.nameLabel = new Label(this.structure.name, 0, 0, 'Helvetica')
+        // this.nameLabel.fontSize = 11
+        this.nameLabel.color = Color.White
+
+        this.levelLabel = new Label(`Lvl. ${this.level}`, 0, 0, 'Helvetica')
+        this.levelLabel.fontSize = 6
+        this.levelLabel.color = Color.White.darken(0.2)
+    }
+
+    levelUp() {
+        this.level += 1
+        this.levelLabel.text = `Lvl. ${this.level}`
     }
 
 
@@ -63,9 +82,15 @@ export class Building extends Actor {
         })
 
         if (this.showLabel) {
-            this.label.pos = this.getCenter()
-            this.label.pos.x -= ctx.measureText(this.structure.name).width / 2
-            this.label.draw(ctx, delta)
+            this.nameLabel.pos = this.getCenter()
+            this.nameLabel.pos.x -= ctx.measureText(this.structure.name).width / 2
+            this.nameLabel.draw(ctx, delta)
+
+            // this.levelLabel.text = `Lvl. ${this.level}`
+            this.levelLabel.pos = this.getCenter()
+            this.levelLabel.pos.y += 10
+            this.levelLabel.pos.x -= ctx.measureText(this.structure.name).width / 4
+            this.levelLabel.draw(ctx, delta)
         }
 
         let debug = false;
@@ -219,6 +244,7 @@ export class Building extends Actor {
     }
 
     protected colorBase(): Color {
+        // if (this.produces) { let c = blockColor(this.produces).desaturate(0.5).lighten(0.4); c.a = 0.5; return c }
         return this.color;
     }
 

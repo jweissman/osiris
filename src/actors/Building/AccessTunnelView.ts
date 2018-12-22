@@ -1,7 +1,7 @@
 import { Building } from "./Building";
 import { Vector } from "excalibur";
 import { Orientation } from "../../values/Orientation";
-import { MainTunnel, CommonArea, LivingQuarters, Laboratory, Mine, PowerPlant } from "../../models/Structure";
+import { MainTunnel, CommonArea, LivingQuarters, Laboratory, Mine, PowerPlant, Refinery } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 
 export class AccessTunnelView extends Building {
@@ -83,6 +83,7 @@ export class AccessTunnelView extends Building {
             LivingQuarters,
             Laboratory,
             Mine,
+            Refinery,
             PowerPlant
         ];
     }
