@@ -1,13 +1,12 @@
-import { Actor, Vector, CollisionType, Color, Label } from "excalibur";
+import { Actor, Vector, CollisionType, Color, Label, Traits } from "excalibur";
 import { Planet } from "../Planet/Planet";
 import { Structure } from "../../models/Structure";
-import * as ex from 'excalibur';
 import { Slot } from "../../values/Slot";
-import { Orientation, flip } from "../../values/Orientation";
+import { Orientation, flip, compass } from "../../values/Orientation";
 import { Citizen } from "../Citizen";
 import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
-import { closest, flatSingle, measureDistance } from "../../Util";
+import { closest, measureDistance } from "../../Util";
 import { Graph } from "../../values/Graph";
 import { ResourceBlock, blockColor } from "../../models/Economy";
 
@@ -36,10 +35,10 @@ export class Building extends Actor {
           structure.height,
           planet.color
         )
-        this.anchor = new ex.Vector(0,0)
+        this.anchor = new Vector(0,0)
 
         this.setup();
-        this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
+        this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
         this.on('pointerenter', () => {
             this.hover = true
@@ -94,7 +93,7 @@ export class Building extends Actor {
             // this.levelLabel.draw(ctx, delta)
         }
 
-        let debug = false;
+        let debug = true;
         if (debug) {
             if (this.slots().length > 0) {
                 // draw slots
@@ -245,7 +244,6 @@ export class Building extends Actor {
     }
 
     protected colorBase(): Color {
-        // if (this.produces) { let c = blockColor(this.produces).desaturate(0.5).lighten(0.4); c.a = 0.5; return c }
         return this.color;
     }
 
@@ -259,41 +257,48 @@ export class Building extends Actor {
         return clr;
     }
 
-    protected validConnectingStructures(): (typeof Structure)[] {
-        return [ ];
+    get connections() {
+        return this.structure.connections;
     }
 
-    protected validConnectingDirections(): Orientation[] {
-        return [
-            Orientation.Up,
-            Orientation.Down,
-            Orientation.Left,
-            Orientation.Right
-        ]
-    }
 
-    protected findSlot(pos: Vector): Slot {
-        let buildings = this.validConnectingStructures().map(structure =>
-            this.planet.closestBuildingByType(pos, [structure])
-        )
-        let slotList = flatSingle(buildings.map(building => building ? building.slots() : []))
+    protected findSlot(
+        pos: Vector,
+        validConnections: { [key in Orientation]: (typeof Structure)[] } = this.connections
+    ): Slot {
+        let slotList = []
+            for (let dir of compass) {
+                const validStructures = validConnections[dir];
+                let flipped = flip(dir)
+                const buildings = validStructures.map(structure =>
+                    this.planet.closestBuildingByType(pos, [structure])
+                )
+                buildings.forEach(building => {
+                    if (building) {
+                        let neighborSlots = building.slots()
+                        neighborSlots.filter(slot => slot.facing === flipped)
+                        .forEach(matchingSlot => {
+                            slotList.push(matchingSlot)
+                        })
+                    }
+                })
+            }
 
-
-        // select slots that COULD match one of our faces (and do so 'legally'...)
-        slotList = slotList.filter((slot: Slot) => 
-            this.validConnectingDirections().includes(slot.facing) &&
-              this.slots().some((ourSlot: Slot) => slot.facing === flip(ourSlot.facing))
-        )
         if (slotList.length > 0) {
             return closest(pos, slotList, (slot) => slot.pos)
+        } else {
+            console.warn('no conecting structures found')
         }
     }
 
-    protected alignToSlot(cursor: Vector) {
-        let theSlot = this.findSlot(cursor)
+    protected alignToSlot(
+        cursor: Vector,
+        validConnections: { [key in Orientation]: (typeof Structure)[] } = this.connections
+    ) {
+        let theSlot = this.findSlot(cursor, validConnections)
         if (theSlot) {
-            // position us so our slot lines up
-            let matchingSlot = this.slots().find(s => s.facing == flip(theSlot.facing))
+            let matchingSlot = this.slots()
+                .find(s => s.facing == flip(theSlot.facing))
             if (matchingSlot) {
                 let offset = theSlot.pos.sub(matchingSlot.pos)
                 this.pos.addEqual(offset)

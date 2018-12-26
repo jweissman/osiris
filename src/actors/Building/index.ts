@@ -1,19 +1,31 @@
 import { Building } from './Building';
 
-import { AccessTunnelView } from './AccessTunnelView';
+import { CorridorView } from './CorridorView';
 import { CommonAreaView } from './CommonAreaView';
 import { DomeView } from './DomeView';
 import { MissionControlView } from './MissionControlView';
 import { TunnelView } from './TunnelView';
-import { LivingQuartersView } from './LivingQuartersView';
+import { ArcologyView } from './ArcologyView';
+import { CloneMatrixView } from './CloneMatrixView';
+import { LabView } from './LabView';
+import { LadderView } from './LadderView';
+import { MineView } from './MineView';
+
+
+// import { LivingQuartersView } from './LivingQuartersView';
 
 export {
     Building,
 
-    AccessTunnelView,
+    CorridorView, // as AccessTunnelView,
     CommonAreaView,
     DomeView,
     MissionControlView,
     TunnelView,
-    LivingQuartersView,
+    ArcologyView,
+    CloneMatrixView,
+    LabView,
+    LadderView,
+    MineView,
+
 }

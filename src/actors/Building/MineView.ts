@@ -1,7 +1,6 @@
 import { CommonAreaView } from '.'
-import { Color, Vector } from 'excalibur';
-import { ResourceBlock } from '../../models/Economy';
-import { AccessTunnel, Refinery, Mine } from '../../models/Structure';
+import { Vector } from 'excalibur';
+import { Corridor, Refinery, Mine } from '../../models/Structure';
 
 export class MineView extends CommonAreaView {
     floorHeight = 150
@@ -14,5 +13,5 @@ export class MineView extends CommonAreaView {
         ];
     }
 
-    validConnectingStructures() { return [ AccessTunnel, Mine, Refinery ]}
+    validConnectingStructures() { return [ Corridor, Mine, Refinery ]}
 }

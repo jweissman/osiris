@@ -2,13 +2,10 @@ import { Scene, Input, UIActor, Label, Vector, LockCameraToActorStrategy } from 
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, SurfaceRoad, Kitchen, CloneMatrix } from "../models/Structure";
-import { Building, DomeView, AccessTunnelView, CommonAreaView, TunnelView, MissionControlView, LivingQuartersView } from "../actors/Building";
+import { Structure, MissionControl, MainTunnel, Dome, Corridor, SurfaceRoad, Kitchen, CloneMatrix } from "../models/Structure";
+import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, MineView, LabView, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
-import { LabView } from "../actors/Building/LabView";
-import { MineView } from "../actors/Building/MineView";
-import { MessView } from "../actors/Building/MessView";
 import { KitchenView } from "../actors/Building/KitchenView";
 import { PowerPlantView } from "../actors/Building/PowerPlantView";
 import { StudyView } from "../actors/Building/StudyView";
@@ -22,32 +19,28 @@ export class Construct extends Scene {
     planet: Planet
     hud: Hud
     player: Player
-    // buildings: Building[] = []
-    // people: Citizen[] = []
 
     dragging: boolean = false
     dragOrigin: Vector
 
-    // currentlyBuilding?: Building
-
     static structureViews: { [key: string]: typeof Building } = {
         TunnelView,
-        MissionControlView, //: new MissionControlView()
+        MissionControlView,
         DomeView,
-        AccessTunnelView,
+        CorridorView,
         CommonAreaView,
-        // LivingQuartersView,
         SurfaceRoadView,
         LabView,
         MineView,
         KitchenView,
-        // MessView,
         PowerPlantView,
         StudyView,
         RefineryView,
 
         ArcologyView,
         CloneMatrixView,
+
+        LadderView,
     }
     ////
     static requiredStructureList: Array<typeof Structure> = [
@@ -56,7 +49,7 @@ export class Construct extends Scene {
         SurfaceRoad,
         Dome,
         MainTunnel,
-        AccessTunnel,
+        Corridor,
         Kitchen,
         CloneMatrix,
     ]
@@ -66,9 +59,6 @@ export class Construct extends Scene {
 
 
         this.hud = new Hud(game, 'hi', (structure) => {
-            //if (this.currentlyBuilding) {
-            //    this.remove(this.currentlyBuilding)
-            //}
             this.startConstructing(structure)
         });
         this.add(this.hud)
@@ -82,7 +72,6 @@ export class Construct extends Scene {
         this.prepareNextBuilding()
         this.camera.zoom(0.001)
         this.camera.zoom(2, 10000)
-        // this.camera.y = 0 //-this.planet.depth/2
     }
 
     public onActivate() {
@@ -96,13 +85,10 @@ export class Construct extends Scene {
 
                 let currentBuilding = this.planet.currentlyConstructing
                 if (currentBuilding) {
-                    // constrain...
                     let constrained = currentBuilding.constrainCursor(this.player.pos)
                     this.player.pos = constrained
 
                     currentBuilding.reshape(this.player.pos)
-                } else {
-                    // show pluses where you could expand?
                 }
             }
         })
@@ -116,14 +102,10 @@ export class Construct extends Scene {
                 const currentBuilding: Building = this.planet.currentlyConstructing
                 if (currentBuilding) {
                     let placementValid = !currentBuilding.overlapsAny()
-                    // console.log("placement valid?", { placementValid, currentBuilding })
                     if (currentBuilding && placementValid && currentBuilding.handleClick(e.pos)) {
-                        // console.log("placed!")
                         this.planet.placeBuilding(currentBuilding)
                         this.planet.colony.currentlyConstructing = null
                         this.prepareNextBuilding(e.pos)
-                    } else {
-                        // console.log("couldn't place?")
                     }
                 }
             } else if (e.button === Input.PointerButton.Middle) {
@@ -168,16 +150,13 @@ export class Construct extends Scene {
         let requiredStructures: Structure[] = Construct.requiredStructureList.map(s => new s())
         let actualStructureNames: string[] = this.buildings.map(building => building.structure.name)
 
-        // console.log({ actualStructureNames, requiredNames: requiredStructures.map(s => s.name) })
         return requiredStructures.find(structure => !actualStructureNames.includes(structure.name))
     }
 
     protected prepareNextBuilding(pos: Vector = new Vector(0,0)) {
-        // let structure = Construct.structureList[this.currentBuildingListIndex % Construct.structureList.length]; 
         let structure = null;
         let nextMissing = this.nextMissingRequiredStructure();
         if (nextMissing) { structure = nextMissing; }
-        // else { this.currentBuildingListIndex += 1 }
         if (structure) {
             this.startConstructing(structure, pos)
         } else {
@@ -192,7 +171,6 @@ export class Construct extends Scene {
         this.planet.colony.currentlyConstructing = theNextOne
         this.camera.pos = theNextOne.pos
         this.camera.zoom(structure.zoom, 250)
-
     }
 
     protected spawnBuilding(structure: Structure): Building {

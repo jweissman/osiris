@@ -1,5 +1,5 @@
 import { Building } from ".";
-import { AccessTunnel } from "../../models/Structure";
+import { Corridor } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 import { Orientation } from "../../values/Orientation";
 import { Vector, Polygon } from "excalibur";
@@ -7,7 +7,7 @@ import { Vector, Polygon } from "excalibur";
 export class PowerPlantView extends Building {
     showLabel = true
 
-    validConnectingStructures() { return [ AccessTunnel ]}
+    validConnectingStructures() { return [ Corridor ]}
 
     draw(ctx, delta) {
         // octagon...

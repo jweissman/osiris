@@ -1,10 +1,10 @@
 import { Building } from "./Building";
 import { Vector } from "excalibur";
 import { Orientation } from "../../values/Orientation";
-import { MainTunnel, CommonArea, Laboratory, Mine, PowerPlant, Refinery } from "../../models/Structure";
+import { MainTunnel, CommonArea, Laboratory, Mine, PowerPlant, Refinery, Ladder } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 
-export class AccessTunnelView extends Building {
+export class CorridorView extends Building {
     edgeWidth: number = 0.4
 
     pickingOrigin: boolean = true
@@ -60,32 +60,36 @@ export class AccessTunnelView extends Building {
 
         if (this.pickingOrigin) {
             let theSlot = this.alignToSlot(cursor)
-            this.facing = theSlot.facing
+            if (theSlot) {
+                this.facing = theSlot.facing
 
-            if (theSlot && this.facing === Orientation.Left) {
-               this.originX = theSlot.pos.x
+                if (theSlot && this.facing === Orientation.Left) {
+                    this.originX = theSlot.pos.x
+                }
             }
 
         } else {
             if (this.facing === Orientation.Left) {
-               this.setWidth(Math.abs(this.originX - cursor.x))
-               this.pos.x = this.originX - this.getWidth()
+                this.setWidth(Math.abs(this.originX - cursor.x))
+                this.pos.x = this.originX - this.getWidth()
             } else {
                 this.setWidth(Math.abs(this.pos.x - cursor.x))
             }
         }
     }
 
-    validConnectingStructures() {
-        return [
-            MainTunnel,
-            CommonArea,
-            // LivingQuarters,
-            Laboratory,
-            Mine,
-            Refinery,
-            PowerPlant
-        ];
-    }
+    // validConnectingStructures() {
+    //     return [
+    //         MainTunnel,
+    //         Ladder,
+
+    //         CommonArea,
+    //         // LivingQuarters,
+    //         Laboratory,
+    //         Mine,
+    //         Refinery,
+    //         PowerPlant
+    //     ];
+    // }
 
 }

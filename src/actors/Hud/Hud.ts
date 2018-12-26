@@ -1,5 +1,5 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Dome, Structure, AccessTunnel, CommonArea, SurfaceRoad, Mine, Laboratory, Kitchen, PowerPlant, Study, Refinery, CloneMatrix, Arcology } from "../../models/Structure";
+import { Dome, Structure, Corridor, CommonArea, SurfaceRoad, Mine, Laboratory, Kitchen, PowerPlant, Study, Refinery, CloneMatrix, Arcology, Ladder } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock } from "../../models/Economy";
 import { ResourcesList } from "./ResourcesList";
@@ -9,8 +9,9 @@ export class Hud extends UIActor {
     resources: ResourcesList
     protected _paletteElement: HTMLDivElement
     static structuresForPalette = [
-        AccessTunnel, CommonArea,
         SurfaceRoad,
+        Corridor, 
+        Ladder,
 
         // LivingQuarters, 
         Dome, Kitchen,
@@ -22,6 +23,8 @@ export class Hud extends UIActor {
 
         CloneMatrix,
         Arcology,
+
+   // CommonArea,
     ];
     constructor(game: Game, message = 'hello', protected onBuildingSelect = null) {
         super(0, 0, game.canvasWidth, game.canvasHeight);

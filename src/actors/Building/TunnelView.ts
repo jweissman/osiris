@@ -57,11 +57,11 @@ export class TunnelView extends Building {
 
     private slotHeights() {
         let slotSize = 40
-        let slotCount = Math.floor((this.getHeight()-60) / slotSize)
+        let slotCount = Math.floor((this.getHeight()-10) / slotSize)
         let heights = []
         for (let i of range(slotCount)) {
             heights.push(
-                100 + this.pos.y + i * slotSize,
+                10 + this.pos.y + i * slotSize,
             )
         }
         return heights
@@ -94,11 +94,19 @@ export class TunnelView extends Building {
                 )
             )
         }
+
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x + this.getWidth()/2,
+                this.pos.y + this.getHeight(),
+                Orientation.Down
+            )
+        )
         return theSlots;
     } 
 
-    validConnectingStructures() { return [ MissionControl ] }
-    validConnectingDirections() { return [ Orientation.Down ] }
+    // validConnectingStructures() { return [ MissionControl ] }
+    // validConnectingDirections() { return [ Orientation.Up, Orientation.Down ] }
 
     handleClick(cursor: Vector) {
         if (this.pickingOrigin) {

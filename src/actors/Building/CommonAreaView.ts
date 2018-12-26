@@ -1,6 +1,6 @@
 import { Building } from "./Building";
 import { Orientation } from "../../values/Orientation";
-import { AccessTunnel, Structure, CommonArea, Laboratory, Mine, Kitchen, Study, CloneMatrix } from "../../models/Structure";
+import { Corridor, Structure, CommonArea, Laboratory, Mine, Kitchen, Study, CloneMatrix, Ladder } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 import { Vector } from "excalibur";
 
@@ -26,6 +26,24 @@ export class CommonAreaView extends Building {
             Orientation.Right,
         )
         theSlots.push(rightSlot)
+
+        // top slot
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x + this.getWidth()/2,
+                this.pos.y,
+                Orientation.Up
+            )
+        )
+
+        // bottom slot
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x + this.getWidth()/2,
+                this.pos.y + this.getHeight(),
+                Orientation.Down
+            )
+        )
         return theSlots;
     }
 
@@ -43,12 +61,13 @@ export class CommonAreaView extends Building {
 
     protected validConnectingStructures(): (typeof Structure)[] {
         return [
-            AccessTunnel,
+            Corridor,
             CommonArea,
             Laboratory,
             Kitchen,
             Study,
             CloneMatrix,
+            Ladder,
         ];
     }
 }
