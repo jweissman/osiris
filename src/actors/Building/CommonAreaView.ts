@@ -1,14 +1,15 @@
 import { Building } from "./Building";
 import { Orientation } from "../../values/Orientation";
-import { Corridor, Structure, CommonArea, Laboratory, Mine, Kitchen, Study, CloneMatrix, Ladder } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 import { Vector } from "excalibur";
 
 export class CommonAreaView extends Building {
     floorHeight: number = 8
-    edgeWidth: number = 1
+    edgeWidth: number = 0.5 //.1
     showLabel = true
     // maybe you can set height AND width of common area view??
+    // maybe just width...
+    colorBase() { return this.color.darken(0.1); }
 
     slots() {
         let theSlots = []
@@ -57,17 +58,5 @@ export class CommonAreaView extends Building {
   
     reshape(cursor) {
         this.alignToSlot(cursor);
-    }
-
-    protected validConnectingStructures(): (typeof Structure)[] {
-        return [
-            Corridor,
-            CommonArea,
-            Laboratory,
-            Kitchen,
-            Study,
-            CloneMatrix,
-            Ladder,
-        ];
     }
 }

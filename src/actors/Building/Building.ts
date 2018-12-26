@@ -6,11 +6,13 @@ import { Orientation, flip, compass } from "../../values/Orientation";
 import { Citizen } from "../Citizen";
 import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
-import { closest, measureDistance } from "../../Util";
+import { closest, measureDistance, drawRect, drawLine } from "../../Util";
 import { Graph } from "../../values/Graph";
 import { ResourceBlock, blockColor } from "../../models/Economy";
 
 export class Building extends Actor {
+    edgeWidth: number = 0 //.1
+
     nameLabel: Label
     levelLabel: Label
 
@@ -18,7 +20,6 @@ export class Building extends Actor {
     hover: boolean = false
     showLabel: boolean = false
     facing: Orientation = Orientation.Right
-    edgeWidth: number = 4
     hideBox: boolean = false
     parentSlot: Slot
     childrenBuildings: Building[] = []
@@ -26,6 +27,8 @@ export class Building extends Actor {
     capacity: number = 4
 
     level: number = 1
+
+    // colorBase() { return this.color.darken(0.1); }
 
     constructor(public structure: Structure, protected planet: Planet) {
         super(
@@ -73,7 +76,7 @@ export class Building extends Actor {
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (!this.hideBox) {
-            this.drawRect(ctx, this.aabb(), this.edgeWidth)
+            drawRect(ctx, this.aabb(), this.edgeWidth, this.processedColor())
         }
 
         this.product.forEach((produced, index) => {
@@ -93,20 +96,20 @@ export class Building extends Actor {
             // this.levelLabel.draw(ctx, delta)
         }
 
-        let debug = true;
+        let debug = false;
         if (debug) {
             if (this.slots().length > 0) {
                 // draw slots
                 this.slots().forEach((slot: Slot) => {
                     let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 3, height: 3 }
-                    this.drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
+                    drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
                 })
             }
             if (this.nodes().length > 0) {
                 // draw nodes
                 this.nodes().forEach((node: Vector) => {
                     let rect: Rectangle = { x: node.x, y: node.y, width: 4, height: 4 }
-                    this.drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
+                    drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
                 })
             }
         }
@@ -192,22 +195,7 @@ export class Building extends Actor {
         }
     }
 
-    protected drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 5, color: Color = null) {
-        let { x, y, width, height } = rectangle;
 
-        let edge = color || this.edgeColor();
-        ctx.fillStyle = edge.toRGBA();
-        ctx.fillRect(x, y, width, height)
-
-        let main = color || this.mainColor();
-        ctx.fillStyle = main.toRGBA();
-        ctx.fillRect(
-            x + edgeWidth,
-            y + edgeWidth,
-            width - edgeWidth*2,
-            height - edgeWidth*2
-        )
-    }
 
     protected aabb(): Rectangle {
         return {

@@ -4,6 +4,7 @@ import { Planet } from "./Planet/Planet";
 import { Structure, MissionControl, Laboratory, Mine, Dome, Kitchen, Study, Refinery } from "../models/Structure";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
+import { eachCons } from "../Util";
 
 export class Citizen extends Actor {
     walkSpeed: number = Game.citizenSpeed
@@ -38,6 +39,7 @@ export class Citizen extends Actor {
         }
 
         if (this.workInProgress) {
+            ctx.lineWidth = 1
             let pw = 10, ph = 3
             let px = this.x - pw/2, py = this.y - 10;
             // draw progress bar?
@@ -51,6 +53,20 @@ export class Citizen extends Actor {
             ctx.fillRect(px, py, this.progress * pw, ph)
 
             this.vel.x += (Math.random())-0.5 // * 10.0)
+        }
+
+        let debugPath = false
+        if (this.path && debugPath) {
+            let c = Color.White.lighten(0.5)
+            c.a = 0.5
+            eachCons(this.path, 2).forEach(([a,b]) => {
+                ctx.beginPath()
+                ctx.moveTo(a.x,a.y)
+                ctx.lineTo(b.x,b.y)
+                ctx.strokeStyle = c.toRGBA()
+                ctx.lineWidth = 10
+                ctx.stroke()
+            })
         }
     }
 
@@ -137,7 +153,7 @@ export class Citizen extends Actor {
                 await source.interact(this)
             } else {
                 console.log("i guess i can try again? (sleep for a bit first)")
-        await new Promise((resolve, reject) => setTimeout(resolve, 15000));
+        await new Promise((resolve, reject) => setTimeout(resolve, 150));
                 //etTimeout(() => this.work(), 500)
             }
         }

@@ -11,9 +11,9 @@ export class Structure {
     name: string = '(structure name)';
     description: string = '(structure description)';
     view: string = '<structure (room) view>';
-    width: number = 10 //* sizeFactor
-    height: number = 10 //* sizeFactor
-    zoom: number = 1 // 0.1 //.25
+    width: number = 10
+    height: number = 10
+    zoom: number = 1
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
@@ -33,8 +33,8 @@ export class MissionControl extends Structure {
     name: string = 'Mission Control';
     description: string = 'Keeping everything on track';
     view: string = 'MissionControlView';
-    width: number = major.third // 10 * majorUnit
-    height: number = minor.third //3 * majorUnit
+    width: number = major.third
+    height: number = minor.third
     zoom = 0.1
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ SurfaceRoad ],
@@ -48,8 +48,8 @@ export class MainTunnel extends Structure {
     name: string = 'Main Tunnel';
     description: string = 'Elevating';
     view: string = 'TunnelView';
-    width: number = major.second // 2 * majorUnit
-    height: number = major.eighth // 10 * majorUnit //150 // * sizeFactor
+    width: number = major.second
+    height: number = major.eighth
     zoom = 0.25
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ Corridor ],
@@ -65,8 +65,8 @@ export class Dome extends Structure {
     produces = ResourceBlock.Food
 
     view: string = 'DomeView';
-    width: number = major.sixth // 10 * majorUnit
-    height: number = major.third //8 * majorUnit
+    width: number = major.sixth
+    height: number = major.third
     zoom = 0.2
     productionTime = 5000
     connections: { [key in Orientation]: (typeof Structure)[] } = {
@@ -81,8 +81,8 @@ export class Corridor extends Structure {
     name: string = 'Corridor'
     description: string = 'in the hallway'
     view: string = 'CorridorView'
-    width: number = minor.fifth // 10 * minorUnit
-    height: number = minor.third //1 * minorUnit
+    width: number = minor.fifth
+    height: number = minor.third
     zoom = 0.5
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [
@@ -98,21 +98,14 @@ export class Corridor extends Structure {
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
-
-    //primaryConnections: { [key in Orientation]: (typeof Structure)[] } = {
-    //    [Orientation.Left]: [ Ladder ],
-    //    [Orientation.Right]: [ Ladder ],
-    //    [Orientation.Up]: [ ],
-    //    [Orientation.Down]: [ ],
-    //}
 }
 
 export class CommonArea extends Structure {
     name: string = 'Commons'
     description: string = 'hallway cap'
     view: string = 'CommonAreaView'
-    width: number = major.eighth //8 * majorUnit
-    height: number = major.fifth //5 * majorUnit
+    width: number = major.eighth
+    height: number = major.fifth
 
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ Corridor, CloneMatrix, Kitchen, Laboratory, Study, CommonArea ],
@@ -122,20 +115,12 @@ export class CommonArea extends Structure {
     }
 }
 
-// export class LivingQuarters extends Structure {
-//     name: string = 'Quarters'
-//     description: string = 'sleepy time'
-//     view: string = 'LivingQuartersView'
-//     width: number = major.third //minor.seventh // 3 * majorUnit
-//     height: number = major.fifth //5 * majorUnit
-// }
-
 export class SurfaceRoad extends Structure {
     name: string = 'Road'
     description: string = 'go for a walk'
     view: string = 'SurfaceRoadView'
-    width: number = minor.fifth // 5 * minorUnit
-    height: number = minor.first // 1 * minorUnit
+    width: number = minor.fifth
+    height: number = minor.first
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ Arcology, Dome, MissionControl ],
         [Orientation.Right]: [ Arcology, Dome, MissionControl ],
@@ -150,8 +135,8 @@ export class Laboratory extends CommonArea {
     consumes = ResourceBlock.Hypothesis
     produces = ResourceBlock.Data
     view: string = 'LabView'
-    width: number = major.sixth // 11 * majorUnit
-    height: number = major.fifth // 5 * majorUnit
+    width: number = major.sixth
+    height: number = major.fifth
     productionTime = 6500
 }
 
@@ -162,18 +147,10 @@ export class Kitchen extends CommonArea {
     consumes = ResourceBlock.Food
     produces = ResourceBlock.Meal
     view: string = 'KitchenView'
-    width: number = major.fourth // 4 * majorUnit
-    height: number = major.fifth //5 * majorUnit
+    width: number = major.fourth
+    height: number = major.fifth
     productionTime = 2000
 }
-
-// export class Mess extends Structure {
-//     name: string = 'Mess'
-//     description: string = 'consume meals'
-//     view: string = 'MessView'
-//     width: number = major.sixth //6 * majorUnit
-//     height: number = major.fifth //5 * majorUnit
-// }
 
 // a mine is maybe a wide structure that you
 // can gradually dig deeper??
@@ -181,6 +158,7 @@ export class Mine extends Structure {
     name: string = 'Mine'
     description: string = 'ore else'
     produces = ResourceBlock.Ore
+    productionTime = 20000
     view: string = 'MineView'
     width: number = major.eighth // 20 * majorUnit
     height: number = 3 * major.sixth //20 * majorUnit
@@ -277,9 +255,3 @@ export class PowerPlant extends Structure {
     //    [Orientation.Down]: [ Ladder ],
     //}
 }
-
-//const validConnections: { [key: string]: { [key in Orientation]: (typeof Structure)[]}} = {
-//    PowerPlant: {
-//
-//    }
-//}

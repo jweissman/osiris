@@ -1,4 +1,4 @@
-import { Actor, Vector, Traits } from 'excalibur';
+import { Actor, Vector, Traits, Color } from 'excalibur';
 import { Building } from '../Building';
 import { minBy } from '../../Util';
 import { Structure, MissionControl } from '../../models/Structure';
@@ -7,17 +7,45 @@ export class Colony extends Actor {
     navTree: NavigationTree;
     buildings: Building[] = [];
     currentlyConstructing: Building = null;
+
     constructor(x: number, y: number) {
-        super(x, y, 100, 100);
+        super(x, y, 0, 0); // 1000, 1000);
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling));
     }
-    draw(ctx, delta) {
+
+    draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta);
+
+        let debugTree = false
+        if (this.navTree && debugTree) {
+            let edges = this.navTree.graph.edgeList();
+                        // console.log("draw edges", {edges})
+            edges.forEach((edge) => {
+                let [a,b] = edge;
+                var gradient = ctx.createLinearGradient(a.x,a.y+this.pos.y,b.x,b.y+this.pos.y);
+
+            // Add three color stops
+            gradient.addColorStop(0, 'green');
+            gradient.addColorStop(1, 'blue');
+
+                // console.log("draw edge", { a,b  })
+                ctx.beginPath()
+                ctx.moveTo(a.x,a.y + this.pos.y)
+                ctx.lineTo(b.x,b.y + this.pos.y)
+                ctx.closePath()
+                ctx.strokeStyle = gradient //Color.Green.toRGBA()
+                ctx.lineWidth = 0.5
+                ctx.stroke()
+            })
+        }
+
         // console.log("DRAW COLONY", { colony: this });
+        // parent does this :/
         // if (this.currentlyConstructing) {
         //     this.currentlyConstructing.draw(ctx, delta)
         // }
     }
+
     placeBuilding(building: Building) {
         building.built = true;
         if (building.parentSlot) {
@@ -28,6 +56,7 @@ export class Colony extends Actor {
         building.afterConstruct();
         this.add(building);
     }
+
     closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = () => true): Building {
         let matching = this.buildings.filter(building => structureTypes.some(structureType => (building.structure instanceof structureType)) &&
             predicate(building));
@@ -36,6 +65,7 @@ export class Colony extends Actor {
             return minBy(matching, distanceToCursor);
         }
     }
+
     pathBetween(origin: Vector, destination: Building): Vector[] {
         if (!this.navTree) {
             this.buildNavTree();
@@ -46,6 +76,7 @@ export class Colony extends Actor {
         let path = this.navTree.seekPath(srcNode, destNode);
         return path;
     }
+
     private buildNavTree() {
         let ctrl = this.buildings.find(building => building.structure instanceof MissionControl);
         if (ctrl) {

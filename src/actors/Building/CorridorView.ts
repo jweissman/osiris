@@ -1,14 +1,15 @@
 import { Building } from "./Building";
 import { Vector } from "excalibur";
 import { Orientation } from "../../values/Orientation";
-import { MainTunnel, CommonArea, Laboratory, Mine, PowerPlant, Refinery, Ladder } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 
 export class CorridorView extends Building {
-    edgeWidth: number = 0.4
+    edgeWidth: number = 0
 
     pickingOrigin: boolean = true
     facing: Orientation = Orientation.Left
+
+    colorBase() { return this.color.darken(0.2); }
 
     slots() {
         // left slot -- right slot
@@ -43,7 +44,6 @@ export class CorridorView extends Building {
         return true;
     }
 
-    // picking a depth for a tunnel first?
     constrainCursor(cursor: Vector): Vector {
         let newCursor = cursor.clone();
         if (this.pickingOrigin) {
@@ -55,7 +55,6 @@ export class CorridorView extends Building {
     }
 
     originX: number = 0
-    // expand
     reshape(cursor: Vector) {
 
         if (this.pickingOrigin) {
@@ -77,19 +76,4 @@ export class CorridorView extends Building {
             }
         }
     }
-
-    // validConnectingStructures() {
-    //     return [
-    //         MainTunnel,
-    //         Ladder,
-
-    //         CommonArea,
-    //         // LivingQuarters,
-    //         Laboratory,
-    //         Mine,
-    //         Refinery,
-    //         PowerPlant
-    //     ];
-    // }
-
 }

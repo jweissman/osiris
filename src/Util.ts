@@ -1,4 +1,5 @@
-import { Vector } from "excalibur";
+import { Vector, Color } from "excalibur";
+import { Rectangle } from "./values/Rectangle";
 
 const extremumBy = (arr, pluck, extremum) => {
   return arr.reduce(function(best, next) {
@@ -51,3 +52,34 @@ function _ecRange (a, i, n) {
 }
 
 export const measureDistance = (a: Vector, b: Vector) => a.distance(b)
+
+
+// tiny rendering lib
+export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, c: Color = Color.White, lineWidth: number = 1) {
+  c.a = 0.5
+  ctx.beginPath()
+  ctx.moveTo(a.x, a.y)
+  ctx.lineTo(b.x, b.y)
+  ctx.strokeStyle = c.toRGBA()
+  ctx.lineWidth = lineWidth
+  ctx.stroke()
+}
+
+export function drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 0, color: Color = Color.White) {
+  let { x, y, width, height } = rectangle;
+
+  if (edgeWidth > 0) {
+    let edge = Color.White; //color; // || this.edgeColor();
+    ctx.fillStyle = edge.toRGBA();
+    ctx.fillRect(x, y, width, height)
+  }
+
+  let main = color; // || this.mainColor();
+  ctx.fillStyle = main.toRGBA();
+  ctx.fillRect(
+    x + edgeWidth,
+    y + edgeWidth,
+    width - edgeWidth * 2,
+    height - edgeWidth * 2
+  )
+}
