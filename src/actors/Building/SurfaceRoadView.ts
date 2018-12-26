@@ -1,10 +1,10 @@
 import { AccessTunnelView } from ".";
-import { MissionControl, Dome } from "../../models/Structure";
+import { MissionControl, Dome, Arcology } from "../../models/Structure";
 
 export class SurfaceRoadView extends AccessTunnelView {
     edgeWidth: 0
     // pickingOrigin: boolean = true
     validConnectingStructures() {
-        return [ MissionControl, Dome ];
+        return [ MissionControl, Dome, Arcology ];
     }
 }

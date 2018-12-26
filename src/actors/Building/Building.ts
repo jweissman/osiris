@@ -43,6 +43,7 @@ export class Building extends Actor {
 
         this.on('pointerenter', () => {
             this.hover = true
+            console.log("HOVER ON", { building: this })
         })
 
         // this.on('pointerdown', () => {
@@ -87,10 +88,10 @@ export class Building extends Actor {
             this.nameLabel.draw(ctx, delta)
 
             // this.levelLabel.text = `Lvl. ${this.level}`
-            this.levelLabel.pos = this.getCenter()
-            this.levelLabel.pos.y += 10
-            this.levelLabel.pos.x -= ctx.measureText(this.structure.name).width / 4
-            this.levelLabel.draw(ctx, delta)
+            // this.levelLabel.pos = this.getCenter()
+            // this.levelLabel.pos.y += 10
+            // this.levelLabel.pos.x -= ctx.measureText(this.structure.name).width / 4
+            // this.levelLabel.draw(ctx, delta)
         }
 
         let debug = false;
@@ -230,7 +231,7 @@ export class Building extends Actor {
     }
 
     public overlapsAny(): boolean {
-        return !!this.planet.buildings.find(bldg => bldg !== this && this.overlaps(bldg))
+        return !!this.planet.colony.buildings.find(bldg => bldg !== this && this.overlaps(bldg))
     }
 
     protected edgeColor(): Color {

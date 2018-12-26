@@ -1,32 +1,29 @@
 import * as ex from 'excalibur';
 import { Actor, Color, Vector, Util, EdgeArea } from 'excalibur';
 import { Building } from '../Building';
-import { minBy, range } from '../../Util';
-import { Citizen } from '../Citizen';
+import { range } from '../../Util';
 import { Mountains } from './PlanetBackground';
-import { Structure, MissionControl, LivingQuarters } from '../../models/Structure';
-import { NavigationTree } from './NavigationTree';
+import { Structure, CloneMatrix } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
 import { ResourceBlock } from '../../models/Economy';
+import { Colony } from './Colony';
+import { Population } from './Population';
+
 
 export class Planet extends Actor {
-    
-    buildings: Building[] = []
-    citizens: Citizen[] = []
-    navTree: NavigationTree
-    currentlyConstructing: Building = null
+    colony: Colony
+    population: Population
 
     constructor(
         public hud: Hud,
-        // public effectiveY: number,
         public color: Color,
         public width: number = 2000000,
-        public depth: number = 1000000,
+        public depth: number = 10000000,
         ) {
         super(0, depth/2, width, depth, color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
-        let yBase = -depth/2 // effectiveY + size/2
+        let yBase = -depth/2
         // crust
         let crustHeight = 20
         this.createLayer(yBase, crustHeight, this.color.lighten(0.25))
@@ -43,6 +40,12 @@ export class Planet extends Actor {
         }
 
         this.add(new Mountains(-depth/2, this.getWidth(), this.color.lighten(0.15)))
+
+        this.colony = new Colony(0,-depth/2) //yBase)
+        this.add(this.colony)
+
+        this.population = new Population(this)
+        this.add(this.population)
     }
 
     private createLayer(y: number, size: number, color: Color) {
@@ -52,73 +55,41 @@ export class Planet extends Actor {
 
     draw(ctx: CanvasRenderingContext2D, delta) {
         super.draw(ctx, delta)
-       if (this.currentlyConstructing) {
-           this.currentlyConstructing.draw(ctx, delta)
-       }
-        this.buildings.forEach(building => building.draw(ctx, delta))
 
-        this.citizens.forEach(citizen => citizen.draw(ctx, delta))
+        if (this.currentlyConstructing) {
+            this.currentlyConstructing.draw(ctx, delta)
+        }
     }
 
     update(engine, delta) {
         super.update(engine, delta)
 
-        this.buildings.forEach(building => building.update(engine, delta))
-        this.citizens.forEach(citizen => citizen.update(engine, delta))
+        this.colony.buildings.forEach(building => building.update(engine, delta))
+        this.population.citizens.forEach(citizen => citizen.update(engine, delta))
+    }
+
+    get currentlyConstructing() {
+        return this.colony.currentlyConstructing
     }
 
     gather(resource: ResourceBlock): any {
         this.hud.resourceGathered(resource)
-        // throw new Error("Method not implemented.");
     }
 
     placeBuilding(building: Building) {
-        building.built = true
-        // whew
-        if (building.parentSlot) {
-            building.parentSlot.parent.childrenBuildings.push(building)
-            // rebuild nav?
-            this.buildNavTree()
-        }
-        this.buildings.push(building);
-        building.afterConstruct()
+        this.colony.placeBuilding(building)
     }
 
     populate(pos: Vector) {
-        let home = this.closestBuildingByType(pos, [LivingQuarters])
-        // console.log("populating", { home })
-        let citizen = new Citizen(home, this)
-        citizen.work()
-        this.citizens.push(citizen)
+        let home = this.closestBuildingByType(pos, [CloneMatrix])
+        this.population.increase(home)
     }
 
-
     closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = ()=>true): Building {
-        let matching = this.buildings.filter(building => 
-            structureTypes.some(structureType => (building.structure instanceof structureType)) &&
-              predicate(building)
-        )
-
-        if (matching && matching.length > 0) {
-            let distanceToCursor = (building) => cursor.distance(building.nodes()[0])
-            return minBy(matching, distanceToCursor)
-        }
+        return this.colony.closestBuildingByType(cursor, structureTypes, predicate)
     }
 
     pathBetween(origin: Vector, destination: Building): Vector[] {
-        if (!this.navTree) { this.buildNavTree() }
-        let srcNode = this.navTree.closestNode(origin)
-        let dest = destination.nodes()[0]
-        let destNode = this.navTree.closestNode(dest)
-        let path = this.navTree.seekPath(srcNode, destNode)
-        return path
+        return this.colony.pathBetween(origin, destination)
     }
-
-    private buildNavTree() {
-        let ctrl = this.buildings.find(building => building.structure instanceof MissionControl);
-        if (ctrl) {
-            this.navTree = new NavigationTree(ctrl)
-        }
-    }
-
 }

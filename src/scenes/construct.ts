@@ -2,7 +2,7 @@ import { Scene, Input, UIActor, Label, Vector, LockCameraToActorStrategy } from 
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad, Kitchen, Mess } from "../models/Structure";
+import { Structure, MissionControl, MainTunnel, Dome, AccessTunnel, CommonArea, SurfaceRoad, Kitchen, CloneMatrix } from "../models/Structure";
 import { Building, DomeView, AccessTunnelView, CommonAreaView, TunnelView, MissionControlView, LivingQuartersView } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
@@ -13,6 +13,8 @@ import { KitchenView } from "../actors/Building/KitchenView";
 import { PowerPlantView } from "../actors/Building/PowerPlantView";
 import { StudyView } from "../actors/Building/StudyView";
 import { RefineryView } from "../actors/Building/RefineryView";
+import { ArcologyView } from "../actors/Building/ArcologyView";
+import { CloneMatrixView } from "../actors/Building/CloneMatrixView";
 
 
 export class Construct extends Scene {
@@ -34,15 +36,18 @@ export class Construct extends Scene {
         DomeView,
         AccessTunnelView,
         CommonAreaView,
-        LivingQuartersView,
+        // LivingQuartersView,
         SurfaceRoadView,
         LabView,
         MineView,
         KitchenView,
-        MessView,
+        // MessView,
         PowerPlantView,
         StudyView,
         RefineryView,
+
+        ArcologyView,
+        CloneMatrixView,
     }
     ////
     static requiredStructureList: Array<typeof Structure> = [
@@ -53,10 +58,7 @@ export class Construct extends Scene {
         MainTunnel,
         AccessTunnel,
         Kitchen,
-        Mess,
-        LivingQuarters,
-        
-        //CommonArea,
+        CloneMatrix,
     ]
 
     public onInitialize(game: Game) {
@@ -118,7 +120,7 @@ export class Construct extends Scene {
                     if (currentBuilding && placementValid && currentBuilding.handleClick(e.pos)) {
                         // console.log("placed!")
                         this.planet.placeBuilding(currentBuilding)
-                        this.planet.currentlyConstructing = null
+                        this.planet.colony.currentlyConstructing = null
                         this.prepareNextBuilding(e.pos)
                     } else {
                         // console.log("couldn't place?")
@@ -159,7 +161,7 @@ export class Construct extends Scene {
     }
 
 
-    get buildings() { return this.planet.buildings }
+    get buildings() { return this.planet.colony.buildings }
 
 
     private nextMissingRequiredStructure(): Structure {
@@ -187,7 +189,7 @@ export class Construct extends Scene {
         structure.origin = pos
         this.hud.message(`Place ${structure.name}`)
         let theNextOne = this.spawnBuilding(structure)
-        this.planet.currentlyConstructing = theNextOne
+        this.planet.colony.currentlyConstructing = theNextOne
         this.camera.pos = theNextOne.pos
         this.camera.zoom(structure.zoom, 250)
 

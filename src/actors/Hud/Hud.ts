@@ -1,5 +1,5 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Dome, Structure, AccessTunnel, CommonArea, LivingQuarters, SurfaceRoad, Mine, Laboratory, Kitchen, Mess, PowerPlant, Study, Refinery } from "../../models/Structure";
+import { Dome, Structure, AccessTunnel, CommonArea, SurfaceRoad, Mine, Laboratory, Kitchen, PowerPlant, Study, Refinery, CloneMatrix, Arcology } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock } from "../../models/Economy";
 import { ResourcesList } from "./ResourcesList";
@@ -12,12 +12,16 @@ export class Hud extends UIActor {
         AccessTunnel, CommonArea,
         SurfaceRoad,
 
-        LivingQuarters, 
-        Dome, Kitchen, Mess,
+        // LivingQuarters, 
+        Dome, Kitchen,
+        // Mess,
 
         Study, Laboratory,
         Mine, Refinery,
-        PowerPlant
+        PowerPlant,
+
+        CloneMatrix,
+        Arcology,
     ];
     constructor(game: Game, message = 'hello', protected onBuildingSelect = null) {
         super(0, 0, game.canvasWidth, game.canvasHeight);

@@ -2,12 +2,6 @@ import { Vector } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 
-// let sizeFactor = 0.85
-
-let minorUnit = Scale.minor.first  //* sizeFactor
-let majorUnit = Scale.major.first //* sizeFactor
-
-// let megaUnit = 16 * majorUnit
 const { major, minor } = Scale
 
 export class Structure {
@@ -73,13 +67,13 @@ export class CommonArea extends Structure {
 
 }
 
-export class LivingQuarters extends Structure {
-    name: string = 'Quarters'
-    description: string = 'sleepy time'
-    view: string = 'LivingQuartersView'
-    width: number = major.third //minor.seventh // 3 * majorUnit
-    height: number = major.fifth //5 * majorUnit
-}
+// export class LivingQuarters extends Structure {
+//     name: string = 'Quarters'
+//     description: string = 'sleepy time'
+//     view: string = 'LivingQuartersView'
+//     width: number = major.third //minor.seventh // 3 * majorUnit
+//     height: number = major.fifth //5 * majorUnit
+// }
 
 export class SurfaceRoad extends Structure {
     name: string = 'Road'
@@ -112,13 +106,13 @@ export class Kitchen extends Structure {
     productionTime = 2000
 }
 
-export class Mess extends Structure {
-    name: string = 'Mess'
-    description: string = 'consume meals'
-    view: string = 'MessView'
-    width: number = major.sixth //6 * majorUnit
-    height: number = major.fifth //5 * majorUnit
-}
+// export class Mess extends Structure {
+//     name: string = 'Mess'
+//     description: string = 'consume meals'
+//     view: string = 'MessView'
+//     width: number = major.sixth //6 * majorUnit
+//     height: number = major.fifth //5 * majorUnit
+// }
 
 // a mine is maybe a wide structure that you
 // can gradually dig deeper??
@@ -160,21 +154,22 @@ export class Ladder extends Structure {
     height = major.third
 }
 
-//export class Workshop extends Structure {
-//    name: string = 'Workshop'
-//    description: string = 'manual'
-//    view: string = 'WorkshopView'
-//    width: number = 120 * sizeFactor
-//    height: number = 80 * sizeFactor
-//}
-//
-//export class Factory extends Structure {
-//    name: string = 'Factory'
-//    description: string = 'assembly'
-//    view: string = 'FactoryView'
-//}
+export class Arcology extends Structure {
+    name = 'Arcology'
+    description = 'megalith'
+    view = 'ArcologyView'
+    width = 12 * major.fifth
+    height = 34 * major.fifth
+    zoom = 0.01
+}
 
-// lab, mine, warehouse/storage, kitchen, workshop, factory
+export class CloneMatrix extends Structure {
+    name = 'Clone Matrix'
+    description = 'you seem familiar'
+    view = 'CloneMatrixView'
+    width = major.fifth
+    height = major.eighth
+}
 
 // huge octagonal generating station with four 'slots'
 // for sub-structures (add-ons) which auto-generate data/ore
