@@ -2,7 +2,7 @@ import { Vector } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter } from './Machine';
+import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter, CloningVat } from './Machine';
 
 const { major, minor } = Scale
 
@@ -244,6 +244,7 @@ export class CloneMatrix extends CommonArea {
     view = 'CloneMatrixView'
     width = major.fifth
     height = major.eighth
+    machines = [ CloningVat ]
 }
 
 // huge octagonal generating station with four 'slots'

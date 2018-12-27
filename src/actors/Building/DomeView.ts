@@ -1,18 +1,13 @@
 import { Color, Vector } from "excalibur";
 import { Building } from "./Building";
-import { Citizen } from "../Citizen";
 import { Orientation } from "../../values/Orientation";
-import { SurfaceRoad } from "../../models/Structure";
-import { ResourceBlock } from "../../models/Economy";
 
-// we're constrained to the surface, so...
 export class DomeView extends Building {
     hideBox = true
 
     slots() {
-        // left slot -- right slot
         let theSlots = [];
-        let slotY = this.getHeight(); // / 2;
+        let slotY = this.getHeight();
 
 
         theSlots.push(
@@ -33,7 +28,6 @@ export class DomeView extends Building {
         return theSlots;
     } 
 
-
     reshape(cursor: Vector) {
         this.alignToSlot(cursor)
     }
@@ -45,7 +39,7 @@ export class DomeView extends Building {
         ctx.arc(
             this.pos.x + this.getWidth()/2,
             this.pos.y + this.getHeight(),
-            this.getHeight()/1.5, // / 2,
+            this.getHeight()/1.5,
             0,
             Math.PI,
             true
@@ -57,7 +51,16 @@ export class DomeView extends Building {
         super.draw(ctx, delta)
     }
 
-    colorBase() { return Color.White.darken(0.05); } // this.baseColor; }
+    colorBase() { return Color.White.darken(0.05); } 
 
-    validConnectingStructures() { return [ SurfaceRoad ]; }
+    devicePlaces() {
+        let w = this.getWidth()/2
+        let x = this.pos.x + w;
+        let y = this.pos.y + this.getHeight() - 6
+        return [
+            new Vector(x - w/3, y),
+            new Vector(x, y),
+            new Vector(x + w/3, y),
+        ]
+    }
 }

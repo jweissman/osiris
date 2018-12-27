@@ -1,5 +1,5 @@
-import { Actor, Label, Color } from "excalibur";
-import { Machine } from "../models/Machine";
+import { Actor, Label, Color, Vector } from "excalibur";
+import { Machine, MachineOperation } from "../models/Machine";
 import { Building } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
@@ -11,10 +11,10 @@ export class Device extends Actor {
     // private machine: typeof Machine
     nameLabel: Label
 
-    constructor(public building: Building, private machine: Machine) {
+    constructor(public building: Building, private machine: Machine, private initialPos: Vector) {
         super(
-            building.devicePlaces()[0].x, // - building.pos.x,
-            building.devicePlaces()[0].y, // - building.pos.y,
+            initialPos.x,
+            initialPos.y,
             machine.width,
             machine.height,
             machine.color
@@ -49,31 +49,36 @@ export class Device extends Actor {
     get consumes()       { return this.machine.consumes }
     get productionTime() { return this.machine.productionTime }
 
-
     async interact(citizen: Citizen) {
-        if (this.product.length > 0) {
-            citizen.carry(this.produces)
-            this.product.pop()
-        } else {
-            if (this.consumes && citizen.carrying === this.consumes) {
-                await citizen.progressBar(this.productionTime)
+        if (this.machine.behavior === MachineOperation.Work) {
+            if (this.product.length > 0) {
+                this.product.pop()
+                await citizen.progressBar(200) //this.productionTime)
                 citizen.carry(this.produces)
             } else {
-                // assume we are gathering a resource here?
-                let resource = citizen.drop()
-                if (resource) {
-                    this.building.redeem(resource) //planet.gather(resource)
+                if (this.consumes && citizen.carrying === this.consumes) {
+                    await citizen.progressBar(this.productionTime)
+                    citizen.carry(this.produces)
                 }
+            }
+        } else if (this.machine.behavior === MachineOperation.CollectResource) {
+            // assume we are gathering a resource here?
+            let resource = citizen.drop()
+            if (resource) {
+                this.building.redeem(resource) //planet.gather(resource)
             }
         }
     }
 
     public produce(step: number) {
-        if (this.produces && !this.consumes && step % this.productionTime === 0) {
-            let shouldProduce = true;
-            if (shouldProduce && this.product.length < this.capacity) {
-                this.product.push(this.produces)
-                console.log("PRODUCE", { produces: this.produces, product: this.product })
+        if (step % this.productionTime === 0) {
+            if (this.machine.behavior === MachineOperation.Work) {
+
+                if (this.produces && !this.consumes && this.product.length < this.capacity) {
+                    this.product.push(this.produces)
+                }
+            } else if (this.machine.behavior === MachineOperation.SpawnCitizen) {
+                setTimeout(() => this.building.populate(this.pos), 100)
             }
         }
     }

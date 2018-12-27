@@ -18,8 +18,8 @@ export class Citizen extends Actor {
     workDuration: number
     progress: number
 
-    constructor(building: Building, protected planet: Planet) {
-        super(building.nodes()[0].x,building.nodes()[0].y,4,10,Color.White)
+    constructor(private device: Device, protected planet: Planet) {
+        super(device.x,device.y,4,10,Color.White)
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
     }
 
@@ -106,6 +106,8 @@ export class Citizen extends Actor {
 
         if (path.length > 0) {
             this.path = path
+            path.pop()
+            path.shift()
             await Promise.all(
                 path.map(step => this.glideTo(step))
             )

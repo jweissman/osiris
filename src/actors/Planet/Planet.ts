@@ -8,7 +8,7 @@ import { Hud } from '../Hud/Hud';
 import { ResourceBlock } from '../../models/Economy';
 import { Colony } from './Colony';
 import { Population } from './Population';
-import { Machine } from '../../models/Machine';
+import { Machine, CloningVat } from '../../models/Machine';
 
 
 export class Planet extends Actor {
@@ -82,7 +82,8 @@ export class Planet extends Actor {
     }
 
     populate(pos: Vector) {
-        let home = this.closestBuildingByType(pos, [CloneMatrix])
+        // let home = this.closestBuildingByType(pos, [CloneMatrix])
+        let home = this.closestDevice(pos, [ CloningVat ])
         this.population.increase(home)
     }
 

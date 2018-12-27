@@ -138,9 +138,11 @@ export class Building extends Actor {
         let { machines } = this.structure; 
         if (machines && machines.length > 0) {
             let machine = new machines[0]();
-            let theDevice = new Device(this, machine)
-            this.devices.push(theDevice)
-            this.add(theDevice)
+            this.devicePlaces().forEach(place => {
+                let theDevice = new Device(this, machine, place)
+                this.devices.push(theDevice)
+                this.add(theDevice)
+            })
         }
 
     }
@@ -159,7 +161,10 @@ export class Building extends Actor {
         ];
     }
 
-    devicePlaces(): Vector[] { return this.nodes(); }
+    devicePlaces(): Vector[] {
+        return this.nodes();
+    }
+    
 
     graph(supergraph: Graph<Vector> = new Graph()): Graph<Vector> {
         let g = supergraph
@@ -181,7 +186,10 @@ export class Building extends Actor {
     // just a patch through to planet -- but could animate something here?
     public redeem(res: ResourceBlock) {
         this.planet.gather(res)
+    }
 
+    public populate(pos: Vector) {
+        this.planet.populate(pos) //this.pos)
     }
 
 
