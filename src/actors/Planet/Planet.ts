@@ -8,6 +8,7 @@ import { Hud } from '../Hud/Hud';
 import { ResourceBlock } from '../../models/Economy';
 import { Colony } from './Colony';
 import { Population } from './Population';
+import { Machine } from '../../models/Machine';
 
 
 export class Planet extends Actor {
@@ -87,6 +88,10 @@ export class Planet extends Actor {
 
     closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = ()=>true): Building {
         return this.colony.closestBuildingByType(cursor, structureTypes, predicate)
+    }
+
+    closestDevice(cursor: Vector, machineTypes: (typeof Machine)[], predicate: (Device) => boolean = () => true) {
+        return this.colony.closestDeviceByType(cursor, machineTypes, predicate);
     }
 
     pathBetween(origin: Vector, destination: Building): Vector[] {

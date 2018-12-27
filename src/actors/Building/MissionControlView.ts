@@ -47,13 +47,8 @@ export class MissionControlView extends Building {
         this.pos.y -= this.getHeight() - 2 // + 1
     }
 
-    async interact(citizen: Citizen) {
-        let resource = citizen.drop()
-        if (resource) {
-            this.planet.gather(resource)
-        }
-    }
-
+    //async interact(citizen: Citizen) {
+    //}
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         let color = this.mainColor();

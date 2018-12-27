@@ -9,6 +9,7 @@ import { Rectangle } from "../../values/Rectangle";
 import { closest, measureDistance, drawRect, drawLine } from "../../Util";
 import { Graph } from "../../values/Graph";
 import { ResourceBlock, blockColor } from "../../models/Economy";
+import { Device } from "../Device";
 
 export class Building extends Actor {
     edgeWidth: number = 0 //.1
@@ -23,10 +24,12 @@ export class Building extends Actor {
     hideBox: boolean = false
     parentSlot: Slot
     childrenBuildings: Building[] = []
-    product: ResourceBlock[] = []
-    capacity: number = 4
+    //product: ResourceBlock[] = []
+    //capacity: number = 4
 
     level: number = 1
+
+    devices: Device[] = []
 
     // colorBase() { return this.color.darken(0.1); }
 
@@ -78,11 +81,7 @@ export class Building extends Actor {
         if (!this.hideBox) {
             drawRect(ctx, this.aabb(), this.edgeWidth, this.processedColor())
         }
-
-        this.product.forEach((produced, index) => {
-            ctx.fillStyle = blockColor(produced).desaturate(0.3).lighten(0.2).toRGBA();
-            ctx.fillRect(this.x + 20 * index, this.y - 20, 18, 18)
-        })
+        this.devices.forEach(device => device.draw(ctx, delta))
 
         if (this.showLabel) {
             this.nameLabel.pos = this.getCenter()
@@ -118,12 +117,10 @@ export class Building extends Actor {
     step: number = 0
     update(engine: Game, delta: number) {
         super.update(engine, delta)
-        // if (this.step % 100 === 0) {
-            let tryProduce = this.built && this.produces && this.product.length < this.capacity;
-            if (tryProduce) {
-                this.produce(this.step);
-            }
-        // }
+        let tryProduce = this.built;
+        if (tryProduce) {
+            this.devices.forEach(device => device.produce(this.step));
+        }
         this.step += 1
     }
 
@@ -136,7 +133,17 @@ export class Building extends Actor {
         this.pos = cursor.clone()
     }
 
-    afterConstruct(): void {}
+    afterConstruct(): void {
+
+        let { machines } = this.structure; 
+        if (machines && machines.length > 0) {
+            let machine = new machines[0]();
+            let theDevice = new Device(this, machine)
+            this.devices.push(theDevice)
+            this.add(theDevice)
+        }
+
+    }
 
     handleClick(cursor: Vector): boolean { return true; }
 
@@ -151,6 +158,8 @@ export class Building extends Actor {
             new Vector(Math.floor(x), Math.floor(y)-4)
         ];
     }
+
+    devicePlaces(): Vector[] { return this.nodes(); }
 
     graph(supergraph: Graph<Vector> = new Graph()): Graph<Vector> {
         let g = supergraph
@@ -169,32 +178,11 @@ export class Building extends Actor {
         return g
     }
 
-    get produces() { return this.structure.produces }
-    get consumes() { return this.structure.consumes }
-    get productionTime() { return this.structure.productionTime }
+    // just a patch through to planet -- but could animate something here?
+    public redeem(res: ResourceBlock) {
+        this.planet.gather(res)
 
-    async interact(citizen: Citizen) {
-        if (this.product.length > 0) {
-            citizen.carry(this.produces)
-            this.product.pop()
-        } else {
-            if (this.consumes && citizen.carrying === this.consumes) {
-                await citizen.progressBar(this.productionTime)
-                citizen.carry(this.produces)
-            }
-        }
     }
-
-    protected produce(step: number) {
-        if (this.produces && !this.consumes && step % this.productionTime === 0) {
-            let shouldProduce = true;
-            if (shouldProduce) {
-                this.product.push(this.produces)
-                console.log("PRODUCE", { produces: this.produces, product: this.product })
-            }
-        }
-    }
-
 
 
     protected aabb(): Rectangle {

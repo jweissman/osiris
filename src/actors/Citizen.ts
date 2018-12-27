@@ -5,6 +5,8 @@ import { Structure, MissionControl, Laboratory, Mine, Dome, Kitchen, Study, Refi
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
 import { eachCons } from "../Util";
+import { Machine, Stove, ExperimentBench, MineralProcessor, CommandCenter, Orchard, MiningDrill, Bookshelf } from "../models/Machine";
+import { Device } from "./Device";
 
 export class Citizen extends Actor {
     walkSpeed: number = Game.citizenSpeed
@@ -97,7 +99,7 @@ export class Citizen extends Actor {
         this.workInProgress = false
     }
 
-    async walkTo(building: Building) { //}, onArrival: (Building) => any) {
+    async pathTo(building: Building) { //}, onArrival: (Building) => any) {
         // let building = this.planet.closestBuildingByType(this.pos, structure)
 
         let path = this.planet.pathBetween(this.pos.clone(), building)
@@ -117,51 +119,45 @@ export class Citizen extends Actor {
 
     async work() {
         if (this.carrying) {
-            // console.log("carrying", this.carrying)
             let item: ResourceBlock = this.carrying;
-            let sinks = []
+            let sinks: (typeof Machine)[] = []
 
-            // what structure consumes what i'm carrying?
-            // could check in a list
             if (ResourceBlock[item] === 'Food') {
-                sinks = [Kitchen]
+                sinks = [Stove]
             } else if (ResourceBlock[item] === 'Hypothesis') {
-                sinks = [Laboratory]
+                sinks = [ExperimentBench]
             } else if (ResourceBlock[item] === 'Ore') {
-                sinks = [Refinery]
+                sinks = [MineralProcessor]
             } else {
-                sinks = [MissionControl]
+                sinks = [CommandCenter]
             }
 
             if (sinks.length > 0) {
-                let theSink = this.planet.closestBuildingByType(this.pos, sinks)
+                let theSink: Device = this.planet.closestDevice(this.pos, sinks)
                 if (theSink) {
-                    await this.walkTo(theSink)
+                    await this.pathTo(theSink.building)
+                    await this.glideTo(theSink.pos)
                     await theSink.interact(this)
                 }
             } else {
                 console.log("nowhere to deliver it", this.carrying)
             }
         } else {
-            let source = this.planet.closestBuildingByType(this.pos,
-                [Dome, Mine, Study],
-                (building) => building.product.length > 0
+            let source: Device = this.planet.closestDevice(this.pos,
+                [ Orchard, MiningDrill, Bookshelf ],
+                (d) => d.product.length > 0
             )
 
             if (source) {
-                await this.walkTo(source)
+                await this.pathTo(source.building)
+                await this.glideTo(source.pos)
                 await source.interact(this)
             } else {
                 console.log("i guess i can try again? (sleep for a bit first)")
-        await new Promise((resolve, reject) => setTimeout(resolve, 150));
-                //etTimeout(() => this.work(), 500)
+                await new Promise((resolve, reject) => setTimeout(resolve, 150));
             }
         }
 
-        // console.log("DONE WORK")
-        // this.work()
         setTimeout(() => this.work(), 100)
-        // await new Promise((resolve, reject) => setTimeout(resolve, 500));
-        // await this.work()
     }
 }

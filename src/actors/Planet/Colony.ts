@@ -1,8 +1,9 @@
 import { Actor, Vector, Traits, Color } from 'excalibur';
 import { Building } from '../Building';
-import { minBy } from '../../Util';
+import { minBy, flatSingle } from '../../Util';
 import { Structure, MissionControl } from '../../models/Structure';
 import { NavigationTree } from './NavigationTree';
+import { Machine } from '../../models/Machine';
 export class Colony extends Actor {
     navTree: NavigationTree;
     buildings: Building[] = [];
@@ -58,8 +59,8 @@ export class Colony extends Actor {
     }
 
     closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = () => true): Building {
-        let matching = this.buildings.filter(building => structureTypes.some(structureType => (building.structure instanceof structureType)) &&
-            predicate(building));
+        let matching = this.buildings
+        .filter(building => structureTypes.some(structureType => (building.structure instanceof structureType)) && predicate(building));
         if (matching && matching.length > 0) {
             let distanceToCursor = (building) => cursor.distance(building.nodes()[0]);
             return minBy(matching, distanceToCursor);
@@ -75,6 +76,16 @@ export class Colony extends Actor {
         let destNode = this.navTree.closestNode(dest);
         let path = this.navTree.seekPath(srcNode, destNode);
         return path;
+    }
+
+    closestDeviceByType(cursor: Vector, machineTypes: (typeof Machine)[], predicate: (Device) => boolean = () => true) {
+        let devices = flatSingle(this.buildings.map(b => b.devices))
+        devices = devices.filter(d => machineTypes.some(machine => d.machine instanceof machine) && predicate(d))
+
+        if (devices && devices.length > 0) {
+            let proximity = (d) => cursor.distance(d)
+            return minBy(devices, proximity)
+        }
     }
 
     private buildNavTree() {

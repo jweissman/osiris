@@ -2,6 +2,7 @@ import { Vector } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
+import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter } from './Machine';
 
 const { major, minor } = Scale
 
@@ -27,6 +28,8 @@ export class Structure {
         [Orientation.Up]: [ Ladder ],
         [Orientation.Down]: [ Ladder ],
     }
+
+    machines: (typeof Machine)[] = []
 }
 
 export class MissionControl extends Structure {
@@ -42,6 +45,8 @@ export class MissionControl extends Structure {
         [Orientation.Up]: [ MainTunnel ],
         [Orientation.Down]: [ MainTunnel ],
     }
+
+    machines = [ CommandCenter ]
 }
 
 export class MainTunnel extends Structure {
@@ -65,8 +70,8 @@ export class Dome extends Structure {
     produces = ResourceBlock.Food
 
     view: string = 'DomeView';
-    width: number = major.sixth
-    height: number = major.third
+    width: number  = 2 * major.eighth
+    height: number = 2 * major.fourth
     zoom = 0.2
     productionTime = 5000
     connections: { [key in Orientation]: (typeof Structure)[] } = {
@@ -75,6 +80,7 @@ export class Dome extends Structure {
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
+    machines = [Orchard]
 }
 
 export class Corridor extends Structure {
@@ -138,6 +144,7 @@ export class Laboratory extends CommonArea {
     width: number = major.sixth
     height: number = major.fifth
     productionTime = 6500
+    machines = [ExperimentBench]
 }
 
 
@@ -150,6 +157,7 @@ export class Kitchen extends CommonArea {
     width: number = major.fourth
     height: number = major.fifth
     productionTime = 2000
+    machines = [Stove]
 }
 
 // a mine is maybe a wide structure that you
@@ -168,6 +176,7 @@ export class Mine extends Structure {
         [Orientation.Up]: [ Ladder ],
         [Orientation.Down]: [ Ladder ],
     }
+    machines = [MiningDrill]
 }
 
 export class Study extends CommonArea {
@@ -178,6 +187,7 @@ export class Study extends CommonArea {
     height = major.fifth
     produces = ResourceBlock.Hypothesis
     productionTime = 2000
+    machines = [Bookshelf]
 }
 
 export class Refinery extends Structure {
@@ -195,6 +205,7 @@ export class Refinery extends Structure {
         [Orientation.Up]: [ Ladder ],
         [Orientation.Down]: [ Ladder ],
     }
+    machines = [MineralProcessor]
 }
 
 export class Ladder extends Structure {
