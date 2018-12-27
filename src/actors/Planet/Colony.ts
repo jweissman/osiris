@@ -8,7 +8,7 @@ export class Colony extends Actor {
     navTree: NavigationTree;
     buildings: Building[] = [];
     currentlyConstructing: Building = null;
-    maxPop: number = 4
+    maxPop: number = 8
 
     constructor(x: number, y: number) {
         super(x, y, 0, 0); // 1000, 1000);

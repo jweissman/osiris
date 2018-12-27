@@ -2,6 +2,12 @@ import { ResourceBlock } from "./Economy";
 import { Scale } from "../values/Scale";
 import { Color } from "excalibur";
 
+const bookshelfSvg = require('../images/bookshelf-plain.svg');
+
+const images = {
+    bookshelf: bookshelfSvg,
+}
+
 export enum MachineOperation {
   // generic functioning: consuming a block to produce a new block
   Work,
@@ -26,6 +32,10 @@ export class Machine {
     productionTime: number = 1000
 
     behavior: MachineOperation = MachineOperation.Work
+
+    image = images.bookshelf
+
+
 }
 
 // resource collection

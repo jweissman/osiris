@@ -36,8 +36,8 @@ export class MissionControl extends Structure {
     name: string = 'Mission Control';
     description: string = 'Keeping everything on track';
     view: string = 'MissionControlView';
-    width: number = major.third
-    height: number = minor.third
+    width: number = 4 * major.third
+    height: number = 4 * minor.third
     zoom = 0.1
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ SurfaceRoad ],

@@ -4,18 +4,10 @@ import { Building } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
 
-const bookshelfSvg = require('../images/bookshelf-plain.svg');
-//import Book from '../images/bookshelf-plain.svg'
-//
-//const images = {
-//    books
-//}
-
 export class Device extends Actor {
     product: ResourceBlock[] = []
     capacity: number = 4
 
-    // private machine: typeof Machine
     nameLabel: Label
 
     image: any
@@ -40,25 +32,17 @@ export class Device extends Actor {
         this.image.onload = function () {
              this.imageLoaded = true
         }
-        
-        let path = "http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg";
-        console.log({ desiredPath: bookshelfSvg })
-        // debugger
-        this.image.src = bookshelfSvg
-
+        this.image.src = machine.image
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
-        // if (this.imageLoaded) {
-            ctx.save()
-            ctx.translate(this.pos.x, this.pos.y)
-            ctx.scale(0.1, 0.1)
-            ctx.drawImage(
-                this.image,
-                0,0
-            )
-            ctx.restore()
-        // }
+        // super.draw(ctx, delta)
+        ctx.drawImage(
+            this.image,
+            this.pos.x - this.getWidth() / 2,
+            this.pos.y - this.getHeight() / 2,
+            this.getWidth(), this.getHeight()
+        )
 
         let showLabel = true
         if (showLabel) {
