@@ -69,12 +69,12 @@ export function drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, ed
   let { x, y, width, height } = rectangle;
 
   if (edgeWidth > 0) {
-    let edge = Color.White; //color; // || this.edgeColor();
+    let edge = Color.White;
     ctx.fillStyle = edge.toRGBA();
     ctx.fillRect(x, y, width, height)
   }
 
-  let main = color; // || this.mainColor();
+  let main = color;
   ctx.fillStyle = main.toRGBA();
   ctx.fillRect(
     x + edgeWidth,

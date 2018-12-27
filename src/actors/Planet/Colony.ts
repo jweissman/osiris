@@ -8,6 +8,7 @@ export class Colony extends Actor {
     navTree: NavigationTree;
     buildings: Building[] = [];
     currentlyConstructing: Building = null;
+    maxPop: number = 4
 
     constructor(x: number, y: number) {
         super(x, y, 0, 0); // 1000, 1000);
@@ -20,31 +21,23 @@ export class Colony extends Actor {
         let debugTree = false
         if (this.navTree && debugTree) {
             let edges = this.navTree.graph.edgeList();
-                        // console.log("draw edges", {edges})
             edges.forEach((edge) => {
                 let [a,b] = edge;
                 var gradient = ctx.createLinearGradient(a.x,a.y+this.pos.y,b.x,b.y+this.pos.y);
 
-            // Add three color stops
-            gradient.addColorStop(0, 'green');
-            gradient.addColorStop(1, 'blue');
+                gradient.addColorStop(0, 'green');
+                gradient.addColorStop(1, 'blue');
 
-                // console.log("draw edge", { a,b  })
                 ctx.beginPath()
-                ctx.moveTo(a.x,a.y + this.pos.y)
-                ctx.lineTo(b.x,b.y + this.pos.y)
+                ctx.moveTo(a.x, a.y + this.pos.y)
+                ctx.lineTo(b.x, b.y + this.pos.y)
                 ctx.closePath()
-                ctx.strokeStyle = gradient //Color.Green.toRGBA()
+                ctx.strokeStyle = gradient
                 ctx.lineWidth = 0.5
                 ctx.stroke()
             })
         }
 
-        // console.log("DRAW COLONY", { colony: this });
-        // parent does this :/
-        // if (this.currentlyConstructing) {
-        //     this.currentlyConstructing.draw(ctx, delta)
-        // }
     }
 
     placeBuilding(building: Building) {

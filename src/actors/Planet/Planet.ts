@@ -82,9 +82,12 @@ export class Planet extends Actor {
     }
 
     populate(pos: Vector) {
-        // let home = this.closestBuildingByType(pos, [CloneMatrix])
-        let home = this.closestDevice(pos, [ CloningVat ])
-        this.population.increase(home)
+        // we could have a colony pop limit for now?
+        if (this.population.citizens.length < this.colony.maxPop) {
+            // let home = this.closestBuildingByType(pos, [CloneMatrix])
+            let home = this.closestDevice(pos, [CloningVat])
+            this.population.increase(home)
+        }
     }
 
     closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = ()=>true): Building {

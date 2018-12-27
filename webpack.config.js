@@ -27,14 +27,19 @@ module.exports = ({ mode, presets } = { mode: "production", presets: [] }) => {
           exclude: /node_modules/
         },
         {
-          test: /\.(png|jpg|bmp)$/,
+          test: /\.(png|jpg|bmp|svg)$/,
           use: [{
             loader: 'file-loader',
             options: {
               emitFile: true
             }
           }]
-        }
+        },
+        // {
+        //  test: /\.svg$/,
+        //  loader: 'svg-url-loader'
+        //  loader: 'svg-inline-loader'
+        // }
       ]
     },
     resolve: {

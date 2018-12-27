@@ -4,6 +4,13 @@ import { Building } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
 
+const bookshelfSvg = require('../images/bookshelf-plain.svg');
+//import Book from '../images/bookshelf-plain.svg'
+//
+//const images = {
+//    books
+//}
+
 export class Device extends Actor {
     product: ResourceBlock[] = []
     capacity: number = 4
@@ -11,7 +18,12 @@ export class Device extends Actor {
     // private machine: typeof Machine
     nameLabel: Label
 
-    constructor(public building: Building, private machine: Machine, private initialPos: Vector) {
+    image: any
+    imageLoaded: boolean = false
+
+    constructor(
+        public building: Building, private machine: Machine, private initialPos: Vector
+    ) {
         super(
             initialPos.x,
             initialPos.y,
@@ -23,10 +35,30 @@ export class Device extends Actor {
         this.nameLabel = new Label(this.machine.name, 0, 0, 'Helvetica')
         this.nameLabel.fontSize = 8
         this.nameLabel.color = Color.White
+
+        this.image = new Image();
+        this.image.onload = function () {
+             this.imageLoaded = true
+        }
+        
+        let path = "http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg";
+        console.log({ desiredPath: bookshelfSvg })
+        // debugger
+        this.image.src = bookshelfSvg
+
     }
 
-    draw(ctx, delta) {
-        super.draw(ctx, delta)
+    draw(ctx: CanvasRenderingContext2D, delta: number) {
+        // if (this.imageLoaded) {
+            ctx.save()
+            ctx.translate(this.pos.x, this.pos.y)
+            ctx.scale(0.1, 0.1)
+            ctx.drawImage(
+                this.image,
+                0,0
+            )
+            ctx.restore()
+        // }
 
         let showLabel = true
         if (showLabel) {
@@ -42,9 +74,8 @@ export class Device extends Actor {
             ctx.fillStyle = blockColor(produced).desaturate(0.3).lighten(0.2).toRGBA();
             ctx.fillRect(bx + blockSize * index, by - blockSize, blockSize-1, blockSize-1)
         })
-
-
     }
+
     get produces()       { return this.machine.produces }
     get consumes()       { return this.machine.consumes }
     get productionTime() { return this.machine.productionTime }
