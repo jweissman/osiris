@@ -40,7 +40,7 @@ export class Device extends Actor {
         ctx.drawImage(
             this.image,
             this.pos.x - this.getWidth() / 2,
-            this.pos.y - this.getHeight() / 2,
+            this.pos.y - this.getHeight() / 2 - 10,
             this.getWidth(), this.getHeight()
         )
 

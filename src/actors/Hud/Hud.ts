@@ -130,7 +130,7 @@ export class Hud extends UIActor {
     }
 
     private buttonFactory(s: Structure) {
-        let bg = s.dominantColor.darken(0.4).desaturate(0.6) //.toRGBA()
+        let bg = s.dominantColor.darken(0.6).desaturate(0.5) //.toRGBA()
         bg.a = 0.8
         let fg = s.dominantColor.lighten(0.8).desaturate(0.4) //.toRGBA()
         let paletteButton = document.createElement('button');
@@ -156,7 +156,7 @@ export class Hud extends UIActor {
         paletteButton.style.background = bg.toRGBA();
         paletteButton.style.color = fg.toRGBA()
         paletteButton.onmouseover = () => {
-            paletteButton.style.background = bg.lighten(0.5).toRGBA()
+            paletteButton.style.background = bg.saturate(0.5).lighten(0.95).toRGBA()
             paletteButton.style.color = fg.lighten(0.9).toRGBA()
         }
         paletteButton.onmouseleave = () => {

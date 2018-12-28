@@ -15,7 +15,7 @@ export class Structure {
     width: number = 10
     height: number = 10
     zoom: number = 1
-    dominantColor: Color = Color.LightGray
+    dominantColor: Color = Color.Gray
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
