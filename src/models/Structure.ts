@@ -2,7 +2,7 @@ import { Vector, Color } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter, CloningVat, OxygenExtractor, SolarCell } from './Machine';
+import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter, CloningVat, OxygenExtractor, SolarCell, Launchpad, WaterCondensingMachine, AirScrubber } from './Machine';
 
 const { major, minor } = Scale
 
@@ -75,7 +75,7 @@ export class Dome extends Structure {
 
     view: string = 'DomeView';
     width: number  = 2 * major.eighth
-    height: number = 2 * major.fourth
+    height: number = major.eighth
     zoom = 0.2
     productionTime = 5000
     connections: { [key in Orientation]: (typeof Structure)[] } = {
@@ -89,6 +89,8 @@ export class Dome extends Structure {
     prereqs = [ Study, OxygenAccumulator ]
 }
 
+// let list = [ CloneMatrix ]
+
 export class Corridor extends Structure {
     name: string = 'Corridor'
     description: string = 'in the hallway'
@@ -100,12 +102,14 @@ export class Corridor extends Structure {
         [Orientation.Left]: [
             MainTunnel,
             Ladder,
-            CloneMatrix, Kitchen, Laboratory, Study, CommonArea 
+            CloneMatrix, Kitchen, Laboratory, Study, CommonArea,
+            Mine, Refinery,
         ],
         [Orientation.Right]: [
             MainTunnel,
             Ladder,
-            CloneMatrix, Kitchen, Laboratory, Study, CommonArea 
+            CloneMatrix, Kitchen, Laboratory, Study, CommonArea ,
+            Mine, Refinery,
         ],
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
@@ -187,7 +191,7 @@ export class Mine extends Structure {
         [Orientation.Down]: [ Ladder ],
     }
     machines = [MiningDrill]
-    prereqs = [SolarFarm]
+    prereqs = [SolarFarm, Library, WaterCondenser]
 }
 
 export class Study extends CommonArea {
@@ -251,7 +255,7 @@ export class Arcology extends Structure {
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
-    prereqs = [ Dome, PowerPlant ]
+    prereqs = [ Arbor, AugmentationChamber, CarbonDioxideScrubber ]
 }
 
 export class CloneMatrix extends CommonArea {
@@ -273,34 +277,136 @@ export class OxygenAccumulator extends Dome {
     prereqs = []
 }
 
+export class WaterCondenser extends Dome {
+    name = 'H2O'
+    description = 'drink deeply'
+    machines = [ WaterCondensingMachine ]
+    prereqs = [OxygenAccumulator]
+}
+
+export class CarbonDioxideScrubber extends Dome {
+    name = 'CO2 Scrub'
+    description = 'purified'
+    machines = [AirScrubber]
+    prereqs = [WaterCondenser]
+}
+
 export class SolarFarm extends Dome {
     name = 'Solar Farm'
     description = 'feel the warmth on your face'
     // view = 'SolarFarmView'
     machines = [ SolarCell ]
-    prereqs = []
+    prereqs = [Kitchen, OxygenAccumulator]
 }
 
-// huge octagonal generating station with four 'slots'
-// for sub-structures (add-ons) which auto-generate data/ore
-// for the central 'power' slot ...
-// ...you can build either...
-// ...a mini black hole or mini sun
-// (the sun takes ore and the hole takes data?)
+export class AugmentationChamber extends CommonArea {
+    name = 'Augmentation'
+    description = 'upgrade your life'
+    dominantColor = Color.Blue
+    machines = []
+    prereqs = [CloneMatrix, Factory]
+}
+
+export class Academy extends CommonArea {
+    name = 'Academy'
+    description = 'teach the generations'
+    dominantColor = Color.Blue
+    machines = []
+    prereqs = [Laboratory, Library, CloneMatrix]
+}
+
+export class Library extends CommonArea {
+    name = 'Library'
+    description = 'study the past'
+    dominantColor = Color.Blue
+    machines = []
+    prereqs = [Kitchen]
+}
+
+// just an 'upgraded', larger dome with a place for a mid-size machine?
+export class Arbor extends Dome {
+    name = 'Arbor'
+    description = 'conserve the land'
+    machines = [Orchard]
+    prereqs = [Dome, WaterCondenser, CloneMatrix]
+    width: number  = 6 * major.eighth
+    height: number = 3 * major.eighth
+}
+
+export class ComputerCore extends CommonArea {
+    name = 'Computer Core'
+    description = 'compute the last digit of pi'
+    dominantColor = Color.Blue
+    machines = []
+    prereqs  = [Academy]
+    width  = 20 * major.fifth
+    height = 10 * major.fifth
+}
+
+export class Factory extends CommonArea {
+    name = 'Factory'
+    decription = 'grit with it'
+    dominantColor = Color.Red
+    machines = []
+    prereqs = [ Library ]
+    width = 3 * major.eighth
+    height = major.sixth
+}
+
 export class PowerPlant extends Structure {
     name: string = 'Power Plant'
     description: string = 'sunny day'
     dominantColor = Color.Red
     view: string = 'PowerPlantView'
-    width: number = 2 * major.eighth //30 * majorUnit
-    height: number = 2 * major.eighth // 30 * majorUnit
-
-    prereqs = [ Mine ] // Factory, CO2
-
-    //connections: {[key in Orientation]: (typeof Structure)[] } = {
-    //    [Orientation.Left]: [ Corridor ],
-    //    [Orientation.Right]: [ Corridor ],
-    //    [Orientation.Up]: [ Ladder ],
-    //    [Orientation.Down]: [ Ladder ],
-    //}
+    width: number = 2 * major.eighth
+    height: number = 2 * major.eighth
+    prereqs = [ CarbonDioxideScrubber, Factory ]
 }
+
+export class Starport extends Dome {
+    name = 'Starport'
+    description = 'you are cleared for take-off'
+    dominantColor = Color.Violet
+    prereqs = [ Arcology, ComputerCore, PowerPlant ]
+    machines = [Launchpad]
+}
+
+
+export class EntertainmentCenter extends CommonArea {
+    name = 'Entertainment Complex'
+    description = 'let us have a good time'
+    dominantColor = Color.Violet
+    prereqs = [ Starport ] //, 
+}
+
+
+export class SuspendedAnimationTomb extends CommonArea {
+    name = 'Cryo Tomb'
+    description = 'pawns on ice'
+    dominantColor = Color.Violet
+    prereqs = [ Starport ]
+}
+
+export class NegentropyPool extends CommonArea {
+    name = 'Negentropy Pool'
+    description = 'extropic singularity'
+    dominantColor = Color.Violet
+    prereqs = [ SuspendedAnimationTomb ]
+}
+
+export class StrangeMatterWorkshop extends CommonArea {
+    name = 'Strange Matter Workshop'
+    description = 'advanced tools'
+    dominantColor = Color.Violet
+    prereqs = [ NegentropyPool ]
+}
+
+export class TimeChamber extends CommonArea {
+    name = 'Time Chamber'
+    description = 'welcome to the world of tomorrow'
+    dominantColor = Color.Violet
+    prereqs = [ StrangeMatterWorkshop ] //, 
+}
+// export class AntimatterCapture extends CommonArea { }
+// export class MolecularEngine extends CommonArea { }
+// export class AtomicCompiler extends CommonArea { }

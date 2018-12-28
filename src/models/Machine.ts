@@ -134,6 +134,18 @@ export class SolarCell extends Machine {
     description = 'feel the warmth'
 }
 
+export class Launchpad extends Machine {
+    name = 'Launchpad'
+}
+
+export class WaterCondensingMachine extends Machine {
+    name = 'H20 Condenser'
+}
+
+export class AirScrubber extends Machine {
+    name = 'Air Scrubber'
+}
+
 // maybe library node 'stores' data?
 //export class LibraryNode {
 //    name = 'Library Node'
