@@ -1,8 +1,8 @@
-import { Scene, Input, UIActor, Label, Vector, LockCameraToActorStrategy } from "excalibur";
+import { Scene, Input, Vector } from "excalibur";
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Dome, Corridor, SurfaceRoad, Kitchen, CloneMatrix, OxygenAccumulator } from "../models/Structure";
+import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, Kitchen, CloneMatrix, OxygenAccumulator } from "../models/Structure";
 import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, MineView, LabView, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";

@@ -146,6 +146,34 @@ export class AirScrubber extends Machine {
     name = 'Air Scrubber'
 }
 
+export class HypermnesisApparatus extends Machine {
+    name = 'Mind Upgrade'
+}
+
+export class AtomicCompiler extends Machine {
+    name = 'Atomic Compiler'
+}
+
+export class Icicle extends Machine {
+    name = 'Cryo Coffin'
+}
+
+export class TimeCrystal extends Machine {
+    name = 'Quantum Portal'
+}
+
+export class GamingRotunda extends Machine {
+    name = 'Gaming Rotunda'
+}
+
+export class MineralWorkshop extends Machine {
+    name = 'Workshop'
+}
+
+export class SingularityFountain extends Machine {
+    name = 'Singularity Fountain'
+}
+
 // maybe library node 'stores' data?
 //export class LibraryNode {
 //    name = 'Library Node'

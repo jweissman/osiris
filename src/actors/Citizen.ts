@@ -1,7 +1,6 @@
 import { Actor, Color, Traits, Vector } from "excalibur";
 import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
-import { Structure, MissionControl, Laboratory, Mine, Dome, Kitchen, Study, Refinery } from "../models/Structure";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
 import { eachCons } from "../Util";

@@ -2,7 +2,7 @@ import { Vector, Color } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter, CloningVat, OxygenExtractor, SolarCell, Launchpad, WaterCondensingMachine, AirScrubber } from './Machine';
+import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter, CloningVat, OxygenExtractor, SolarCell, Launchpad, WaterCondensingMachine, AirScrubber, HypermnesisApparatus, AtomicCompiler, GamingRotunda, TimeCrystal, MineralWorkshop, Icicle, SingularityFountain } from './Machine';
 
 const { major, minor } = Scale
 
@@ -15,7 +15,7 @@ export class Structure {
     width: number = 10
     height: number = 10
     zoom: number = 1
-    dominantColor: Color = Color.White
+    dominantColor: Color = Color.LightGray
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
@@ -67,26 +67,29 @@ export class MainTunnel extends Structure {
     }
 }
 
-export class Dome extends Structure {
+class Dome extends Structure {
     name: string = 'Biodome';
     description: string = 'Biome sweet biome';
-    produces = ResourceBlock.Food
     dominantColor = Color.Green
 
     view: string = 'DomeView';
     width: number  = 2 * major.eighth
     height: number = major.eighth
     zoom = 0.2
-    productionTime = 5000
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ SurfaceRoad ],
         [Orientation.Right]: [ SurfaceRoad ],
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
-    machines = [Orchard]
 
+}
+
+export class Biodome extends Dome {
+    machines = [Orchard]
     prereqs = [ Study, OxygenAccumulator ]
+    produces = ResourceBlock.Food
+    productionTime = 5000
 }
 
 // let list = [ CloneMatrix ]
@@ -102,21 +105,23 @@ export class Corridor extends Structure {
         [Orientation.Left]: [
             MainTunnel,
             Ladder,
-            CloneMatrix, Kitchen, Laboratory, Study, CommonArea,
-            Mine, Refinery,
+            CommonArea
+            // CloneMatrix, Kitchen, Laboratory, Study, CommonArea,
+            // Mine, Refinery,
         ],
         [Orientation.Right]: [
             MainTunnel,
             Ladder,
-            CloneMatrix, Kitchen, Laboratory, Study, CommonArea ,
-            Mine, Refinery,
+            CommonArea
+            // CloneMatrix, Kitchen, Laboratory, Study, CommonArea ,
+            // Mine, Refinery,
         ],
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
 }
 
-export class CommonArea extends Structure {
+class CommonArea extends Structure {
     name: string = 'Commons'
     description: string = 'hallway cap'
     view: string = 'CommonAreaView'
@@ -124,8 +129,15 @@ export class CommonArea extends Structure {
     height: number = major.fifth
 
     connections: { [key in Orientation]: (typeof Structure)[] } = {
-        [Orientation.Left]: [ Corridor, CloneMatrix, Kitchen, Laboratory, Study, CommonArea ],
-        [Orientation.Right]: [ Corridor, CloneMatrix, Kitchen, Laboratory, Study, CommonArea ],
+        [Orientation.Left]: [
+            Corridor, CommonArea
+            //  Corridor, CloneMatrix, Kitchen, Laboratory, Study, CommonArea
+            ],
+        [Orientation.Right]: [
+            Corridor,
+            CommonArea,
+            // CloneMatrix, Kitchen, Laboratory, Study, CommonArea ],
+        ],
         [Orientation.Up]: [ Ladder ],
         [Orientation.Down]: [ Ladder ],
     }
@@ -175,7 +187,7 @@ export class Kitchen extends CommonArea {
 
 // a mine is maybe a wide structure that you
 // can gradually dig deeper??
-export class Mine extends Structure {
+export class Mine extends CommonArea {
     name: string = 'Mine'
     description: string = 'ore else'
     dominantColor = Color.Red
@@ -184,12 +196,12 @@ export class Mine extends Structure {
     view: string = 'MineView'
     width: number = major.eighth // 20 * majorUnit
     height: number = 3 * major.sixth //20 * majorUnit
-    connections: { [key in Orientation]: (typeof Structure)[] } = {
-        [Orientation.Left]: [ Mine, Refinery, Corridor ],
-        [Orientation.Right]: [ Mine, Refinery, Corridor ],
-        [Orientation.Up]: [ Ladder ],
-        [Orientation.Down]: [ Ladder ],
-    }
+    //connections: { [key in Orientation]: (typeof Structure)[] } = {
+    //    [Orientation.Left]: [ Mine, Refinery, Corridor ],
+    //    [Orientation.Right]: [ Mine, Refinery, Corridor ],
+    //    [Orientation.Up]: [ Ladder ],
+    //    [Orientation.Down]: [ Ladder ],
+    //}
     machines = [MiningDrill]
     prereqs = [SolarFarm, Library, WaterCondenser]
 }
@@ -206,7 +218,7 @@ export class Study extends CommonArea {
     machines = [Bookshelf]
 }
 
-export class Refinery extends Structure {
+export class Refinery extends CommonArea {
     name = 'Refinery'
     description = 'flotate'
     dominantColor = Color.Red
@@ -216,12 +228,6 @@ export class Refinery extends Structure {
     width = major.fifth
     height = major.fifth
     productionTime = 9000
-    connections: { [key in Orientation]: (typeof Structure)[] } = {
-        [Orientation.Left]: [ Mine, Refinery, Corridor ],
-        [Orientation.Right]: [ Mine, Refinery, Corridor ],
-        [Orientation.Up]: [ Ladder ],
-        [Orientation.Down]: [ Ladder ],
-    }
     machines = [MineralProcessor]
     prereqs = [Mine]
 }
@@ -234,8 +240,8 @@ export class Ladder extends Structure {
     height = 100 + major.third
     zoom = 0.5
     connections: { [key in Orientation]: (typeof Structure)[] } = {
-        [Orientation.Up]: [ CloneMatrix, Kitchen, Laboratory, Study, CommonArea ],
-        [Orientation.Down]: [ CloneMatrix, Kitchen, Laboratory, Study, CommonArea ],
+        [Orientation.Up]: [ CommonArea ],
+        [Orientation.Down]: [ CommonArea ],
         [Orientation.Left]: [ ],
         [Orientation.Right]: [ ],
     }
@@ -303,7 +309,7 @@ export class AugmentationChamber extends CommonArea {
     name = 'Augmentation'
     description = 'upgrade your life'
     dominantColor = Color.Blue
-    machines = []
+    machines = [ HypermnesisApparatus ]
     prereqs = [CloneMatrix, Factory]
 }
 
@@ -311,7 +317,7 @@ export class Academy extends CommonArea {
     name = 'Academy'
     description = 'teach the generations'
     dominantColor = Color.Blue
-    machines = []
+    machines = [Bookshelf]
     prereqs = [Laboratory, Library, CloneMatrix]
 }
 
@@ -319,7 +325,7 @@ export class Library extends CommonArea {
     name = 'Library'
     description = 'study the past'
     dominantColor = Color.Blue
-    machines = []
+    machines = [Bookshelf]
     prereqs = [Kitchen]
 }
 
@@ -328,7 +334,7 @@ export class Arbor extends Dome {
     name = 'Arbor'
     description = 'conserve the land'
     machines = [Orchard]
-    prereqs = [Dome, WaterCondenser, CloneMatrix]
+    prereqs = [Biodome, WaterCondenser, CloneMatrix]
     width: number  = 6 * major.eighth
     height: number = 3 * major.eighth
 }
@@ -347,13 +353,13 @@ export class Factory extends CommonArea {
     name = 'Factory'
     decription = 'grit with it'
     dominantColor = Color.Red
-    machines = []
+    machines = [MineralWorkshop]
     prereqs = [ Library ]
     width = 3 * major.eighth
     height = major.sixth
 }
 
-export class PowerPlant extends Structure {
+export class PowerPlant extends CommonArea {
     name: string = 'Power Plant'
     description: string = 'sunny day'
     dominantColor = Color.Red
@@ -377,14 +383,15 @@ export class EntertainmentCenter extends CommonArea {
     description = 'let us have a good time'
     dominantColor = Color.Violet
     prereqs = [ Starport ] //, 
+    machines = [GamingRotunda]
 }
-
 
 export class SuspendedAnimationTomb extends CommonArea {
     name = 'Cryo Tomb'
     description = 'pawns on ice'
     dominantColor = Color.Violet
     prereqs = [ Starport ]
+    machines = [ Icicle ]
 }
 
 export class NegentropyPool extends CommonArea {
@@ -392,6 +399,7 @@ export class NegentropyPool extends CommonArea {
     description = 'extropic singularity'
     dominantColor = Color.Violet
     prereqs = [ SuspendedAnimationTomb ]
+    machines = [ SingularityFountain ]
 }
 
 export class StrangeMatterWorkshop extends CommonArea {
@@ -399,6 +407,7 @@ export class StrangeMatterWorkshop extends CommonArea {
     description = 'advanced tools'
     dominantColor = Color.Violet
     prereqs = [ NegentropyPool ]
+    machines = [ AtomicCompiler ]
 }
 
 export class TimeChamber extends CommonArea {
@@ -406,6 +415,7 @@ export class TimeChamber extends CommonArea {
     description = 'welcome to the world of tomorrow'
     dominantColor = Color.Violet
     prereqs = [ StrangeMatterWorkshop ] //, 
+    machines = [ TimeCrystal ]
 }
 // export class AntimatterCapture extends CommonArea { }
 // export class MolecularEngine extends CommonArea { }

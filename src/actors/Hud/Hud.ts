@@ -1,7 +1,7 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Dome, Structure, Corridor, CommonArea, SurfaceRoad, Mine, Laboratory, Kitchen, PowerPlant, Study, Refinery, CloneMatrix, Arcology, Ladder, OxygenAccumulator, SolarFarm, WaterCondenser, CarbonDioxideScrubber, AugmentationChamber, Academy, Library, Arbor, ComputerCore, Factory, TimeChamber, EntertainmentCenter, NegentropyPool, Starport, SuspendedAnimationTomb, StrangeMatterWorkshop } from "../../models/Structure";
+import { Biodome, Structure, Corridor, SurfaceRoad, Mine, Laboratory, Kitchen, PowerPlant, Study, Refinery, CloneMatrix, Arcology, Ladder, OxygenAccumulator, SolarFarm, WaterCondenser, CarbonDioxideScrubber, AugmentationChamber, Academy, Library, Arbor, ComputerCore, Factory, TimeChamber, EntertainmentCenter, NegentropyPool, Starport, SuspendedAnimationTomb, StrangeMatterWorkshop } from "../../models/Structure";
 import { Game } from "../../Game";
-import { ResourceBlock, PureValue, emptyMarket } from "../../models/Economy";
+import { ResourceBlock, emptyMarket } from "../../models/Economy";
 import { ResourcesList } from "./ResourcesList";
 import { Building } from "../Building";
 import { StatusAnalysisView } from "./StatusAnalysisView";
@@ -16,44 +16,37 @@ export class Hud extends UIActor {
     private _paletteElement: HTMLDivElement
 
     static structuresForPalette = [
-        SurfaceRoad,
-        Corridor, 
-        Ladder,
-
-        Study, Laboratory,
-        Library, Academy,
-
-        SolarFarm,
-        Mine, Refinery,
-        Factory,
-        PowerPlant,
-
-        CloneMatrix,
-        AugmentationChamber,
-
-        Dome, Kitchen,
+        Academy,
         Arbor,
         Arcology,
-
-        OxygenAccumulator,
-
-        WaterCondenser,
+        AugmentationChamber,
+        Biodome,
         CarbonDioxideScrubber,
-
-
+        CloneMatrix,
         ComputerCore,
-
-        Starport,
+        Corridor, 
         EntertainmentCenter,
-        SuspendedAnimationTomb,
+        Factory,
+        Kitchen,
+        Laboratory,
+        Ladder,
+        Library,
+        Mine, Refinery,
         NegentropyPool,
+        OxygenAccumulator,
+        PowerPlant,
+        SolarFarm,
+        Starport,
         StrangeMatterWorkshop,
+        Study,
+        SurfaceRoad,
+        SuspendedAnimationTomb,
         TimeChamber,
-
-   // CommonArea,
+        WaterCondenser,
     ];
 
     comprehendedStructures: (typeof Structure)[] = []
+    builtStructures: (typeof Structure)[] = []
 
     constructor(game: Game, protected onBuildingSelect = null) {
         super(0, 0, game.canvasWidth, game.canvasHeight);
@@ -95,7 +88,7 @@ export class Hud extends UIActor {
     }
 
     updatePalette(bldgs: Building[]) {
-        let builtStructures: (typeof Structure[]) = //bldgs
+        this.builtStructures = //bldgs
           Hud.structuresForPalette.filter((structure) => bldgs.some(b => b.structure instanceof structure))
 
 
@@ -104,13 +97,13 @@ export class Hud extends UIActor {
             let prereqs: (typeof Structure)[] = s.prereqs
             console.log("can i build", { name: s.name, prereqs })
             return prereqs.every((prereq: (typeof Structure)) => {
-                let built = builtStructures.some((s: (typeof Structure)) => s === prereq)
+                let built = this.builtStructures.some((s: (typeof Structure)) => s === prereq)
                 console.log("do i have any", { prereq, built })
                 return built
             })
         })
 
-          console.log("Built", { builtStructures, comprehended: this.comprehendedStructures })
+        console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
 
           // rebuild palette with updated available buildings
         this._paletteElement.parentElement.removeChild(this._paletteElement)
@@ -137,25 +130,33 @@ export class Hud extends UIActor {
     }
 
     private buttonFactory(s: Structure) {
-        let bg = s.dominantColor.darken(0.8) //.desaturate(0.25) //.toRGBA()
-        bg.a = 0.6
-        let fg = Color.Blue.lighten(0.8).desaturate(0.55) //.toRGBA()
+        let bg = s.dominantColor.darken(0.4).desaturate(0.6) //.toRGBA()
+        bg.a = 0.8
+        let fg = s.dominantColor.lighten(0.8).desaturate(0.4) //.toRGBA()
         let paletteButton = document.createElement('button');
-        paletteButton.textContent = `${s.name}`;
+
+        let label = s.name
+        if (!this.builtStructures.map(s => new s().name).includes(s.name)) {
+            label += '*';
+
+        }
+
+        paletteButton.textContent = label; // `${s.name}`;
+
         paletteButton.style.display = 'block';
         paletteButton.style.fontSize = '10pt';
 
         paletteButton.style.fontFamily = 'Helvetica';
         paletteButton.style.fontWeight = '600';
         paletteButton.style.padding = '8px';
-        paletteButton.style.width = '130px';
+        paletteButton.style.width = '160px';
         paletteButton.style.textTransform = 'uppercase'
-        paletteButton.style.border = 'none'
+        paletteButton.style.border = '1px solid rgba(255,255,255,0.08)'
 
         paletteButton.style.background = bg.toRGBA();
         paletteButton.style.color = fg.toRGBA()
         paletteButton.onmouseover = () => {
-            paletteButton.style.background = bg.lighten(0.4).toRGBA()
+            paletteButton.style.background = bg.lighten(0.5).toRGBA()
             paletteButton.style.color = fg.lighten(0.9).toRGBA()
         }
         paletteButton.onmouseleave = () => {
