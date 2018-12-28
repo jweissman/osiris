@@ -6,6 +6,7 @@ import { Vector, Polygon } from "excalibur";
 
 export class PowerPlantView extends Building {
     showLabel = true
+    edgeWidth = 5
 
     validConnectingStructures() { return [ Corridor ]}
 

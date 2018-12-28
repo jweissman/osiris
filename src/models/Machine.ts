@@ -2,10 +2,18 @@ import { ResourceBlock } from "./Economy";
 import { Scale } from "../values/Scale";
 import { Color } from "excalibur";
 
+let { major, minor } = Scale
+
 const bookshelfSvg = require('../images/bookshelf-plain.svg');
+const vatSvg = require('../images/vat-plain.svg');
+const benchSimple = require('../images/bench-simple-plain.svg');
+const stove = require('../images/stove-plain.svg');
 
 const images = {
     bookshelf: bookshelfSvg,
+    vat: vatSvg,
+    bench: benchSimple,
+    stove: stove,
 }
 
 export enum MachineOperation {
@@ -23,8 +31,8 @@ export enum MachineOperation {
 export class Machine {
     name: string = '(machine name)'
     description: string = '(machine description)'
-    width: number = Scale.minor.third
-    height: number = Scale.minor.fourth
+    width: number = major.second
+    height: number = major.second
     color: Color = Color.LightGray
 
     consumes: ResourceBlock = null
@@ -43,6 +51,8 @@ export class CommandCenter extends Machine {
     name = 'Command'
     description = 'gather resources'
     behavior = MachineOperation.CollectResource
+
+    image = images.bench
 }
 
 // meals
@@ -58,6 +68,7 @@ export class Stove extends Machine {
     description = 'make a meal'
     consumes = ResourceBlock.Food
     produces = ResourceBlock.Meal
+    image = images.stove
 }
 
 // minerals
@@ -89,6 +100,7 @@ export class ExperimentBench extends Machine {
     description = 'test some hypotheses'
     consumes = ResourceBlock.Hypothesis
     produces = ResourceBlock.Data
+    image = images.bench
 }
 
 // reproduction
@@ -99,6 +111,27 @@ export class CloningVat extends Machine {
     // consumes = ResourceBlock.Meal
     behavior = MachineOperation.SpawnCitizen 
     productionTime = 1500
+
+    height = major.third
+    // width = minor.fifth
+    // height = major.first
+
+    image = images.vat
+}
+
+// providence (power, life support...)
+
+export class OxygenExtractor extends Machine {
+    name = 'O2 Extractor'
+    description = 'breathe deep'
+    // behavior
+    // height = 
+    image = images.vat
+}
+
+export class SolarCell extends Machine {
+    name = 'Solar Cell'
+    description = 'feel the warmth'
 }
 
 // maybe library node 'stores' data?

@@ -24,11 +24,11 @@ Our prayers are with you.
 
 ## Stories to Play
 
-- Clone Vat (produce a clone every so often, consume a lot of meals/data)
+- [ok] Clone Vat (produce a clone every so often, consume a lot of meals/data)
 - Reshape most buildings (i.e., permit user to set width, and so number of slots, at least on most subsurface buildings)
 - Pinnacle buildings (huge devices/slots)
-- Tech Tree (remaining buildings; unpack building menu over time) 
+- [some] Tech Tree (remaining buildings; unpack building menu over time) 
 - Device Palette (click to place devices in buildings; 'images' for most devices?)
-- Condensed Hud (hide/show menus; construct/furnish 'modes' where menus are hidden)
+- Condensed Hud (hide/show menus; construct/furnish 'modes' where menus are hidden; intangible/'providential' resources [power/atmos/hope -- pop cap/building cap/base level or wealth])
 - Building backgrounds (wall and floor patterns)
 - Economy (apply cost constraints; model higher-order substances: strange matter [negative-mass omnium?], algorithms [highly condensed/processed/worked data? output of a 'dev console'?], bioplasm [ some advanced biotic material?? ])

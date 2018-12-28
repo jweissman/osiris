@@ -1,12 +1,7 @@
 import { Color } from 'excalibur';
 import { Structure } from './Structure';
 import { sample } from '../Util';
-
-export class Colony {
-    // origin: Vector
-    structures: Structure[] = []
-    // build(structure) ...
-}
+import { Planet } from '../actors/Planet/Planet';
 
 
 export class World {
@@ -18,5 +13,7 @@ export class World {
   skyColor: Color = sample([ Color.Cyan, Color.Vermillion ] ). // Color.Rose //World.colors).
         lighten(0.15).
         desaturate(0.65) // sample([Color.Blue, Color.Rose,Color.Blue]).lighten(0.1).desaturate(0.8)
-  colony: Colony = new Colony()
+//   colony: Colony = new Colony()
+
+  
 }

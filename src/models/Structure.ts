@@ -1,8 +1,8 @@
-import { Vector } from 'excalibur';
+import { Vector, Color } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter, CloningVat } from './Machine';
+import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter, CloningVat, OxygenExtractor, SolarCell } from './Machine';
 
 const { major, minor } = Scale
 
@@ -15,6 +15,7 @@ export class Structure {
     width: number = 10
     height: number = 10
     zoom: number = 1
+    dominantColor: Color = Color.White
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
@@ -30,6 +31,8 @@ export class Structure {
     }
 
     machines: (typeof Machine)[] = []
+
+    prereqs: (typeof Structure)[] = []
 }
 
 export class MissionControl extends Structure {
@@ -68,6 +71,7 @@ export class Dome extends Structure {
     name: string = 'Biodome';
     description: string = 'Biome sweet biome';
     produces = ResourceBlock.Food
+    dominantColor = Color.Green
 
     view: string = 'DomeView';
     width: number  = 2 * major.eighth
@@ -81,6 +85,8 @@ export class Dome extends Structure {
         [Orientation.Down]: [ ],
     }
     machines = [Orchard]
+
+    prereqs = [ Study, OxygenAccumulator ]
 }
 
 export class Corridor extends Structure {
@@ -140,17 +146,20 @@ export class Laboratory extends CommonArea {
     description: string = 'learn some things'
     consumes = ResourceBlock.Hypothesis
     produces = ResourceBlock.Data
+    dominantColor = Color.Blue
     view: string = 'LabView'
     width: number = major.sixth
     height: number = major.fifth
     productionTime = 6500
     machines = [ExperimentBench]
+    prereqs = [ Kitchen, Study ]
 }
 
 
 export class Kitchen extends CommonArea {
     name: string = 'Kitchen'
     description: string = 'veg -> meals'
+    dominantColor = Color.Green
     consumes = ResourceBlock.Food
     produces = ResourceBlock.Meal
     view: string = 'KitchenView'
@@ -165,6 +174,7 @@ export class Kitchen extends CommonArea {
 export class Mine extends Structure {
     name: string = 'Mine'
     description: string = 'ore else'
+    dominantColor = Color.Red
     produces = ResourceBlock.Ore
     productionTime = 20000
     view: string = 'MineView'
@@ -177,11 +187,13 @@ export class Mine extends Structure {
         [Orientation.Down]: [ Ladder ],
     }
     machines = [MiningDrill]
+    prereqs = [SolarFarm]
 }
 
 export class Study extends CommonArea {
     name: string = 'Study'
     description: string = 'reflect'
+    dominantColor = Color.Blue
     view: string = 'StudyView'
     width = major.third
     height = major.fifth
@@ -193,6 +205,7 @@ export class Study extends CommonArea {
 export class Refinery extends Structure {
     name = 'Refinery'
     description = 'flotate'
+    dominantColor = Color.Red
     consumes = ResourceBlock.Ore
     produces = ResourceBlock.Mineral
     view = 'RefineryView'
@@ -206,6 +219,7 @@ export class Refinery extends Structure {
         [Orientation.Down]: [ Ladder ],
     }
     machines = [MineralProcessor]
+    prereqs = [Mine]
 }
 
 export class Ladder extends Structure {
@@ -227,6 +241,7 @@ export class Arcology extends Structure {
     name = 'Arcology'
     description = 'megalith'
     view = 'ArcologyView'
+    dominantColor = Color.Green
     width = 12 * major.fifth
     height = 34 * major.fifth
     zoom = 0.01
@@ -236,15 +251,34 @@ export class Arcology extends Structure {
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
+    prereqs = [ Dome, PowerPlant ]
 }
 
 export class CloneMatrix extends CommonArea {
     name = 'Clone Matrix'
     description = 'you seem familiar'
+    dominantColor = Color.Blue
     view = 'CloneMatrixView'
     width = major.fifth
     height = major.eighth
     machines = [ CloningVat ]
+    prereqs = [ Study ]
+}
+
+export class OxygenAccumulator extends Dome {
+    name = 'O2'
+    description = 'breathe free'
+    // view = 'OxygenAccumulatorView'
+    machines = [ OxygenExtractor ]
+    prereqs = []
+}
+
+export class SolarFarm extends Dome {
+    name = 'Solar Farm'
+    description = 'feel the warmth on your face'
+    // view = 'SolarFarmView'
+    machines = [ SolarCell ]
+    prereqs = []
 }
 
 // huge octagonal generating station with four 'slots'
@@ -256,9 +290,12 @@ export class CloneMatrix extends CommonArea {
 export class PowerPlant extends Structure {
     name: string = 'Power Plant'
     description: string = 'sunny day'
+    dominantColor = Color.Red
     view: string = 'PowerPlantView'
     width: number = 2 * major.eighth //30 * majorUnit
     height: number = 2 * major.eighth // 30 * majorUnit
+
+    prereqs = [ Mine ] // Factory, CO2
 
     //connections: {[key in Orientation]: (typeof Structure)[] } = {
     //    [Orientation.Left]: [ Corridor ],

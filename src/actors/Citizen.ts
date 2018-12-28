@@ -7,8 +7,10 @@ import { Game } from "../Game";
 import { eachCons } from "../Util";
 import { Machine, Stove, ExperimentBench, MineralProcessor, CommandCenter, Orchard, MiningDrill, Bookshelf } from "../models/Machine";
 import { Device } from "./Device";
+import { Scale } from "../values/Scale";
 
 export class Citizen extends Actor {
+
     walkSpeed: number = Game.citizenSpeed
     carrying: ResourceBlock = null
     path: Vector[] = []
@@ -19,7 +21,7 @@ export class Citizen extends Actor {
     progress: number
 
     constructor(private device: Device, protected planet: Planet) {
-        super(device.x,device.y,4,10,Color.White)
+        super(device.x, device.y, Scale.minor.first, Scale.minor.third, Color.White)
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
     }
 

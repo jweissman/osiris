@@ -2,7 +2,7 @@ import { Scene, Input, UIActor, Label, Vector, LockCameraToActorStrategy } from 
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Dome, Corridor, SurfaceRoad, Kitchen, CloneMatrix } from "../models/Structure";
+import { Structure, MissionControl, MainTunnel, Dome, Corridor, SurfaceRoad, Kitchen, CloneMatrix, OxygenAccumulator } from "../models/Structure";
 import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, MineView, LabView, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
@@ -47,18 +47,20 @@ export class Construct extends Scene {
         MissionControl,
 
         SurfaceRoad,
-        Dome,
+        OxygenAccumulator,
+        // Dome,
         MainTunnel,
         Corridor,
         Kitchen,
-        CloneMatrix,
+        // Study,
+        // CloneMatrix,
     ]
 
     public onInitialize(game: Game) {
         this.game = game
 
 
-        this.hud = new Hud(game, 'hi', (structure) => {
+        this.hud = new Hud(game, (structure) => {
             this.startConstructing(structure)
         });
         this.add(this.hud)
@@ -106,6 +108,7 @@ export class Construct extends Scene {
                         this.planet.placeBuilding(currentBuilding)
                         this.planet.colony.currentlyConstructing = null
                         this.prepareNextBuilding(e.pos)
+                        this.hud.updatePalette(this.planet.colony.buildings)
                     }
                 }
             } else if (e.button === Input.PointerButton.Middle) {
@@ -160,13 +163,13 @@ export class Construct extends Scene {
         if (structure) {
             this.startConstructing(structure, pos)
         } else {
-            this.hud.message(`Welcome to OSIRIS!`)
+            this.hud.setMessage(`Welcome to OSIRIS!`)
         }
     }
 
     startConstructing(structure: Structure, pos: Vector = new Vector(0, 0)) {
         structure.origin = pos
-        this.hud.message(`Place ${structure.name}`)
+        this.hud.setMessage(`Place ${structure.name}`)
         let theNextOne = this.spawnBuilding(structure)
         this.planet.colony.currentlyConstructing = theNextOne
         this.camera.pos = theNextOne.pos

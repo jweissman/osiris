@@ -1,5 +1,37 @@
 import { Color } from "excalibur";
 
+// an abstract/intangible thing (or at least something we don't represent)
+export enum PureValue {
+    Power = 'Power',
+    Hope = 'Hope',
+    Shelter = 'Shelter',
+    Oxygen = 'Oxygen',
+}
+
+export type Economy = { [key in PureValue]: {
+    supply: number,
+    demand: number
+} }
+
+export const emptyMarket : Economy = {
+    Power: {
+        supply: 0,
+        demand: 0
+    },
+    Hope: {
+        supply: 0,
+        demand: 0
+    },
+    Shelter: {
+        supply: 0,
+        demand: 0
+    },
+    Oxygen: {
+        supply: 0,
+        demand: 0
+    },
+}
+
 export enum ResourceBlock {
     // base
     Food = 'Food',
