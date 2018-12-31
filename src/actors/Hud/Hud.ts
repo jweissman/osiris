@@ -1,12 +1,11 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Structure, Corridor, SurfaceRoad, Ladder, Dome, CommonArea } from "../../models/Structure";
+import { Structure, Corridor, SurfaceRoad, Ladder, Dome, SmallRoom } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket } from "../../models/Economy";
 import { ResourcesList } from "./ResourcesList";
-import { Building } from "../Building";
-import { StatusAnalysisView } from "./StatusAnalysisView";
-import { Desk, Bookshelf, CookingFire, Cabin, Machine, CloningVat } from "../../models/Machine";
+import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed } from "../../models/Machine";
 import { flatSingle } from "../../Util";
+import { Colony } from "../Planet/Colony";
 
 export class Hud extends UIActor {
     private messageLabel: Label
@@ -23,53 +22,34 @@ export class Hud extends UIActor {
         Corridor,
         Ladder,
 
-        // dome
+        // surface
         Dome,
-        CommonArea,
 
         // subsurface
+        SmallRoom,
 
-        // Academy,
-        // Arbor,
-        // Arcology,
-        // AugmentationChamber,
-        // Biodome,
-        // CarbonDioxideScrubber,
-        // CloneMatrix,
-        // ComputerCore,
-        // Corridor, 
-        // EntertainmentCenter,
-        // Factory,
-        // Kitchen,
-        // Laboratory,
-        // Ladder,
-        // Library,
-        // Mine, Refinery,
-        // NegentropyPool,
-        // OxygenAccumulator,
-        // PowerPlant,
-        // SolarFarm,
-        // Starport,
-        // StrangeMatterWorkshop,
-        // Study,
-        // SurfaceRoad,
-        // SuspendedAnimationTomb,
-        // TimeChamber,
-        // WaterCondenser,
     ];
 
     comprehendedStructures: (typeof Structure)[] = []
     builtStructures: (typeof Structure)[] = []
 
     static machinesForPalette = [
-        Cabin,
-        CookingFire,
+        Bed,
+        // Cabin,
+        // CookingFire,
         Bookshelf,
         Desk,
-        CloningVat
+        Stove,
+
+        AlgaeVat,
+        CloningVat,
+
+        OxygenExtractor,
+        WaterCondensingMachine,
     ]
 
     comprehendedMachines: (typeof Machine)[] = []
+    builtMachines: (typeof Machine)[] = []
 
     constructor(private game: Game, protected onBuildingSelect = null, protected onMachineSelect = null) {
         super(0, 0, game.canvasWidth, game.canvasHeight);
@@ -85,10 +65,6 @@ export class Hud extends UIActor {
         this.resources = new ResourcesList(50, 40)
         this.add(this.resources)
 
-        // start economy empty?
-        let econ = emptyMarket
-        let statusX = 20;
-        let statusY = game.canvasHeight - 200
         // this.add(this.status)
 
     }
@@ -117,9 +93,14 @@ export class Hud extends UIActor {
 
     }
 
-    updateBuildingPalette(bldgs: Building[]) {
+    updatePalettes(colony: Colony) {
+        this.updateBuildingPalette(colony)
+        this.updateMachinePalette(colony)
+    }
+
+    private updateBuildingPalette(colony: Colony) { //bldgs: Building[]) {
         this.builtStructures = //bldgs
-          Hud.structuresForPalette.filter((structure) => bldgs.some(b => b.structure instanceof structure))
+          Hud.structuresForPalette.filter((structure) => colony.buildings.some(b => b.structure instanceof structure))
 
 
         this.comprehendedStructures = Hud.structuresForPalette.filter((structure: typeof Structure) => {
@@ -138,16 +119,22 @@ export class Hud extends UIActor {
           // rebuild palette with updated available buildings
         this._structurePaletteElement.parentElement.removeChild(this._structurePaletteElement)
           this._makeStructurePalette(this.onBuildingSelect)
-
-          // rebuild machine palette too here i guess?
-        this.updateMachinePalette(bldgs)
     }
 
-    updateMachinePalette(bldg: Building[]) {
-        let availableMachines = flatSingle(bldg.map(b => b.structure.machines))
+    private updateMachinePalette(colony: Colony) { //bldgs: Building[]) {
+        let bldgs = colony.buildings
+        let availableMachines = flatSingle(bldgs.map(b => b.structure.machines))
+        let devices = colony.findAllDevices() //flatSingle(bldgs.map(b => b.devices))
+
+        this.builtMachines = //flatSingle(bldg.map(b => b.devices))
+        Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine))
         console.log("available machines", { availableMachines })
         this.comprehendedMachines = Hud.machinesForPalette.filter((machine: typeof Machine) => {
-            return availableMachines.includes(machine);
+            let canBuild = availableMachines.includes(machine);
+            // let m = new machine()
+            return canBuild && (new machine()).prereqs.every((prereq: (typeof Machine)) => {
+                return this.builtMachines.some((m: (typeof Machine)) => m === prereq)
+            })
 
         }) //availableMachines
         this._machinePaletteElement.parentElement.removeChild(this._machinePaletteElement)

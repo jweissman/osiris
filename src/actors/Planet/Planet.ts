@@ -94,7 +94,7 @@ export class Planet extends Actor {
         return this.colony.closestBuildingByType(cursor, structureTypes, predicate)
     }
 
-    closestDevice(cursor: Vector, machineTypes: (typeof Machine)[], predicate: (Device) => boolean = () => true) {
+    closestDevice(cursor: Vector, machineTypes: (typeof Machine)[] = [], predicate: (Device) => boolean = () => true) {
         return this.colony.closestDeviceByType(cursor, machineTypes, predicate);
     }
 

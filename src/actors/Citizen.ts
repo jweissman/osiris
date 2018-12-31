@@ -4,9 +4,11 @@ import { Planet } from "./Planet/Planet";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
 import { eachCons } from "../Util";
-import { Machine, Stove, ExperimentBench, MineralProcessor, CommandCenter, Orchard, MiningDrill, Bookshelf, CookingFire, Cabin } from "../models/Machine";
+// import { Machine, Stove, ExperimentBench, MineralProcessor, CommandCenter, Orchard, MiningDrill, Bookshelf, CookingFire, Cabin } from "../models/Machine";
 import { Device } from "./Device";
 import { Scale } from "../values/Scale";
+import { MachineOperation } from "../models/Machine";
+// import { Machine, Stove, CommandCenter } from "../models/Machine";
 
 export class Citizen extends Actor {
 
@@ -123,31 +125,41 @@ export class Citizen extends Actor {
     async work() {
         if (this.carrying) {
             let item: ResourceBlock = this.carrying;
-            let sinks: (typeof Machine)[] = []
+            // let sinks: (typeof Machine)[] = []
 
-            if (ResourceBlock[item] === 'Food') {
-                sinks = [CookingFire, Stove]
-            } else if (ResourceBlock[item] === 'Hypothesis') {
-                sinks = [ExperimentBench]
-            } else if (ResourceBlock[item] === 'Ore') {
-                sinks = [MineralProcessor]
-            } else {
-                sinks = [CommandCenter]
-            }
+            let theDevices = this.planet.colony.findAllDevices()
+            // let theSinks = theDevices.find(device => device.machine.consumes(ResourceBlock[item]))
 
-            if (sinks.length > 0) {
-                let theSink: Device = this.planet.closestDevice(this.pos, sinks)
-                if (theSink) {
-                    await this.pathTo(theSink.building)
-                    await this.glideTo(theSink.pos)
-                    await theSink.interact(this)
-                }
+            let sink = this.planet.closestDevice(this.pos,
+                [],
+                (device) => 
+                device.machine.consumes === item || //ResourceBlock[item]
+                device.machine.behavior === MachineOperation.CollectResource
+            )
+
+            //if (ResourceBlock[item] === 'Food') {
+            //    sinks = [Stove] //CookingFire, Stove]
+            //} else if (ResourceBlock[item] === 'Hypothesis') {
+            //    sinks = [ExperimentBench]
+            //// } else if (ResourceBlock[item] === 'Ore') {
+            //    // sinks = [MineralProcessor]
+            //} else {
+            //    sinks = [CommandCenter]
+            //}
+
+            // if (theSinks.length > 0) {
+                // let theSink: Device = this.planet.closestDevice(this.pos, sinks)
+            if (sink) {
+                await this.pathTo(sink.building)
+                await this.glideTo(sink.pos)
+                await sink.interact(this)
             } else {
                 console.log("nowhere to deliver it", this.carrying)
             }
         } else {
             let source: Device = this.planet.closestDevice(this.pos,
-                [ Cabin, Orchard, MiningDrill, Bookshelf ],
+                [],
+                // [ Cabin, Orchard, MiningDrill, Bookshelf ],
                 (d) => d.product.length > 0
             )
 

@@ -4,6 +4,7 @@ import { Orientation } from "../../values/Orientation";
 
 export class DomeView extends Building {
     hideBox = true
+    showLabel = true
 
     slots() {
         let theSlots = [];

@@ -1,15 +1,15 @@
 import { Actor, Vector, CollisionType, Color, Label, Traits } from "excalibur";
 import { Planet } from "../Planet/Planet";
-import { Structure } from "../../models/Structure";
+import { Structure, } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
 import { Orientation, flip, compass } from "../../values/Orientation";
-import { Citizen } from "../Citizen";
 import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
-import { closest, measureDistance, drawRect, drawLine } from "../../Util";
+import { closest, measureDistance, drawRect } from "../../Util";
 import { Graph } from "../../values/Graph";
-import { ResourceBlock, blockColor } from "../../models/Economy";
+import { ResourceBlock } from "../../models/Economy";
 import { Device } from "../Device";
+import { allSpaceFunctions } from "../../models/SpaceFunction";
 
 export class Building extends Actor {
     edgeWidth: number = 0 //.1
@@ -29,7 +29,7 @@ export class Building extends Actor {
 
     level: number = 1
 
-    devices: Device[] = []
+    private devices: Device[] = []
 
     // colorBase() { return this.color.darken(0.1); }
 
@@ -104,7 +104,7 @@ export class Building extends Actor {
                     drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
                 })
             }
-            if (this.nodes().length > 0) {
+         if (this.nodes().length > 0) {
                 // draw nodes
                 this.nodes().forEach((node: Vector) => {
                     let rect: Rectangle = { x: node.x, y: node.y, width: 4, height: 4 }
@@ -114,7 +114,8 @@ export class Building extends Actor {
 
         }
 
-        if (this.devicePlaces().length > 0) {
+        let showDevicePlaces = false
+        if (showDevicePlaces && this.devicePlaces().length > 0) {
             this.devicePlaces().forEach(place => {
                 drawRect(ctx,
                     { x: place.x, y: place.y, width: 10, height: 10 },
@@ -159,7 +160,7 @@ export class Building extends Actor {
 
     }
 
-    handleClick(cursor: Vector): boolean { return true; }
+    handleClick(_pos): boolean { return true; }
 
     slots(): Slot[] {
         return []
@@ -310,6 +311,41 @@ export class Building extends Actor {
             pos: new Vector(x,y),
             facing,
             parent: this
+        }
+    }
+
+    public addDevice(device: Device) {
+        device.finalize()
+        if (device.building !== this) {
+            device.building = this
+        }
+        this.devices.push(device)
+        this.updateName()
+    }
+
+    public hasPlaceForDevice() {
+        return this.devices.length < this.devicePlaces().length
+    }
+
+    public nextDevicePlace() {
+        // could throw an err if we have no place
+        return this.devicePlaces()[
+            this.devices.length
+        ]
+    }
+
+    public getDevices() {
+        return this.devices
+    }
+
+    private updateName() {
+        let fn = allSpaceFunctions.find(spaceFn =>
+            spaceFn.machines.every(machine =>
+                this.devices.some(d => d.machine instanceof machine)
+            )
+        )
+        if (fn) {
+            this.nameLabel.text = fn.label
         }
     }
 }

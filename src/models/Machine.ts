@@ -10,6 +10,7 @@ const benchSimple = require('../images/bench-simple-plain.svg');
 const stove = require('../images/stove-plain.svg');
 const cabin = require('../images/cabin-plain.svg');
 const fire = require('../images/cooking-fire-plain.svg')
+const bed = require('../images/bed-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -17,7 +18,8 @@ const images = {
     bench: benchSimple,
     stove,
     cabin,
-    fire
+    fire,
+    bed
 }
 
 export enum MachineOperation {
@@ -41,12 +43,15 @@ export class Machine {
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
-    productionTime: number = 1000
+
+    // need to stop using this both for work time and 'generation' time
+    productionTime: number = 500
 
     behavior: MachineOperation = MachineOperation.Work
 
-    image = images.bookshelf
+    image = images.vat
 
+    prereqs: (typeof Machine)[] = []
 
 }
 
@@ -61,11 +66,11 @@ export class CommandCenter extends Machine {
 
 // meals
 
-export class Orchard extends Machine {
-    name = 'Orchard'
-    description = 'grow some food'
-    produces = ResourceBlock.Food
-}
+//export class Orchard extends Machine {
+//    name = 'Orchard'
+//    description = 'grow some food'
+//    produces = ResourceBlock.Food
+//}
 
 export class Stove extends Machine {
     name = 'Stove'
@@ -73,43 +78,50 @@ export class Stove extends Machine {
     consumes = ResourceBlock.Food
     produces = ResourceBlock.Meal
     image = images.stove
+
+    prereqs = [Bookshelf]
 }
 
-export class CookingFire extends Machine {
-    name = 'Cooking Fire'
-    consumes = ResourceBlock.Food
-    produces = ResourceBlock.Meal
-    image = images.fire
-
-}
-export class Cabin extends Machine {
-    name = 'Cabin'
-    produces = ResourceBlock.Food
-
-    image = images.cabin
-}
+//export class CookingFire extends Machine {
+//    name = 'Cooking Fire'
+//    consumes = ResourceBlock.Food
+//    produces = ResourceBlock.Meal
+//    image = images.fire
+//
+//    prereqs = [OxygenExtractor]
+//}
+//export class Cabin extends Machine {
+//    name = 'Cabin'
+//    produces = ResourceBlock.Food
+//
+//    image = images.cabin
+//    prereqs = [WaterCondensingMachine, OxygenExtractor]
+//}
 
 export class Desk extends Machine {
     name = 'Desk'
-
+    consumes = ResourceBlock.Hypothesis
+    produces = ResourceBlock.Data
+    image = images.bench
+    prereqs = [ OxygenExtractor ]
 }
 
 
 // minerals
 
-export class MiningDrill extends Machine {
-    name = 'Drill'
-    description = 'find some ores'
-    produces = ResourceBlock.Ore
-}
+// export class MiningDrill extends Machine {
+//     name = 'Drill'
+//     description = 'find some ores'
+//     produces = ResourceBlock.Ore
+// }
 
-export class MineralProcessor extends Machine {
-    name = 'Processor'
-    description = 'extract some minerals'
+// export class MineralProcessor extends Machine {
+//     name = 'Processor'
+//     description = 'extract some minerals'
 
-    consumes = ResourceBlock.Ore
-    produces = ResourceBlock.Mineral
-}
+//     consumes = ResourceBlock.Ore
+//     produces = ResourceBlock.Mineral
+// }
 
 // data
 
@@ -117,14 +129,22 @@ export class Bookshelf extends Machine {
     name = 'Shelf'
     description = 'brainstorm'
     produces = ResourceBlock.Hypothesis
+    image = images.bookshelf
+    prereqs = [ OxygenExtractor, Desk ]
 }
 
-export class ExperimentBench extends Machine {
-    name = 'Bench'
-    description = 'test some hypotheses'
-    consumes = ResourceBlock.Hypothesis
-    produces = ResourceBlock.Data
-    image = images.bench
+//export class ExperimentBench extends Machine {
+//    name = 'Bench'
+//    description = 'test some hypotheses'
+//    consumes = ResourceBlock.Hypothesis
+//    produces = ResourceBlock.Data
+//    image = images.bench
+//}
+
+export class AlgaeVat extends Machine {
+    name = 'Algae Vat'
+    produces = ResourceBlock.Food
+    prereqs = [ OxygenExtractor ]
 }
 
 // reproduction
@@ -141,9 +161,17 @@ export class CloningVat extends Machine {
     // height = major.first
 
     image = images.vat
+
+    prereqs = [AlgaeVat]
 }
 
 // providence (power, life support...)
+
+export class Bed extends Machine {
+    name = 'Bed'
+    image = images.bed
+    prereqs = [ OxygenExtractor ]
+}
 
 export class OxygenExtractor extends Machine {
     name = 'O2 Extractor'
@@ -151,52 +179,53 @@ export class OxygenExtractor extends Machine {
     // behavior
     // height = 
     image = images.vat
+    prereqs = [ WaterCondensingMachine ]
 }
 
-export class SolarCell extends Machine {
-    name = 'Solar Cell'
-    description = 'feel the warmth'
-}
+// export class SolarCell extends Machine {
+//     name = 'Solar Cell'
+//     description = 'feel the warmth'
+// }
 
-export class Launchpad extends Machine {
-    name = 'Launchpad'
-}
+// export class Launchpad extends Machine {
+//     name = 'Launchpad'
+// }
 
 export class WaterCondensingMachine extends Machine {
     name = 'H20 Condenser'
 }
 
-export class AirScrubber extends Machine {
-    name = 'Air Scrubber'
-}
+// export class AirScrubber extends Machine {
+//     name = 'Air Scrubber'
+// }
 
-export class HypermnesisApparatus extends Machine {
-    name = 'Mind Upgrade'
-}
+// export class HypermnesisApparatus extends Machine {
+//     name = 'Mind Upgrade'
+// }
 
-export class AtomicCompiler extends Machine {
-    name = 'Atomic Compiler'
-}
+// export class AtomicCompiler extends Machine {
+//     name = 'Atomic Compiler'
+// }
 
-export class Icicle extends Machine {
-    name = 'Cryo Coffin'
-}
+// export class Icicle extends Machine {
+//     name = 'Cryo Coffin'
+// }
 
-export class TimeCrystal extends Machine {
-    name = 'Quantum Portal'
-}
+// export class TimeCrystal extends Machine {
+//     name = 'Quantum Portal'
+// }
 
-export class GamingRotunda extends Machine {
-    name = 'Gaming Rotunda'
-}
+// export class GamingRotunda extends Machine {
+//     name = 'Gaming Rotunda'
+// }
 
-export class MineralWorkshop extends Machine {
-    name = 'Workshop'
-}
+// export class MineralWorkshop extends Machine {
+//     name = 'Workshop'
+// }
 
-export class SingularityFountain extends Machine {
-    name = 'Singularity Fountain'
-}
+// export class SingularityFountain extends Machine {
+//     name = 'Singularity Fountain'
+// }
 
 // maybe library node 'stores' data?
 //export class LibraryNode {

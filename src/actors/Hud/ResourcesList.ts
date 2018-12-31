@@ -28,6 +28,10 @@ export class ResourcesList extends Actor {
     }
 
     increment(resource: ResourceBlock) {
-        this.entries[resource].credit(1);
+        console.log("INCREMENT", { resource })
+        let res = this.entries[resource]
+        if (res) {
+            res.credit(1);
+        }
     }
 }

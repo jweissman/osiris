@@ -1,12 +1,11 @@
-import { Vector, Color } from 'excalibur';
+import { Color } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Orchard, ExperimentBench, Stove, MiningDrill, Bookshelf, MineralProcessor, CommandCenter, CloningVat, OxygenExtractor, SolarCell, Launchpad, WaterCondensingMachine, AirScrubber, HypermnesisApparatus, AtomicCompiler, GamingRotunda, TimeCrystal, MineralWorkshop, Icicle, SingularityFountain, Cabin, CookingFire } from './Machine';
+import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed } from './Machine';
+import { SpaceFunction } from './SpaceFunction';
 
 const { major, minor } = Scale
-
-
 
 export class Structure {
     name: string = '(structure name)';
@@ -85,6 +84,7 @@ export class Corridor extends Structure {
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
+    prereqs = [MainTunnel]
 }
 
 export class Ladder extends Structure {
@@ -100,6 +100,7 @@ export class Ladder extends Structure {
         [Orientation.Left]: [ ],
         [Orientation.Right]: [ ],
     }
+    prereqs = [CommonArea]
 }
 
 // 'abstract' structure...
@@ -120,11 +121,14 @@ export class Dome extends Structure {
         [Orientation.Down]: [ ],
     }
 
-    machines = [Cabin, CookingFire]
+    machines = [
+        OxygenExtractor, WaterCondensingMachine,
+        // Cabin, CookingFire
+    ]
 }
 
 // two-slot...
-export class CommonArea extends Structure {
+class CommonArea extends Structure {
     name: string = 'Commons'
     description: string = 'hallway cap'
     view: string = 'CommonAreaView'
@@ -143,8 +147,40 @@ export class CommonArea extends Structure {
         [Orientation.Down]: [ Ladder ],
     }
 
-    machines = [ CloningVat ]
+    machines = [
+        CloningVat,
+        AlgaeVat,
+        Stove,
+        Bed,
+        Desk,
+        Bookshelf,
+    ]
+
+    prereqs = [
+        Dome 
+    ]
 }
+
+export class SmallRoom extends CommonArea {
+    name = 'Small Room'
+    // two small slots
+}
+
+export class MediumRoom extends CommonArea {
+    name = 'Medium Room'
+    prereqs = [ SmallRoom ]
+    width = 4 * major.eighth
+    height = 3 * major.fifth
+    // two medium slots...
+}
+
+export class MidDome extends Dome {
+    name = 'Mid Dome'
+    width = 4 * major.eighth
+    height = 3 * major.eighth
+    prereqs = [ Dome, MediumRoom ]
+}
+
 //////
 
 export class MissionControl extends Structure {
@@ -163,6 +199,8 @@ export class MissionControl extends Structure {
 
     machines = [ CommandCenter ]
 }
+
+//////
 
 
 

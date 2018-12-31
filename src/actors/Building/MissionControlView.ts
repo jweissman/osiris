@@ -15,9 +15,10 @@ export class MissionControlView extends Building {
             let machine = new machines[0]();
             this.devicePlaces().forEach(place => {
                 let theDevice = new Device(machine, place)
-                this.devices.push(theDevice)
-                theDevice.building = this;
-                this.add(theDevice)
+                this.addDevice(theDevice)
+                // this.devices.push(theDevice)
+                // theDevice.building = this;
+                // this.add(theDevice)
             })
         }
 

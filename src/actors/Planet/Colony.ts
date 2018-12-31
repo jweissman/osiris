@@ -52,9 +52,15 @@ export class Colony extends Actor {
         this.add(building);
     }
 
-    closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = () => true): Building {
+    closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[] = [], predicate: (Building) => boolean = () => true): Building {
         let matching = this.buildings
-        .filter(building => structureTypes.some(structureType => (building.structure instanceof structureType)) && predicate(building));
+        .filter(building => //predicate(building) &&
+            (structureTypes.length > 0
+            ? structureTypes.some(st => building.structure instanceof st)
+            : true)
+             && predicate(building)
+        )
+
         if (matching && matching.length > 0) {
             let distanceToCursor = (building) => cursor.distance(building.nodes()[0]);
             return minBy(matching, distanceToCursor);
@@ -72,9 +78,12 @@ export class Colony extends Actor {
         return path;
     }
 
-    closestDeviceByType(cursor: Vector, machineTypes: (typeof Machine)[], predicate: (Device) => boolean = () => true) {
-        let devices = flatSingle(this.buildings.map(b => b.devices))
-        devices = devices.filter(d => machineTypes.some(machine => d.machine instanceof machine) && predicate(d))
+    closestDeviceByType(cursor: Vector, machineTypes: (typeof Machine)[] = [], predicate: (Device) => boolean = () => true) {
+        let devices = this.findAllDevices()
+        devices = devices.filter(d => 
+            (machineTypes.length > 0 ? machineTypes.some(machine => d.machine instanceof machine) : true)
+             && predicate(d)
+        )
 
         if (devices && devices.length > 0) {
             let proximity = (d) => cursor.distance(d)
@@ -87,5 +96,9 @@ export class Colony extends Actor {
         if (ctrl) {
             this.navTree = new NavigationTree(ctrl);
         }
+    }
+
+    findAllDevices() {
+        return flatSingle(this.buildings.map(b => b.getDevices()))
     }
 }

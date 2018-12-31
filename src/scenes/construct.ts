@@ -113,13 +113,17 @@ export class Construct extends Scene {
                             this.planet.placeBuilding(buildingUnderConstruction)
                             this.planet.colony.currentlyConstructing = null
                             this.prepareNextBuilding(e.pos)
-                            this.hud.updateBuildingPalette(this.planet.colony.buildings)
+                            this.hud.updatePalettes(this.planet.colony)
                         }
                     } else {
-                        console.warn("Would construct machine!")
                         let deviceUnderConstruction = currentlyBuilding
-                        deviceUnderConstruction.finalize()
+                        let bldg = deviceUnderConstruction.building
+
+                        bldg.addDevice(deviceUnderConstruction)
+                        
+                        // deviceUnderConstruction.finalize()
                         this.planet.colony.currentlyConstructing = null
+                        this.hud.updatePalettes(this.planet.colony)
                     }
                 }
             } else if (e.button === Input.PointerButton.Middle) {

@@ -4,7 +4,7 @@ import { Building } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
-import { CommonArea, Dome } from "../models/Structure";
+import { SmallRoom, Dome } from "../models/Structure";
 
 export class Device extends Actor {
     product: ResourceBlock[] = []
@@ -19,7 +19,7 @@ export class Device extends Actor {
 
     constructor(
         // public building: Building,
-        private machine: Machine,
+        public machine: Machine,
         private initialPos: Vector
     ) {
         super(
@@ -104,28 +104,30 @@ export class Device extends Actor {
         }
     }
 
+    // todo only snap when close enough? try to prevent some mis-clicks?
     snap(planet: Planet, pos: Vector = this.pos) {
         let bldg = planet.colony.closestBuildingByType(pos,
-            [ Dome, CommonArea ],
+            [ Dome, SmallRoom ],
             // machines count < device slots count
             (bldg: Building) => {
-                let hasSpace = bldg.devices.length < bldg.devicePlaces().length
+                let hasSpace = bldg.hasPlaceForDevice()
                 return hasSpace && bldg.structure.machines.some(Machine => this.machine instanceof Machine)
 
             }
         )
 
-        // bldg.devi
-
         if (bldg) {
             this.building = bldg;
-            this.pos = this.building.devicePlaces()[
-                this.building.devices.length
-            ]
+            this.pos = this.building.nextDevicePlace()
+            //devicePlaces()[
+            //    this.building.devices.length
+            //]
         }
+
+        return !!bldg;
     }
 
     finalize() {
-        this.building.devices.push(this)
+        // this.building.devices.push(this)
     }
 }
