@@ -1,4 +1,4 @@
-import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove } from './Machine';
+import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge } from './Machine';
 
 export class SpaceFunction {
     static label: string = '(generic)';
@@ -12,7 +12,7 @@ class LivingQuarters extends SpaceFunction {
 
 class Kitchen extends SpaceFunction {
     static label = 'Kitchen'
-    static machines = [ Stove ]
+    static machines = [ Stove, Fridge ]
 }
 
 class LifeSupportPod extends SpaceFunction {
@@ -27,7 +27,7 @@ class LifeSupportPod extends SpaceFunction {
 
 class CloneMatrix extends SpaceFunction {
     static label = 'Clone Matrix'
-    static machines = [ CloningVat, ]
+    static machines = [ CloningVat, CloningVat ] //
 }
 
 class Library extends SpaceFunction {
@@ -35,10 +35,20 @@ class Library extends SpaceFunction {
     static machines = [ Bookshelf, Bookshelf ]
 }
 
+class Archive extends SpaceFunction {
+    static label = 'Archive'
+    static machines = [ ResearchServer, ResearchServer ]
+}
+
 //export class Arboretum extends SpaceFunction {
 //    static label = 'Arboretum'
 //    static machines = [ Arbor, Arbor ]
 //}
+
+class AlgaeFarm extends SpaceFunction {
+    static label = 'Algae Farm'
+    static machines = [ AlgaeVat, AlgaeVat ]
+}
 
 export const allSpaceFunctions = [
     Library,
@@ -46,5 +56,6 @@ export const allSpaceFunctions = [
     CloneMatrix,
     LivingQuarters,
     Kitchen,
+    AlgaeFarm,
+    Archive,
 ]
-

@@ -1,9 +1,9 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Structure, Corridor, SurfaceRoad, Ladder, Dome, SmallRoom } from "../../models/Structure";
+import { Structure, Corridor, SurfaceRoad, Ladder, Dome, SmallRoomThree, SmallRoomTwo, MediumRoom } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket } from "../../models/Economy";
 import { ResourcesList } from "./ResourcesList";
-import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed } from "../../models/Machine";
+import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed, Fridge, ResearchServer } from "../../models/Machine";
 import { flatSingle } from "../../Util";
 import { Colony } from "../Planet/Colony";
 
@@ -26,7 +26,9 @@ export class Hud extends UIActor {
         Dome,
 
         // subsurface
-        SmallRoom,
+        SmallRoomTwo,
+        SmallRoomThree,
+        MediumRoom,
 
     ];
 
@@ -40,9 +42,12 @@ export class Hud extends UIActor {
         Bookshelf,
         Desk,
         Stove,
+        Fridge,
 
         AlgaeVat,
         CloningVat,
+
+        ResearchServer,
 
         OxygenExtractor,
         WaterCondensingMachine,
@@ -106,15 +111,15 @@ export class Hud extends UIActor {
         this.comprehendedStructures = Hud.structuresForPalette.filter((structure: typeof Structure) => {
             let s = new structure()
             let prereqs: (typeof Structure)[] = s.prereqs
-            console.log("can i build", { name: s.name, prereqs })
+            // console.log("can i build", { name: s.name, prereqs })
             return prereqs.every((prereq: (typeof Structure)) => {
                 let built = this.builtStructures.some((s: (typeof Structure)) => s === prereq)
-                console.log("do i have any", { prereq, built })
+                // console.log("do i have any", { prereq, built })
                 return built
             })
         })
 
-        console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
+        // console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
 
           // rebuild palette with updated available buildings
         this._structurePaletteElement.parentElement.removeChild(this._structurePaletteElement)
@@ -128,7 +133,7 @@ export class Hud extends UIActor {
 
         this.builtMachines = //flatSingle(bldg.map(b => b.devices))
         Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine))
-        console.log("available machines", { availableMachines })
+        // console.log("available machines", { availableMachines })
         this.comprehendedMachines = Hud.machinesForPalette.filter((machine: typeof Machine) => {
             let canBuild = availableMachines.includes(machine);
             // let m = new machine()
@@ -155,7 +160,7 @@ export class Hud extends UIActor {
         .forEach((structure: Structure) => {
             let label = structure.name
             if (!this.builtStructures.map(s => new s().name).includes(structure.name)) {
-                label += '*';
+                label += ' *';
             }
             let clr = structure.dominantColor
             let _paletteButton = this.buttonFactory(label, clr); //structure);
@@ -180,6 +185,9 @@ export class Hud extends UIActor {
             .map(Machine => new Machine())
             .forEach(machine => {
                 let label = machine.name
+                if (!this.builtMachines.map(m => new m().name).includes(machine.name)) {
+                    label += ' *'
+                }
                 let clr = machine.color
                 let btn = this.buttonFactory(label, clr)
                 this._machinePaletteElement.appendChild(btn)

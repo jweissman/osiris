@@ -26,7 +26,7 @@ export function closest<T>(cursor: Vector, arr: Array<T>, getVector: (T) => Vect
    let matching: Array<T> = arr;
    if (predicate) { arr = arr.filter(predicate) }
    if (matching) {
-      let distanceToCursor = (elem: T) => cursor.distance(getVector(elem)) //vec) => cursor.distance(vec)
+      let distanceToCursor = (elem: T) => cursor.distance(getVector(elem))
       return minBy(matching, distanceToCursor)
    }
 }
@@ -93,7 +93,8 @@ export function drawRect(
 
   if (edgeWidth > 0) {
     let edge = Color.White;
-    ctx.strokeStyle = edge.toRGBA();
+    ctx.strokeStyle = `${edgeWidth}px solid ${edge.toRGBA()}`;
+    // ctx.strokeStyle = Stroke.So
     ctx.strokeRect(
       x, y, width, height
     )

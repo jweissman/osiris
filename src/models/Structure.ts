@@ -2,7 +2,7 @@ import { Color } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed } from './Machine';
+import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed, Fridge, ResearchServer } from './Machine';
 import { SpaceFunction } from './SpaceFunction';
 
 const { major, minor } = Scale
@@ -148,12 +148,11 @@ class CommonArea extends Structure {
     }
 
     machines = [
-        CloningVat,
-        AlgaeVat,
         Stove,
         Bed,
         Desk,
         Bookshelf,
+        Fridge,
     ]
 
     prereqs = [
@@ -161,17 +160,32 @@ class CommonArea extends Structure {
     ]
 }
 
-export class SmallRoom extends CommonArea {
-    name = 'Small Room'
+export class SmallRoomTwo extends CommonArea {
+    name = 'Small Room (2)'
+    width = 3 * major.fifth
     // two small slots
+}
+
+export class SmallRoomThree extends CommonArea {
+    name = 'Small Room (3)'
+    prereqs = [SmallRoomTwo]
+    view: string = 'SmallRoomThreeView'
+    // three small slots
+    width = 5 * major.fifth
 }
 
 export class MediumRoom extends CommonArea {
     name = 'Medium Room'
-    prereqs = [ SmallRoom ]
-    width = 4 * major.eighth
-    height = 3 * major.fifth
+    prereqs = [ SmallRoomThree ]
+    // view: string = 'MediumRoomView'
+    width = 5 * major.sixth
+    height = 5 * major.third
     // two medium slots...
+    machines = [
+        ResearchServer,
+        AlgaeVat,
+        CloningVat,
+    ]
 }
 
 export class MidDome extends Dome {

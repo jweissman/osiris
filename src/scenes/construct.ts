@@ -8,6 +8,7 @@ import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
 import { Device } from "../actors/Device";
 import { Machine } from "../models/Machine";
+import { SmallRoomThreeView } from "../actors/Building/SmallRoomThreeView";
 
 
 export class Construct extends Scene {
@@ -27,6 +28,8 @@ export class Construct extends Scene {
         CommonAreaView,
         LadderView,
         SurfaceRoadView,
+
+        SmallRoomThreeView,
 
         //LabView,
         //MineView,

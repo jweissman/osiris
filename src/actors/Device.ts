@@ -4,7 +4,7 @@ import { Building } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
-import { SmallRoom, Dome } from "../models/Structure";
+import { Dome, SmallRoomThree, SmallRoomTwo, MediumRoom } from "../models/Structure";
 
 export class Device extends Actor {
     product: ResourceBlock[] = []
@@ -16,6 +16,8 @@ export class Device extends Actor {
     imageLoaded: boolean = false
 
     building: Building // set once built?
+
+    inUse: boolean = false
 
     constructor(
         // public building: Building,
@@ -31,7 +33,7 @@ export class Device extends Actor {
         )
 
         this.nameLabel = new Label(this.machine.name, 0, 0, 'Helvetica')
-        this.nameLabel.fontSize = 8
+        this.nameLabel.fontSize = 6
         this.nameLabel.color = Color.White
 
         this.image = new Image();
@@ -53,12 +55,12 @@ export class Device extends Actor {
         let showLabel = true
         if (showLabel) {
             this.nameLabel.pos = this.getCenter()
-            this.nameLabel.pos.x -= ctx.measureText(this.machine.name).width / 2
-            this.nameLabel.pos.y -= 20
+            this.nameLabel.pos.x -= 10 //ctx.measureText(this.machine.name).width / 2
+            this.nameLabel.pos.y -= 28
             this.nameLabel.draw(ctx, delta)
         }
 
-        let bx = this.x - this.getWidth()/2, by = this.y - 10
+        let bx = this.x - this.getWidth()/2 + 5, by = this.y - 23
         let blockSize = 5
         this.product.forEach((produced, index) => {
             ctx.fillStyle = blockColor(produced).desaturate(0.3).lighten(0.2).toRGBA();
@@ -71,23 +73,53 @@ export class Device extends Actor {
     get productionTime() { return this.machine.productionTime }
 
     async interact(citizen: Citizen) {
-        if (this.machine.behavior === MachineOperation.Work) {
-            if (this.product.length > 0) {
-                this.product.pop()
-                await citizen.progressBar(200) //this.productionTime)
+        if (this.inUse) {
+            citizen.waitToUse(this)
+            return
+        }
+
+        if (this.product.length > 0) {
+            this.product.pop()
+            this.inUse = true
+            await citizen.progressBar(500) //this.productionTime)
+            this.inUse = false
+            citizen.carry(this.produces)
+        } else {
+            if (this.consumes && citizen.carrying === this.consumes) {
+                this.inUse = true
+                await citizen.progressBar(this.productionTime)
                 citizen.carry(this.produces)
-            } else {
-                if (this.consumes && citizen.carrying === this.consumes) {
-                    await citizen.progressBar(this.productionTime)
-                    citizen.carry(this.produces)
-                }
+                this.inUse = false
             }
+        }
+
+        if (this.machine.behavior === MachineOperation.Work) {
+            // ...
+
         } else if (this.machine.behavior === MachineOperation.CollectResource) {
-            // assume we are gathering a resource here?
+            // generic redeem..
             let resource = citizen.drop()
             if (resource) {
-                this.building.redeem(resource) //planet.gather(resource)
+                this.building.redeem(resource)
             }
+        } else if (this.machine.behavior === MachineOperation.CollectMeals) {
+            // store a meal...
+            if (citizen.carrying === ResourceBlock.Meal) {
+                let resource = citizen.drop()
+                if (resource) {
+                    this.building.redeem(resource)
+                }
+            }
+        } else if (this.machine.behavior === MachineOperation.CollectData) {
+            // store research
+            if (citizen.carrying === ResourceBlock.Data) {
+                let resource = citizen.drop()
+                if (resource) {
+                    this.building.redeem(resource)
+                }
+            }
+        } else {
+            console.warn("no handler for this interaction", { device: this })
         }
     }
 
@@ -107,7 +139,8 @@ export class Device extends Actor {
     // todo only snap when close enough? try to prevent some mis-clicks?
     snap(planet: Planet, pos: Vector = this.pos) {
         let bldg = planet.colony.closestBuildingByType(pos,
-            [ Dome, SmallRoom ],
+            // hmmm
+            [ Dome, SmallRoomTwo, SmallRoomThree, MediumRoom ],
             // machines count < device slots count
             (bldg: Building) => {
                 let hasSpace = bldg.hasPlaceForDevice()
@@ -118,7 +151,7 @@ export class Device extends Actor {
 
         if (bldg) {
             this.building = bldg;
-            this.pos = this.building.nextDevicePlace()
+            this.pos = this.building.nextDevicePlace().position
             //devicePlaces()[
             //    this.building.devices.length
             //]

@@ -5,11 +5,25 @@ import { Slot } from "../../values/Slot";
 import { Orientation, flip, compass } from "../../values/Orientation";
 import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
-import { closest, measureDistance, drawRect } from "../../Util";
+import { closest, measureDistance, drawRect, deleteByValue } from "../../Util";
 import { Graph } from "../../values/Graph";
 import { ResourceBlock } from "../../models/Economy";
 import { Device } from "../Device";
 import { allSpaceFunctions } from "../../models/SpaceFunction";
+import { DeviceSize } from "../../values/DeviceSize";
+
+export class DevicePlace {
+    constructor(private pos: Vector, private size: DeviceSize) {}
+    get position() { return this.pos }
+    getVisibleSize(): number {
+        let sz = 10;
+        switch(this.size) {
+            case DeviceSize.Small: sz = 15; break;
+            case DeviceSize.Medium: sz = 25; break;
+        }
+        return sz;
+    }
+}
 
 export class Building extends Actor {
     edgeWidth: number = 0 //.1
@@ -24,14 +38,10 @@ export class Building extends Actor {
     hideBox: boolean = false
     parentSlot: Slot
     childrenBuildings: Building[] = []
-    //product: ResourceBlock[] = []
-    //capacity: number = 4
 
     level: number = 1
 
     private devices: Device[] = []
-
-    // colorBase() { return this.color.darken(0.1); }
 
     constructor(pos: Vector, public structure: Structure, protected planet: Planet) {
         super(
@@ -116,9 +126,11 @@ export class Building extends Actor {
 
         let showDevicePlaces = false
         if (showDevicePlaces && this.devicePlaces().length > 0) {
-            this.devicePlaces().forEach(place => {
+            this.devicePlaces().forEach(p => {
+                let place = p.position
+                let sz = p.getVisibleSize()
                 drawRect(ctx,
-                    { x: place.x, y: place.y, width: 10, height: 10 },
+                    { x: place.x, y: place.y, width: sz, height: sz },
                     1,
                     Color.White,
                     false
@@ -146,19 +158,7 @@ export class Building extends Actor {
         this.pos = cursor.clone()
     }
 
-    afterConstruct(): void {
-
-        // let { machines } = this.structure;
-        // if (machines && machines.length > 0) {
-        //     let machine = new machines[0]();
-        //     this.devicePlaces().forEach(place => {
-        //         let theDevice = new Device(this, machine, place)
-        //         this.devices.push(theDevice)
-        //         this.add(theDevice)
-        //     })
-        // }
-
-    }
+    afterConstruct(): void {}
 
     handleClick(_pos): boolean { return true; }
 
@@ -174,7 +174,7 @@ export class Building extends Actor {
         ];
     }
 
-    devicePlaces(): Vector[] {
+    devicePlaces(): DevicePlace[] {
         return []; //this.nodes();
     }
     
@@ -327,7 +327,7 @@ export class Building extends Actor {
         return this.devices.length < this.devicePlaces().length
     }
 
-    public nextDevicePlace() {
+    public nextDevicePlace(): DevicePlace {
         // could throw an err if we have no place
         return this.devicePlaces()[
             this.devices.length
@@ -339,11 +339,16 @@ export class Building extends Actor {
     }
 
     private updateName() {
-        let fn = allSpaceFunctions.find(spaceFn =>
-            spaceFn.machines.every(machine =>
-                this.devices.some(d => d.machine instanceof machine)
-            )
-        )
+        let fn = allSpaceFunctions.find(spaceFn => {
+            let matched = true;
+            let unseenDevices = this.devices.slice() // clone?
+            spaceFn.machines.forEach(machine => {
+                let matchingDevice = unseenDevices.find(d => d.machine instanceof machine)
+                if (!matchingDevice) { matched = false; }
+                unseenDevices = deleteByValue(unseenDevices, matchingDevice)
+            })
+            return matched;
+        })
         if (fn) {
             this.nameLabel.text = fn.label
         }

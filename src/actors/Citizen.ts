@@ -8,6 +8,7 @@ import { eachCons } from "../Util";
 import { Device } from "./Device";
 import { Scale } from "../values/Scale";
 import { MachineOperation } from "../models/Machine";
+import { worker } from "cluster";
 // import { Machine, Stove, CommandCenter } from "../models/Machine";
 
 export class Citizen extends Actor {
@@ -121,34 +122,22 @@ export class Citizen extends Actor {
         return true;
     }
 
+    waitToUse(device) {
+        setTimeout(() => device.interact(this), 250)
+    }
 
     async work() {
         if (this.carrying) {
             let item: ResourceBlock = this.carrying;
-            // let sinks: (typeof Machine)[] = []
-
-            let theDevices = this.planet.colony.findAllDevices()
-            // let theSinks = theDevices.find(device => device.machine.consumes(ResourceBlock[item]))
-
-            let sink = this.planet.closestDevice(this.pos,
+            let sink: Device = this.planet.closestDevice(this.pos,
                 [],
                 (device) => 
-                device.machine.consumes === item || //ResourceBlock[item]
-                device.machine.behavior === MachineOperation.CollectResource
+                        device.machine.consumes === item ||
+                        device.machine.behavior === MachineOperation.CollectResource ||
+                        item === ResourceBlock.Meal && device.machine.behavior === MachineOperation.CollectMeals ||
+                        item === ResourceBlock.Data && device.machine.behavior === MachineOperation.CollectData
             )
 
-            //if (ResourceBlock[item] === 'Food') {
-            //    sinks = [Stove] //CookingFire, Stove]
-            //} else if (ResourceBlock[item] === 'Hypothesis') {
-            //    sinks = [ExperimentBench]
-            //// } else if (ResourceBlock[item] === 'Ore') {
-            //    // sinks = [MineralProcessor]
-            //} else {
-            //    sinks = [CommandCenter]
-            //}
-
-            // if (theSinks.length > 0) {
-                // let theSink: Device = this.planet.closestDevice(this.pos, sinks)
             if (sink) {
                 await this.pathTo(sink.building)
                 await this.glideTo(sink.pos)

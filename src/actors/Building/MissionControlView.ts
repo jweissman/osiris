@@ -1,20 +1,22 @@
 import { Color, Vector } from "excalibur";
-import { Building } from "./Building";
+import { Building, DevicePlace } from "./Building";
 import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Device } from "../Device";
+import { DeviceSize } from "../../values/DeviceSize";
 
 export class MissionControlView extends Building {
     hideBox = true
 
-    devicePlaces() { return this.nodes() }
+    devicePlaces() { return this.nodes().map(n => new DevicePlace(n, DeviceSize.Medium)) }
+
     afterConstruct() {
         // build devices?
         let { machines } = this.structure;
         if (machines && machines.length > 0) {
             let machine = new machines[0]();
             this.devicePlaces().forEach(place => {
-                let theDevice = new Device(machine, place)
+                let theDevice = new Device(machine, place.position)
                 this.addDevice(theDevice)
                 // this.devices.push(theDevice)
                 // theDevice.building = this;

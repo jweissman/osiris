@@ -1,6 +1,7 @@
 import { ResourceBlock } from "./Economy";
 import { Scale } from "../values/Scale";
 import { Color } from "excalibur";
+import { DeviceSize } from "../values/DeviceSize";
 
 let { major, minor } = Scale
 
@@ -11,6 +12,8 @@ const stove = require('../images/stove-plain.svg');
 const cabin = require('../images/cabin-plain.svg');
 const fire = require('../images/cooking-fire-plain.svg')
 const bed = require('../images/bed-plain.svg')
+const fridge = require('../images/fridge-plain.svg')
+const server = require('../images/research-server-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -19,27 +22,29 @@ const images = {
     stove,
     cabin,
     fire,
-    bed
+    bed,
+    fridge,
+    server,
 }
 
 export enum MachineOperation {
-  // generic functioning: consuming a block to produce a new block
-  Work,
-
-  // more interesting functions
-  SpawnCitizen,
-  CollectResource,
-
-  // ...ProduceValue? [i.e., hope]
-  // StoreResource ??
+    // generic functioning: consuming a block to produce a new block
+    Work,
+    // more interesting functions
+    SpawnCitizen,
+    CollectResource,
+    CollectMeals,
+    CollectData
 }
 
 export class Machine {
     name: string = '(machine name)'
     description: string = '(machine description)'
-    width: number = major.second
-    height: number = major.second
+    width: number = major.third
+    height: number = major.third
     color: Color = Color.LightGray
+
+    size: DeviceSize = DeviceSize.Small
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
@@ -58,10 +63,30 @@ export class Machine {
 // resource collection
 export class CommandCenter extends Machine {
     name = 'Command'
-    description = 'gather resources'
+    description = 'gather resources...'
     behavior = MachineOperation.CollectResource
-
     image = images.bench
+
+    size = DeviceSize.Medium
+}
+
+export class Fridge extends Machine {
+    name = 'Fridge'
+    description = 'store meals'
+    behavior = MachineOperation.CollectMeals
+    image = images.fridge
+    prereqs = [Bookshelf]
+}
+
+export class ResearchServer extends Machine {
+    name = 'Research Server'
+    description = 'hold data'
+    produces = ResourceBlock.Hypothesis
+    behavior = MachineOperation.CollectData
+    image = images.server
+    prereqs = [Bookshelf]
+
+    size = DeviceSize.Medium
 }
 
 // meals
@@ -79,7 +104,7 @@ export class Stove extends Machine {
     produces = ResourceBlock.Meal
     image = images.stove
 
-    prereqs = [Bookshelf]
+    prereqs = [Bookshelf, Fridge]
 }
 
 //export class CookingFire extends Machine {
@@ -144,7 +169,8 @@ export class Bookshelf extends Machine {
 export class AlgaeVat extends Machine {
     name = 'Algae Vat'
     produces = ResourceBlock.Food
-    prereqs = [ OxygenExtractor ]
+    prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
+    size = DeviceSize.Medium
 }
 
 // reproduction
@@ -163,6 +189,7 @@ export class CloningVat extends Machine {
     image = images.vat
 
     prereqs = [AlgaeVat]
+    size = DeviceSize.Medium
 }
 
 // providence (power, life support...)

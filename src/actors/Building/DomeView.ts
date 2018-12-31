@@ -1,6 +1,7 @@
 import { Color, Vector } from "excalibur";
-import { Building } from "./Building";
+import { Building, DevicePlace } from "./Building";
 import { Orientation } from "../../values/Orientation";
+import { DeviceSize } from "../../values/DeviceSize";
 
 export class DomeView extends Building {
     hideBox = true
@@ -58,10 +59,12 @@ export class DomeView extends Building {
         let w = this.getWidth()/2
         let x = this.pos.x + w;
         let y = this.pos.y + this.getHeight() - 6
-        return [
+        let ds = [
             new Vector(x - w/3, y),
             // new Vector(x, y),
             new Vector(x + w/3, y),
         ]
+
+        return ds.map(d => new DevicePlace(d, DeviceSize.Small))
     }
 }

@@ -6,10 +6,9 @@ import { DomeView } from './DomeView';
 import { MissionControlView } from './MissionControlView';
 import { TunnelView } from './TunnelView';
 import { ArcologyView } from './ArcologyView';
-import { CloneMatrixView } from './CloneMatrixView';
-import { LabView } from './LabView';
 import { LadderView } from './LadderView';
 import { MineView } from './MineView';
+import { SurfaceRoadView } from './SurfaceRoadView';
 
 
 // import { LivingQuartersView } from './LivingQuartersView';
@@ -23,9 +22,8 @@ export {
     MissionControlView,
     TunnelView,
     ArcologyView,
-    CloneMatrixView,
-    LabView,
     LadderView,
     MineView,
+    SurfaceRoadView,
 
 }
