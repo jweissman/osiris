@@ -59,4 +59,15 @@ export class CommonAreaView extends Building {
     reshape(cursor) {
         this.alignToSlot(cursor);
     }
+
+    devicePlaces() {
+        let w = this.getWidth()/2
+        let x = this.pos.x + w;
+        let y = this.pos.y + this.getHeight() - 6
+        return [
+            new Vector(x - w/3, y),
+            // new Vector(x, y),
+            new Vector(x + w/3, y),
+        ]
+    }
 }

@@ -3,7 +3,7 @@ import { Actor, Color, Vector, Util, EdgeArea } from 'excalibur';
 import { Building } from '../Building';
 import { range } from '../../Util';
 import { Mountains } from './PlanetBackground';
-import { Structure, CloneMatrix } from '../../models/Structure';
+import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
 import { ResourceBlock } from '../../models/Economy';
 import { Colony } from './Colony';

@@ -4,10 +4,11 @@ import { minBy, flatSingle } from '../../Util';
 import { Structure, MissionControl } from '../../models/Structure';
 import { NavigationTree } from './NavigationTree';
 import { Machine } from '../../models/Machine';
+import { Device } from '../Device';
 export class Colony extends Actor {
     navTree: NavigationTree;
     buildings: Building[] = [];
-    currentlyConstructing: Building = null;
+    currentlyConstructing: Building | Device = null;
     maxPop: number = 8
 
     constructor(x: number, y: number) {

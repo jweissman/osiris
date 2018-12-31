@@ -8,12 +8,16 @@ const bookshelfSvg = require('../images/bookshelf-plain.svg');
 const vatSvg = require('../images/vat-plain.svg');
 const benchSimple = require('../images/bench-simple-plain.svg');
 const stove = require('../images/stove-plain.svg');
+const cabin = require('../images/cabin-plain.svg');
+const fire = require('../images/cooking-fire-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
     vat: vatSvg,
     bench: benchSimple,
-    stove: stove,
+    stove,
+    cabin,
+    fire
 }
 
 export enum MachineOperation {
@@ -70,6 +74,26 @@ export class Stove extends Machine {
     produces = ResourceBlock.Meal
     image = images.stove
 }
+
+export class CookingFire extends Machine {
+    name = 'Cooking Fire'
+    consumes = ResourceBlock.Food
+    produces = ResourceBlock.Meal
+    image = images.fire
+
+}
+export class Cabin extends Machine {
+    name = 'Cabin'
+    produces = ResourceBlock.Food
+
+    image = images.cabin
+}
+
+export class Desk extends Machine {
+    name = 'Desk'
+
+}
+
 
 // minerals
 

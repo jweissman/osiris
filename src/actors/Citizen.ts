@@ -4,7 +4,7 @@ import { Planet } from "./Planet/Planet";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
 import { eachCons } from "../Util";
-import { Machine, Stove, ExperimentBench, MineralProcessor, CommandCenter, Orchard, MiningDrill, Bookshelf } from "../models/Machine";
+import { Machine, Stove, ExperimentBench, MineralProcessor, CommandCenter, Orchard, MiningDrill, Bookshelf, CookingFire, Cabin } from "../models/Machine";
 import { Device } from "./Device";
 import { Scale } from "../values/Scale";
 
@@ -126,7 +126,7 @@ export class Citizen extends Actor {
             let sinks: (typeof Machine)[] = []
 
             if (ResourceBlock[item] === 'Food') {
-                sinks = [Stove]
+                sinks = [CookingFire, Stove]
             } else if (ResourceBlock[item] === 'Hypothesis') {
                 sinks = [ExperimentBench]
             } else if (ResourceBlock[item] === 'Ore') {
@@ -147,7 +147,7 @@ export class Citizen extends Actor {
             }
         } else {
             let source: Device = this.planet.closestDevice(this.pos,
-                [ Orchard, MiningDrill, Bookshelf ],
+                [ Cabin, Orchard, MiningDrill, Bookshelf ],
                 (d) => d.product.length > 0
             )
 

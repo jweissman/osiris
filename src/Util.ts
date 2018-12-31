@@ -65,21 +65,37 @@ export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, c:
   ctx.stroke()
 }
 
-export function drawRect(ctx: CanvasRenderingContext2D, rectangle: Rectangle, edgeWidth: number = 0, color: Color = Color.White) {
+export function drawRect(
+  ctx: CanvasRenderingContext2D,
+  rectangle: Rectangle,
+  edgeWidth: number = 0,
+  color: Color = Color.White,
+  filled: boolean = true
+) {
   let { x, y, width, height } = rectangle;
+
+  // if (edgeWidth > 0) {
+  //   let edge = Color.White;
+  //   ctx.fillStyle = edge.toRGBA();
+  //   ctx.fillRect(x, y, width, height)
+  // }
+
+  if (filled) {
+    let main = color;
+    ctx.fillStyle = main.toRGBA();
+    ctx.fillRect(
+      x, //+ edgeWidth,
+      y, //+ edgeWidth,
+      width, // - edgeWidth * 2,
+      height // - edgeWidth * 2
+    )
+  }
 
   if (edgeWidth > 0) {
     let edge = Color.White;
-    ctx.fillStyle = edge.toRGBA();
-    ctx.fillRect(x, y, width, height)
+    ctx.strokeStyle = edge.toRGBA();
+    ctx.strokeRect(
+      x, y, width, height
+    )
   }
-
-  let main = color;
-  ctx.fillStyle = main.toRGBA();
-  ctx.fillRect(
-    x + edgeWidth,
-    y + edgeWidth,
-    width - edgeWidth * 2,
-    height - edgeWidth * 2
-  )
 }

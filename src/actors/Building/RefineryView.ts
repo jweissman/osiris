@@ -1,7 +1,7 @@
 import { CommonAreaView } from ".";
-import { Corridor, Mine, Refinery } from "../../models/Structure";
+// import { Corridor, Mine, Refinery } from "../../models/Structure";
 
 export class RefineryView extends CommonAreaView {
-    validConnectingStructures() { return [ Corridor, Mine, Refinery ]}
+    // validConnectingStructures() { return [ Corridor, Mine, Refinery ]}
 
 }

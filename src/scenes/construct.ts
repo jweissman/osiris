@@ -2,16 +2,12 @@ import { Scene, Input, Vector } from "excalibur";
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, Kitchen, CloneMatrix, OxygenAccumulator } from "../models/Structure";
-import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, MineView, LabView, } from "../actors/Building";
+import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad } from "../models/Structure";
+import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
-import { KitchenView } from "../actors/Building/KitchenView";
-import { PowerPlantView } from "../actors/Building/PowerPlantView";
-import { StudyView } from "../actors/Building/StudyView";
-import { RefineryView } from "../actors/Building/RefineryView";
-import { ArcologyView } from "../actors/Building/ArcologyView";
-import { CloneMatrixView } from "../actors/Building/CloneMatrixView";
+import { Device } from "../actors/Device";
+import { Machine } from "../models/Machine";
 
 
 export class Construct extends Scene {
@@ -29,29 +25,30 @@ export class Construct extends Scene {
         DomeView,
         CorridorView,
         CommonAreaView,
-        SurfaceRoadView,
-        LabView,
-        MineView,
-        KitchenView,
-        PowerPlantView,
-        StudyView,
-        RefineryView,
-
-        ArcologyView,
-        CloneMatrixView,
-
         LadderView,
+        SurfaceRoadView,
+
+        //LabView,
+        //MineView,
+        //KitchenView,
+        //PowerPlantView,
+        //StudyView,
+        //RefineryView,
+
+        //ArcologyView,
+        //CloneMatrixView,
+
     }
     ////
     static requiredStructureList: Array<typeof Structure> = [
         MissionControl,
 
         SurfaceRoad,
-        OxygenAccumulator,
+        // OxygenAccumulator,
         // Dome,
         MainTunnel,
         Corridor,
-        Kitchen,
+        // Kitchen,
         // Study,
         // CloneMatrix,
     ]
@@ -62,6 +59,8 @@ export class Construct extends Scene {
 
         this.hud = new Hud(game, (structure) => {
             this.startConstructing(structure)
+        }, (device) => {
+            this.startConstructing(device)
         });
         this.add(this.hud)
 
@@ -85,30 +84,42 @@ export class Construct extends Scene {
             } else {
                 this.player.pos = e.pos
 
-                let currentBuilding = this.planet.currentlyConstructing
-                if (currentBuilding) {
-                    let constrained = currentBuilding.constrainCursor(this.player.pos)
+                let currentlyBuilding = this.planet.currentlyConstructing
+                if (currentlyBuilding instanceof Building) {
+
+                    let constrained = currentlyBuilding.constrainCursor(this.player.pos)
                     this.player.pos = constrained
 
-                    currentBuilding.reshape(this.player.pos)
+                    currentlyBuilding.reshape(this.player.pos)
+                } else if (currentlyBuilding instanceof Device) {
+                    // console.warn("would snap device in place!")
+                    currentlyBuilding.snap(this.planet, this.player.pos)
                 }
             }
         })
 
-        this.game.input.pointers.primary.on('up', (e: Input.PointerUpEvent) => {
+        this.game.input.pointers.primary.on('up', () => {
             if (this.dragging) { this.dragging = false; }
         })
 
         this.game.input.pointers.primary.on('down', (e: Input.PointerDownEvent) => {
             if (e.button == Input.PointerButton.Left) {
-                const currentBuilding: Building = this.planet.currentlyConstructing
-                if (currentBuilding) {
-                    let placementValid = !currentBuilding.overlapsAny()
-                    if (currentBuilding && placementValid && currentBuilding.handleClick(e.pos)) {
-                        this.planet.placeBuilding(currentBuilding)
+                const currentlyBuilding = this.planet.currentlyConstructing
+                if (currentlyBuilding) {
+                    if (currentlyBuilding instanceof Building) {
+                        let buildingUnderConstruction = currentlyBuilding
+                        let placementValid = !buildingUnderConstruction.overlapsAny()
+                        if (buildingUnderConstruction && placementValid && buildingUnderConstruction.handleClick(e.pos)) {
+                            this.planet.placeBuilding(buildingUnderConstruction)
+                            this.planet.colony.currentlyConstructing = null
+                            this.prepareNextBuilding(e.pos)
+                            this.hud.updateBuildingPalette(this.planet.colony.buildings)
+                        }
+                    } else {
+                        console.warn("Would construct machine!")
+                        let deviceUnderConstruction = currentlyBuilding
+                        deviceUnderConstruction.finalize()
                         this.planet.colony.currentlyConstructing = null
-                        this.prepareNextBuilding(e.pos)
-                        this.hud.updatePalette(this.planet.colony.buildings)
                     }
                 }
             } else if (e.button === Input.PointerButton.Middle) {
@@ -167,24 +178,46 @@ export class Construct extends Scene {
         }
     }
 
-    startConstructing(structure: Structure, pos: Vector = new Vector(0, 0)) {
-        structure.origin = pos
-        this.hud.setMessage(`Place ${structure.name}`)
-        let theNextOne = this.spawnBuilding(structure)
+    startConstructing(structureOrMachine: Structure | Machine, pos: Vector = new Vector(0, 0)) {
+        let theNextOne = null
+        if (structureOrMachine instanceof Structure) {
+            let structure = structureOrMachine
+            // structure.origin = pos // thread this out somehow??
+            this.hud.setMessage(`Place ${structure.name}`)
+            theNextOne = this.spawnBuilding(structure, pos)
+            this.camera.zoom(structure.zoom, 250)
+        } else if (structureOrMachine instanceof Machine) {
+            // setup machine?
+            let machine = structureOrMachine
+            // machine.origin = pos
+
+            theNextOne = this.spawnDevice(machine, pos)
+            this.camera.zoom(1.5, 250)
+        }
+
         this.planet.colony.currentlyConstructing = theNextOne
-        this.camera.pos = theNextOne.pos
-        this.camera.zoom(structure.zoom, 250)
+        if (theNextOne) {
+            console.warn("would start constructing", { theNextOne })
+            this.camera.pos = theNextOne.pos
+        }
     }
 
-    protected spawnBuilding(structure: Structure): Building {
-        let anotherBuilding = this.assembleBuildingFromStructure(structure)
+    protected spawnDevice(machine: Machine, pos: Vector): Device {
+        // let bldg = this.planet.closestBuildingByType(pos, [ CommonArea, Biodome ])
+        let device = new Device(machine, pos)
+        device.snap(this.planet)
+        return device
+    }
+
+    protected spawnBuilding(structure: Structure, pos: Vector): Building {
+        let anotherBuilding = this.assembleBuildingFromStructure(structure, pos)
         anotherBuilding.reshape(anotherBuilding.constrainCursor(anotherBuilding.pos))
         return anotherBuilding
     }
     
-    private assembleBuildingFromStructure(structure: Structure): Building {
+    private assembleBuildingFromStructure(structure: Structure, pos: Vector): Building {
         let View = Construct.structureViews[structure.view]
-        let building = new View(structure, this.planet)
+        let building = new View(pos, structure, this.planet)
         return building;
     }
 } 

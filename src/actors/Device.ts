@@ -3,6 +3,8 @@ import { Machine, MachineOperation } from "../models/Machine";
 import { Building } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
+import { Planet } from "./Planet/Planet";
+import { CommonArea, Dome } from "../models/Structure";
 
 export class Device extends Actor {
     product: ResourceBlock[] = []
@@ -13,8 +15,12 @@ export class Device extends Actor {
     image: any
     imageLoaded: boolean = false
 
+    building: Building // set once built?
+
     constructor(
-        public building: Building, private machine: Machine, private initialPos: Vector
+        // public building: Building,
+        private machine: Machine,
+        private initialPos: Vector
     ) {
         super(
             initialPos.x,
@@ -98,4 +104,28 @@ export class Device extends Actor {
         }
     }
 
+    snap(planet: Planet, pos: Vector = this.pos) {
+        let bldg = planet.colony.closestBuildingByType(pos,
+            [ Dome, CommonArea ],
+            // machines count < device slots count
+            (bldg: Building) => {
+                let hasSpace = bldg.devices.length < bldg.devicePlaces().length
+                return hasSpace && bldg.structure.machines.some(Machine => this.machine instanceof Machine)
+
+            }
+        )
+
+        // bldg.devi
+
+        if (bldg) {
+            this.building = bldg;
+            this.pos = this.building.devicePlaces()[
+                this.building.devices.length
+            ]
+        }
+    }
+
+    finalize() {
+        this.building.devices.push(this)
+    }
 }

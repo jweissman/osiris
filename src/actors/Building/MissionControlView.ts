@@ -1,17 +1,33 @@
 import { Color, Vector } from "excalibur";
 import { Building } from "./Building";
-import { Citizen } from "../Citizen";
 import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
+import { Device } from "../Device";
 
 export class MissionControlView extends Building {
     hideBox = true
+
+    devicePlaces() { return this.nodes() }
+    afterConstruct() {
+        // build devices?
+        let { machines } = this.structure;
+        if (machines && machines.length > 0) {
+            let machine = new machines[0]();
+            this.devicePlaces().forEach(place => {
+                let theDevice = new Device(machine, place)
+                this.devices.push(theDevice)
+                theDevice.building = this;
+                this.add(theDevice)
+            })
+        }
+
+    }
 
     slots() {
         let theSlots: Slot[] = []
         theSlots.push(
             this.buildSlot(
-                this.pos.x + this.getWidth()/2,
+                this.pos.x + this.getWidth() / 2,
                 this.pos.y + this.getHeight(),
                 Orientation.Down
             )
@@ -32,7 +48,7 @@ export class MissionControlView extends Building {
                 Orientation.Right
             )
         )
-           
+
 
         return theSlots;
     }
@@ -59,7 +75,7 @@ export class MissionControlView extends Building {
 
         // could draw a little flag :)
         let flagpoleHeight = 18
-        let flagX = this.pos.x + 3*(this.getWidth()/4)
+        let flagX = this.pos.x + 3 * (this.getWidth() / 4)
         let flagY = this.pos.y - flagpoleHeight
         ctx.fillRect(flagX, flagY, 2, flagpoleHeight)
         ctx.fillRect(flagX, flagY, 10, 5)

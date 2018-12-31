@@ -33,10 +33,10 @@ export class Building extends Actor {
 
     // colorBase() { return this.color.darken(0.1); }
 
-    constructor(public structure: Structure, protected planet: Planet) {
+    constructor(pos: Vector, public structure: Structure, protected planet: Planet) {
         super(
-          structure.origin.x,
-          structure.origin.y,
+          pos.x,
+          pos.y,
           structure.width,
           structure.height,
           planet.color
@@ -111,6 +111,18 @@ export class Building extends Actor {
                     drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
                 })
             }
+
+        }
+
+        if (this.devicePlaces().length > 0) {
+            this.devicePlaces().forEach(place => {
+                drawRect(ctx,
+                    { x: place.x, y: place.y, width: 10, height: 10 },
+                    1,
+                    Color.White,
+                    false
+                )
+            })
         }
     }
 
@@ -124,26 +136,26 @@ export class Building extends Actor {
         this.step += 1
     }
 
-    setup(): void {}
+    setup(): void { }
 
     constrainCursor(cursor: Vector): Vector {
         return cursor.clone();
-    } 
+    }
     reshape(cursor: Vector): void {
         this.pos = cursor.clone()
     }
 
     afterConstruct(): void {
 
-        let { machines } = this.structure; 
-        if (machines && machines.length > 0) {
-            let machine = new machines[0]();
-            this.devicePlaces().forEach(place => {
-                let theDevice = new Device(this, machine, place)
-                this.devices.push(theDevice)
-                this.add(theDevice)
-            })
-        }
+        // let { machines } = this.structure;
+        // if (machines && machines.length > 0) {
+        //     let machine = new machines[0]();
+        //     this.devicePlaces().forEach(place => {
+        //         let theDevice = new Device(this, machine, place)
+        //         this.devices.push(theDevice)
+        //         this.add(theDevice)
+        //     })
+        // }
 
     }
 
@@ -162,7 +174,7 @@ export class Building extends Actor {
     }
 
     devicePlaces(): Vector[] {
-        return this.nodes();
+        return []; //this.nodes();
     }
     
 
