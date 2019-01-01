@@ -118,7 +118,7 @@ export class Building extends Actor {
 
         }
 
-        let showDevicePlaces = true
+        let showDevicePlaces = false
         if (showDevicePlaces && this.devicePlaces().length > 0) {
             this.devicePlaces().forEach(p => {
                 let place = p.position

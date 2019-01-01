@@ -1,4 +1,4 @@
-import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard } from './Machine';
+import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator } from './Machine';
 
 export class SpaceFunction {
     static label: string = '(generic)';
@@ -86,6 +86,11 @@ class Farm extends SpaceFunction {
     static machines = [ Orchard, Orchard ]
 }
 
+class Factory extends SpaceFunction {
+    static label = 'Factory'
+    static machines = [ Megafabricator, Megafabricator ]
+}
+
 export const allSpaceFunctions = [
     Library,
     Barracks,
@@ -103,4 +108,5 @@ export const allSpaceFunctions = [
     ReadingRoom,
     Nursery,
     Farm,
+    Factory,
 ]
