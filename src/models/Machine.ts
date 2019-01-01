@@ -50,8 +50,8 @@ export class Machine {
 
     // need to stop using this both for work time and 'generation' time
     // productionTime: number = 500
-    generationTime: number = 5000
-    workTime: number = 2000
+    generationTime: number = 3000
+    workTime: number = 10000
     capacity: number = 2
 
     behavior: MachineOperation = MachineOperation.Work
@@ -92,14 +92,25 @@ export class WaterCondensingMachine extends Machine {
 }
 
 /// small subsurface
-export class Desk extends Machine {
-    name = 'Desk'
+export class StudyMachine extends Machine {
     consumes = ResourceBlock.Hypothesis
     produces = ResourceBlock.Data
+}
+
+export class Desk extends StudyMachine {
+    name = 'Desk'
     image = images.bench
     prereqs = [ OxygenExtractor ]
     // color = Blue
 }
+
+export class Workstation extends StudyMachine {
+    name = 'Workstation'
+    prereqs = [ Bookshelf ]
+    color = Blue
+}
+
+
 
 export class Bookshelf extends Machine {
     name = 'Shelf'
@@ -137,13 +148,6 @@ export class Bed extends Machine {
     prereqs = [ OxygenExtractor ]
     color = Orange
 }
-
-export class Workstation extends Machine {
-    name = 'Workstation'
-    prereqs = [ Bookshelf ]
-    color = Blue
-}
-
 export class Houseplant extends Machine {
     name = 'House Plant'
     prereqs = [ Bed ]

@@ -95,8 +95,8 @@ export class Hud extends UIActor {
         if (this._machinePaletteElement) {
             let left = ctx.canvas.offsetLeft;
             let top = ctx.canvas.offsetTop;
-            this._machinePaletteElement.style.left = `${left + this.game.canvasWidth - 180}px`;
-            this._machinePaletteElement.style.top = `${top + 100}px`;
+            this._machinePaletteElement.style.left = `${left + 20}px`;
+            this._machinePaletteElement.style.top = `${top + 340}px`;
         }
     }
 
@@ -110,45 +110,39 @@ export class Hud extends UIActor {
         this.updateMachinePalette(colony)
     }
 
-    private updateBuildingPalette(colony: Colony) { //bldgs: Building[]) {
-        this.builtStructures = //bldgs
+    private updateBuildingPalette(colony: Colony) {
+        this.builtStructures =
           Hud.structuresForPalette.filter((structure) => colony.buildings.some(b => b.structure instanceof structure))
 
 
         this.comprehendedStructures = Hud.structuresForPalette.filter((structure: typeof Structure) => {
             let s = new structure()
             let prereqs: (typeof Structure)[] = s.prereqs
-            // console.log("can i build", { name: s.name, prereqs })
             return prereqs.every((prereq: (typeof Structure)) => {
                 let built = this.builtStructures.some((s: (typeof Structure)) => s === prereq)
-                // console.log("do i have any", { prereq, built })
                 return built
             })
         })
 
         console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
 
-          // rebuild palette with updated available buildings
         this._structurePaletteElement.parentElement.removeChild(this._structurePaletteElement)
           this._makeStructurePalette(this.onBuildingSelect)
     }
 
-    private updateMachinePalette(colony: Colony) { //bldgs: Building[]) {
+    private updateMachinePalette(colony: Colony) {
         let bldgs = colony.buildings
         let availableMachines = flatSingle(bldgs.map(b => b.structure.machines))
-        let devices = colony.findAllDevices() //flatSingle(bldgs.map(b => b.devices))
+        let devices = colony.findAllDevices()
 
-        this.builtMachines = //flatSingle(bldg.map(b => b.devices))
-        Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine))
-        // console.log("available machines", { availableMachines })
+        this.builtMachines = Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine))
         this.comprehendedMachines = Hud.machinesForPalette.filter((machine: typeof Machine) => {
             let canBuild = availableMachines.includes(machine);
-            // let m = new machine()
             return canBuild && (new machine()).prereqs.every((prereq: (typeof Machine)) => {
                 return this.builtMachines.some((m: (typeof Machine)) => m === prereq)
             })
 
-        }) //availableMachines
+        })
         this._machinePaletteElement.parentElement.removeChild(this._machinePaletteElement)
         this._makeMachinePalette(this.onMachineSelect)
     }
@@ -156,14 +150,12 @@ export class Hud extends UIActor {
 
     protected _makeStructurePalette(fn: (Structure) => any) {
         this._structurePaletteElement = document.createElement('div') 
-        // this._structurePaletteElement.id = '_thePalette'
         this._structurePaletteElement.style.position = 'absolute'
         this._structurePaletteElement.style.border = '1px solid white'
         document.body.appendChild(this._structurePaletteElement)
 
         this.comprehendedStructures
         .map(structure => new structure())
-        // .sort((a,b) => a.dominantColor > b.dominantColor ? -1 : 1)
         .forEach((structure: Structure) => {
             let label = structure.name
             if (!this.builtStructures.map(s => new s().name).includes(structure.name)) {
@@ -216,11 +208,11 @@ export class Hud extends UIActor {
         paletteButton.textContent = label; // `${s.name}`;
 
         paletteButton.style.display = 'block';
-        paletteButton.style.fontSize = '12pt';
+        paletteButton.style.fontSize = '10pt';
 
         paletteButton.style.fontFamily = 'Helvetica';
         paletteButton.style.fontWeight = '600';
-        paletteButton.style.padding = '8px';
+        paletteButton.style.padding = '4px';
         paletteButton.style.width = '160px';
         paletteButton.style.textTransform = 'uppercase'
         paletteButton.style.border = '1px solid rgba(255,255,255,0.08)'
