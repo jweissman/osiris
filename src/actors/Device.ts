@@ -4,7 +4,7 @@ import { Building, CommonAreaView } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
-import { SmallRoomThree, SmallRoomTwo, MediumRoom, SmallDome, MidDome, LargeRoom } from "../models/Structure";
+import { SmallRoomThree, SmallRoomTwo, MediumRoom, SmallDome, MidDome, LargeRoom, allStructures } from "../models/Structure";
 import { getVisibleDeviceSize } from "../values/DeviceSize";
 
 export class Device extends Actor {
@@ -145,7 +145,7 @@ export class Device extends Actor {
     snap(planet: Planet, pos: Vector = this.pos) {
         let bldg = planet.colony.closestBuildingByType(pos,
             // hmmm
-            [SmallDome, MidDome, SmallRoomTwo, SmallRoomThree, MediumRoom, LargeRoom],
+            allStructures,
             // machines count < device slots count
             (bldg: Building) => {
                 let hasSpace = bldg.hasPlaceForDevice()

@@ -1,6 +1,6 @@
 import { ResourceBlock } from "./Economy";
 import { Scale } from "../values/Scale";
-import { Color } from "excalibur";
+import { Color, Resource } from "excalibur";
 import { DeviceSize } from "../values/DeviceSize";
 
 
@@ -219,12 +219,18 @@ export class CloningVat extends Machine {
     
 export class Fabricator extends Machine {
     name = 'Fabricator'
-    consumes = ResourceBlock.Mineral
-    produces = ResourceBlock.Alloy
+    consumes = ResourceBlock.Ore
+    produces = ResourceBlock.Mineral
     size = DeviceSize.Medium
     color = Red
     // ...
 }
+
+//export class HoloProjector extends Machine {
+//    name = 'Holo Projector'
+//    size = DeviceSize.Medium
+//    color = Violet
+//}
 
 // large devices!
 
@@ -232,6 +238,7 @@ export class MiningDrill extends Machine {
     name = 'Mining Drill'
     size = DeviceSize.Large
     prereqs = [ Fabricator ]
+    produces = ResourceBlock.Ore
 //
 }    
 
@@ -249,44 +256,45 @@ export class Preserve extends Machine {
     color = Green
 }
 
-// providence (power, life support...)
+/// huge devices
 
+export class Microcity extends Machine {
+    name = 'Microcity'
+    size = DeviceSize.Huge
+    prereqs = [ Megafabricator ]
+    color = Orange
+}
 
-// export class AirScrubber extends Machine {
-//     name = 'Air Scrubber'
-// }
+export class LogicCrystal extends Machine {
+    name = 'Logic Crystal'
+    size = DeviceSize.Huge
+    prereqs = [ Megafabricator ]
+    color = Blue
+}
 
-// export class HypermnesisApparatus extends Machine {
-//     name = 'Mind Upgrade'
-// }
+// export class MiniSun extends Machine {}
 
-// export class AtomicCompiler extends Machine {
-//     name = 'Atomic Compiler'
-// }
-
-// export class Icicle extends Machine {
-//     name = 'Cryo Coffin'
-// }
-
-// export class TimeCrystal extends Machine {
-//     name = 'Quantum Portal'
-// }
-
-// export class GamingRotunda extends Machine {
-//     name = 'Gaming Rotunda'
-// }
-
-// export class MineralWorkshop extends Machine {
-//     name = 'Workshop'
-// }
-
-// export class SingularityFountain extends Machine {
-//     name = 'Singularity Fountain'
-// }
-
-// maybe library node 'stores' data?
-//export class LibraryNode {
-//    name = 'Library Node'
-//
-//    consumes = ResourceBlock.
-//}
+export const allMachines = [
+    AlgaeVat,
+    Arbor,
+    Bed,
+    Bookshelf,
+    Cabin,
+    CloningVat,
+    Desk,
+    Fabricator,
+    Fridge,
+    Houseplant,
+    Megafabricator,
+    MiningDrill,
+    Orchard,
+    OxygenExtractor,
+    Preserve,
+    ResearchServer,
+    SolarCell,
+    Stove,
+    WaterCondensingMachine,
+    Workstation,
+    Microcity,
+    LogicCrystal,
+]

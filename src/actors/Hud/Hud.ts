@@ -1,13 +1,14 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Structure, Corridor, SurfaceRoad, Ladder, SmallRoomThree, SmallRoomTwo, MediumRoom, MidDome, SmallDome, LargeRoom } from "../../models/Structure";
+import { Structure, Corridor, SurfaceRoad, Ladder, SmallRoomThree, SmallRoomTwo, MediumRoom, MidDome, SmallDome, LargeRoom, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket } from "../../models/Economy";
 import { ResourcesList } from "./ResourcesList";
-import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Cabin, Orchard, SolarCell, Megafabricator, Arbor, Fabricator, MiningDrill, Preserve, Workstation, Houseplant } from "../../models/Machine";
+import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Cabin, Orchard, SolarCell, Megafabricator, Arbor, Fabricator, MiningDrill, Preserve, Workstation, Houseplant, allMachines } from "../../models/Machine";
 import { flatSingle } from "../../Util";
 import { Colony } from "../Planet/Colony";
 
 export class Hud extends UIActor {
+    private restrictConstruction: boolean = false
     private messageLabel: Label
 
 
@@ -22,43 +23,14 @@ export class Hud extends UIActor {
         Corridor,
         Ladder,
 
-        // surface
-        SmallDome,
-        MidDome,
-
-        // subsurface
-        SmallRoomTwo,
-        SmallRoomThree,
-        MediumRoom,
-        LargeRoom,
+        ...allStructures
 
     ];
 
     comprehendedStructures: (typeof Structure)[] = []
     builtStructures: (typeof Structure)[] = []
 
-    static machinesForPalette = [
-        AlgaeVat,
-        Arbor,
-        Bed,
-        Bookshelf,
-        Cabin,
-        CloningVat,
-        Desk,
-        Fabricator,
-        Fridge,
-        Houseplant,
-        Megafabricator,
-        MiningDrill,
-        Orchard,
-        OxygenExtractor,
-        Preserve,
-        ResearchServer,
-        SolarCell,
-        Stove,
-        WaterCondensingMachine,
-        Workstation,
-    ]
+    static machinesForPalette = allMachines
 
     comprehendedMachines: (typeof Machine)[] = []
     builtMachines: (typeof Machine)[] = []
@@ -96,7 +68,7 @@ export class Hud extends UIActor {
             let left = ctx.canvas.offsetLeft;
             let top = ctx.canvas.offsetTop;
             this._machinePaletteElement.style.left = `${left + 20}px`;
-            this._machinePaletteElement.style.top = `${top + 340}px`;
+            this._machinePaletteElement.style.top = `${top + 380}px`;
         }
     }
 
@@ -111,23 +83,25 @@ export class Hud extends UIActor {
     }
 
     private updateBuildingPalette(colony: Colony) {
-        this.builtStructures =
-          Hud.structuresForPalette.filter((structure) => colony.buildings.some(b => b.structure instanceof structure))
+        this.comprehendedStructures = Hud.structuresForPalette
+        if (this.restrictConstruction) {
+            this.builtStructures =
+                Hud.structuresForPalette.filter((structure) => colony.buildings.some(b => b.structure instanceof structure))
 
-
-        this.comprehendedStructures = Hud.structuresForPalette.filter((structure: typeof Structure) => {
-            let s = new structure()
-            let prereqs: (typeof Structure)[] = s.prereqs
-            return prereqs.every((prereq: (typeof Structure)) => {
-                let built = this.builtStructures.some((s: (typeof Structure)) => s === prereq)
-                return built
+            this.comprehendedStructures = this.comprehendedStructures.filter((structure: typeof Structure) => {
+                let s = new structure()
+                let prereqs: (typeof Structure)[] = s.prereqs
+                return prereqs.every((prereq: (typeof Structure)) => {
+                    let built = this.builtStructures.some((s: (typeof Structure)) => s === prereq)
+                    return built
+                })
             })
-        })
+        }
 
-        console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
+        // console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
 
         this._structurePaletteElement.parentElement.removeChild(this._structurePaletteElement)
-          this._makeStructurePalette(this.onBuildingSelect)
+        this._makeStructurePalette(this.onBuildingSelect)
     }
 
     private updateMachinePalette(colony: Colony) {
@@ -208,12 +182,12 @@ export class Hud extends UIActor {
         paletteButton.textContent = label; // `${s.name}`;
 
         paletteButton.style.display = 'block';
-        paletteButton.style.fontSize = '10pt';
+        paletteButton.style.fontSize = '9pt';
 
         paletteButton.style.fontFamily = 'Helvetica';
         paletteButton.style.fontWeight = '600';
-        paletteButton.style.padding = '4px';
-        paletteButton.style.width = '160px';
+        paletteButton.style.padding = '3px';
+        paletteButton.style.width = '180px';
         paletteButton.style.textTransform = 'uppercase'
         paletteButton.style.border = '1px solid rgba(255,255,255,0.08)'
 

@@ -2,7 +2,7 @@ import { Color } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Orchard, Cabin, SolarCell, Arbor, Megafabricator, MiningDrill, Preserve, Workstation, Houseplant, Fabricator } from './Machine';
+import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Orchard, Cabin, SolarCell, Arbor, Megafabricator, MiningDrill, Preserve, Workstation, Houseplant, Fabricator, LogicCrystal, Microcity } from './Machine';
 import { SpaceFunction } from './SpaceFunction';
 
 const { major, minor } = Scale
@@ -166,23 +166,23 @@ class CommonArea extends Structure {
 }
 
 export class SmallRoomTwo extends CommonArea {
-    name = 'Small Room (2)'
+    name = 'Sm. Room (2)'
     width = major.eighth
     prereqs = [ SmallDome ]
     // two small slots
 }
 
 export class SmallRoomThree extends CommonArea {
-    name = 'Small Room (3)'
+    name = 'Sm. Room (3)'
     prereqs = [SmallRoomTwo]
     view = 'SmallRoomThreeView'
     width = 2 * major.eighth
 }
 
 export class MediumRoom extends CommonArea {
-    name = 'Medium Room'
+    name = 'Mid Room'
     prereqs = [ SmallRoomThree ]
-    view: string = 'MediumRoomView'
+    view = 'MediumRoomView'
     width = 3 * major.eighth
     height = 2 * major.third
     // two medium slots...
@@ -195,7 +195,7 @@ export class MediumRoom extends CommonArea {
 }
 
 export class LargeRoom extends CommonArea {
-    name = 'Large Room'
+    name = 'Lg. Room'
     view = 'LargeRoomView'
     prereqs = [ MediumRoom ]
     width = 6 * major.eighth
@@ -205,14 +205,24 @@ export class LargeRoom extends CommonArea {
     machines = [
         MiningDrill,
         Megafabricator,
-        Preserve,
+        // Preserve,
     ]
+}
+
+export class HugeRoom extends CommonArea {
+    name = 'Huge Room'
+    view = 'HugeRoomView'
+    width = 10 * major.eighth
+    height = 8 * major.eighth
+
+    prereqs = [LargeRoom]
+    machines = [ LogicCrystal ] // ultrafab...
 }
 
 /// surface bldgs
 
 export class SmallDome extends Dome {
-    name = 'Small Dome'
+    name = 'Sm. Dome'
     width = 3 * major.eighth
     height = 2 * major.eighth
 }
@@ -228,6 +238,28 @@ export class MidDome extends Dome {
         Orchard,
         Arbor,
         // Campfir
+    ]
+}
+
+export class LargeDome extends Dome {
+    name = 'Lg. Dome'
+    view = 'BigDomeView'
+    width = 8 * major.eighth
+    height = 6 * major.eighth
+    prereqs = [MidDome, LargeRoom]
+    machines = [
+        Preserve
+    ]
+}
+
+export class Arcology extends Dome {
+    name = 'Arcology'
+    view = 'ArcologyView'
+    width = 12 * major.eighth
+    height = 36 * major.eighth
+    prereqs = [LargeDome, HugeRoom]
+    machines = [
+        Microcity
     ]
 }
 
@@ -249,3 +281,19 @@ export class MissionControl extends Structure {
 
     machines = [ CommandCenter ]
 }
+
+export const allStructures =
+    [
+        SmallDome,
+        MidDome,
+        LargeDome,
+        Arcology,
+
+        SmallRoomTwo,
+        SmallRoomThree,
+        MediumRoom,
+        LargeRoom,
+        HugeRoom,
+    ]
+
+

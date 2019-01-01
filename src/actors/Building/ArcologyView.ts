@@ -1,10 +1,28 @@
 import { DomeView } from ".";
-import { Color } from "excalibur";
+import { Color, Vector } from "excalibur";
+import { DevicePlace } from "./Building";
+import { DeviceSize } from "../../values/DeviceSize";
 
 export class ArcologyView extends DomeView {
+
+    devicePlaces() {
+        let w = 3*this.getWidth()/5
+        let x = this.pos.x + w;
+        let y = this.pos.y + this.getHeight()/2 // - 20
+        let ds = [
+            new Vector(x, y-800),
+            new Vector(x, y),
+            new Vector(x, y+800),
+        ]
+
+        return ds.map(d => new DevicePlace(d, DeviceSize.Huge))
+    }
+
     draw(ctx: CanvasRenderingContext2D, delta: number) {
+        // super.draw(ctx, delta)
 
         this.drawShape(ctx, this.pos.x, this.pos.y)
+        this.getDevices().forEach(device => device.draw(ctx, delta))
 
     }
 

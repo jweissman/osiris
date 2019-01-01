@@ -3,7 +3,7 @@ import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
 import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad } from "../models/Structure";
-import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, } from "../actors/Building";
+import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, ArcologyView, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
 import { Device } from "../actors/Device";
@@ -12,6 +12,8 @@ import { SmallRoomThreeView } from "../actors/Building/SmallRoomThreeView";
 import { MidDomeView } from "../actors/Building/MidDomeView";
 import { MediumRoomView } from "../actors/Building/MediumRoomView";
 import { LargeRoomView } from "../actors/Building/LargeRoomView";
+import { HugeRoomView } from "../actors/Building/HugeRoomView";
+import { BigDomeView } from "../actors/Building/BigDomeView";
 
 
 export class Construct extends Scene {
@@ -24,17 +26,25 @@ export class Construct extends Scene {
     dragOrigin: Vector
 
     static structureViews: { [key: string]: typeof Building } = {
-        CommonAreaView,
         CorridorView,
-        DomeView,
         LadderView,
-        MidDomeView,
-        MissionControlView,
-        SmallRoomThreeView,
-        SurfaceRoadView,
         TunnelView,
+        SurfaceRoadView,
+
+        DomeView,
+        MidDomeView,
+        BigDomeView,
+
+        MissionControlView,
+        // SmallRoomTwoView, [ none, same as common area? ]
+        SmallRoomThreeView,
+
+        CommonAreaView,
         MediumRoomView,
         LargeRoomView,
+        HugeRoomView,
+
+        ArcologyView,
     }
     ////
     static requiredStructureList: Array<typeof Structure> = [
