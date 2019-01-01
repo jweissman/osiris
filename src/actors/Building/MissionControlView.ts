@@ -8,7 +8,12 @@ import { DeviceSize } from "../../values/DeviceSize";
 export class MissionControlView extends Building {
     hideBox = true
 
-    devicePlaces() { return this.nodes().map(n => new DevicePlace(n, DeviceSize.Medium)) }
+    devicePlaces() {
+        return this.nodes().map(n => {
+            n.y -= 20
+            return new DevicePlace(n, DeviceSize.Medium)
+        }) 
+    }
 
     afterConstruct() {
         // build devices?

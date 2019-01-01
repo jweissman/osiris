@@ -40,7 +40,8 @@ export enum ResourceBlock {
     // derived
     Meal = 'Meal',
     Hypothesis = 'Hypothesis',
-    Mineral = 'Mineral'
+    Mineral = 'Mineral',
+    Alloy = "Alloy"
 }
 
 const blockColors: { [key in ResourceBlock]: Color } = {
@@ -52,6 +53,7 @@ const blockColors: { [key in ResourceBlock]: Color } = {
     Hypothesis: Color.Violet.darken(0.4),
     Ore: Color.Red.darken(0.5),
 
+    Alloy: Color.LightGray.darken(0.2),
 }
 
 export function blockColor(block: ResourceBlock) {

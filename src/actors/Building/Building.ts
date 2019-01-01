@@ -10,19 +10,13 @@ import { Graph } from "../../values/Graph";
 import { ResourceBlock } from "../../models/Economy";
 import { Device } from "../Device";
 import { allSpaceFunctions } from "../../models/SpaceFunction";
-import { DeviceSize } from "../../values/DeviceSize";
+import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 
 export class DevicePlace {
     constructor(private pos: Vector, private size: DeviceSize) {}
     get position() { return this.pos }
-    getVisibleSize(): number {
-        let sz = 10;
-        switch(this.size) {
-            case DeviceSize.Small: sz = 15; break;
-            case DeviceSize.Medium: sz = 25; break;
-        }
-        return sz;
-    }
+    get visibleSize() { return getVisibleDeviceSize(this.size) }
+
 }
 
 export class Building extends Actor {
@@ -124,13 +118,13 @@ export class Building extends Actor {
 
         }
 
-        let showDevicePlaces = false
+        let showDevicePlaces = true
         if (showDevicePlaces && this.devicePlaces().length > 0) {
             this.devicePlaces().forEach(p => {
                 let place = p.position
-                let sz = p.getVisibleSize()
+                let sz = p.visibleSize
                 drawRect(ctx,
-                    { x: place.x, y: place.y, width: sz, height: sz },
+                    { x: place.x - sz/2, y: place.y - sz/2, width: sz, height: sz },
                     1,
                     Color.White,
                     false

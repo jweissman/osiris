@@ -1,14 +1,15 @@
 import { Actor, Label, Color, Vector } from "excalibur";
 import { Machine, MachineOperation } from "../models/Machine";
-import { Building } from "./Building";
+import { Building, CommonAreaView } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
-import { Dome, SmallRoomThree, SmallRoomTwo, MediumRoom } from "../models/Structure";
+import { SmallRoomThree, SmallRoomTwo, MediumRoom, SmallDome, MidDome, LargeRoom } from "../models/Structure";
+import { getVisibleDeviceSize } from "../values/DeviceSize";
 
 export class Device extends Actor {
     product: ResourceBlock[] = []
-    capacity: number = 4
+    // capacity: number = 4
 
     nameLabel: Label
 
@@ -27,8 +28,9 @@ export class Device extends Actor {
         super(
             initialPos.x,
             initialPos.y,
-            machine.width,
-            machine.height,
+            getVisibleDeviceSize(machine.size),
+            getVisibleDeviceSize(machine.size),
+            // machine.height,
             machine.color
         )
 
@@ -56,7 +58,7 @@ export class Device extends Actor {
         if (showLabel) {
             this.nameLabel.pos = this.getCenter()
             this.nameLabel.pos.x -= 10 //ctx.measureText(this.machine.name).width / 2
-            this.nameLabel.pos.y -= 28
+            this.nameLabel.pos.y += 8 + this.getHeight()/2
             this.nameLabel.draw(ctx, delta)
         }
 
@@ -70,7 +72,10 @@ export class Device extends Actor {
 
     get produces()       { return this.machine.produces }
     get consumes()       { return this.machine.consumes }
-    get productionTime() { return this.machine.productionTime }
+    get workTime()       { return this.machine.workTime }
+    get generationTime() { return this.machine.generationTime }
+    // get productionTime() { return this.machine.productionTime }
+    get capacity()       { return this.machine.capacity }
 
     async interact(citizen: Citizen) {
         if (this.inUse) {
@@ -87,7 +92,7 @@ export class Device extends Actor {
         } else {
             if (this.consumes && citizen.carrying === this.consumes) {
                 this.inUse = true
-                await citizen.progressBar(this.productionTime)
+                await citizen.progressBar(this.workTime)
                 citizen.carry(this.produces)
                 this.inUse = false
             }
@@ -124,7 +129,7 @@ export class Device extends Actor {
     }
 
     public produce(step: number) {
-        if (step % this.productionTime === 0) {
+        if (step % this.generationTime === 0) {
             if (this.machine.behavior === MachineOperation.Work) {
 
                 if (this.produces && !this.consumes && this.product.length < this.capacity) {
@@ -140,7 +145,7 @@ export class Device extends Actor {
     snap(planet: Planet, pos: Vector = this.pos) {
         let bldg = planet.colony.closestBuildingByType(pos,
             // hmmm
-            [ Dome, SmallRoomTwo, SmallRoomThree, MediumRoom ],
+            [SmallDome, MidDome, SmallRoomTwo, SmallRoomThree, MediumRoom, LargeRoom],
             // machines count < device slots count
             (bldg: Building) => {
                 let hasSpace = bldg.hasPlaceForDevice()

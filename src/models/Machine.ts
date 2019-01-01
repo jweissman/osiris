@@ -3,7 +3,6 @@ import { Scale } from "../values/Scale";
 import { Color } from "excalibur";
 import { DeviceSize } from "../values/DeviceSize";
 
-let { major, minor } = Scale
 
 const bookshelfSvg = require('../images/bookshelf-plain.svg');
 const vatSvg = require('../images/vat-plain.svg');
@@ -27,6 +26,8 @@ const images = {
     server,
 }
 
+const { Red, Green, Blue, Orange, Violet, Yellow } = Color;
+
 export enum MachineOperation {
     // generic functioning: consuming a block to produce a new block
     Work,
@@ -40,8 +41,6 @@ export enum MachineOperation {
 export class Machine {
     name: string = '(machine name)'
     description: string = '(machine description)'
-    width: number = major.third
-    height: number = major.third
     color: Color = Color.LightGray
 
     size: DeviceSize = DeviceSize.Small
@@ -50,7 +49,10 @@ export class Machine {
     produces: ResourceBlock = null
 
     // need to stop using this both for work time and 'generation' time
-    productionTime: number = 500
+    // productionTime: number = 500
+    generationTime: number = 5000
+    workTime: number = 2000
+    capacity: number = 2
 
     behavior: MachineOperation = MachineOperation.Work
 
@@ -60,7 +62,6 @@ export class Machine {
 
 }
 
-// resource collection
 export class CommandCenter extends Machine {
     name = 'Command'
     description = 'gather resources...'
@@ -70,32 +71,54 @@ export class CommandCenter extends Machine {
     size = DeviceSize.Medium
 }
 
+// small
+/// small surface
+
+export class OxygenExtractor extends Machine {
+    name = 'O2 Extractor'
+    description = 'breathe deep'
+    image = images.vat
+    prereqs = [ WaterCondensingMachine, SolarCell ]
+}
+
+export class SolarCell extends Machine {
+    name = 'Solar Cell'
+    description = 'feel the warmth'
+}
+
+export class WaterCondensingMachine extends Machine {
+    name = 'H20 Condenser'
+    prereqs = [ SolarCell ]
+}
+
+/// small subsurface
+export class Desk extends Machine {
+    name = 'Desk'
+    consumes = ResourceBlock.Hypothesis
+    produces = ResourceBlock.Data
+    image = images.bench
+    prereqs = [ OxygenExtractor ]
+    // color = Blue
+}
+
+export class Bookshelf extends Machine {
+    name = 'Shelf'
+    description = 'brainstorm'
+    produces = ResourceBlock.Hypothesis
+    image = images.bookshelf
+    prereqs = [ OxygenExtractor, Desk ]
+    color = Blue
+}
+
+
 export class Fridge extends Machine {
     name = 'Fridge'
     description = 'store meals'
     behavior = MachineOperation.CollectMeals
     image = images.fridge
     prereqs = [Bookshelf]
+    color = Yellow
 }
-
-export class ResearchServer extends Machine {
-    name = 'Research Server'
-    description = 'hold data'
-    produces = ResourceBlock.Hypothesis
-    behavior = MachineOperation.CollectData
-    image = images.server
-    prereqs = [Bookshelf]
-
-    size = DeviceSize.Medium
-}
-
-// meals
-
-//export class Orchard extends Machine {
-//    name = 'Orchard'
-//    description = 'grow some food'
-//    produces = ResourceBlock.Food
-//}
 
 export class Stove extends Machine {
     name = 'Stove'
@@ -105,122 +128,125 @@ export class Stove extends Machine {
     image = images.stove
 
     prereqs = [Bookshelf, Fridge]
+    color = Yellow
 }
 
-//export class CookingFire extends Machine {
-//    name = 'Cooking Fire'
-//    consumes = ResourceBlock.Food
-//    produces = ResourceBlock.Meal
-//    image = images.fire
-//
-//    prereqs = [OxygenExtractor]
-//}
-//export class Cabin extends Machine {
-//    name = 'Cabin'
-//    produces = ResourceBlock.Food
-//
-//    image = images.cabin
-//    prereqs = [WaterCondensingMachine, OxygenExtractor]
-//}
-
-export class Desk extends Machine {
-    name = 'Desk'
-    consumes = ResourceBlock.Hypothesis
-    produces = ResourceBlock.Data
-    image = images.bench
+export class Bed extends Machine {
+    name = 'Bed'
+    image = images.bed
     prereqs = [ OxygenExtractor ]
+    color = Orange
 }
 
+export class Workstation extends Machine {
+    name = 'Workstation'
+    prereqs = [ Bookshelf ]
+    color = Blue
+}
 
-// minerals
+export class Houseplant extends Machine {
+    name = 'House Plant'
+    prereqs = [ Bed ]
+    produces = ResourceBlock.Food
+    capacity = 1
+    color = Green
+}
 
-// export class MiningDrill extends Machine {
-//     name = 'Drill'
-//     description = 'find some ores'
-//     produces = ResourceBlock.Ore
-// }
+// medium
 
-// export class MineralProcessor extends Machine {
-//     name = 'Processor'
-//     description = 'extract some minerals'
 
-//     consumes = ResourceBlock.Ore
-//     produces = ResourceBlock.Mineral
-// }
-
-// data
-
-export class Bookshelf extends Machine {
-    name = 'Shelf'
-    description = 'brainstorm'
+export class ResearchServer extends Machine {
+    name = 'Research Server'
+    description = 'hold data'
     produces = ResourceBlock.Hypothesis
-    image = images.bookshelf
-    prereqs = [ OxygenExtractor, Desk ]
+    behavior = MachineOperation.CollectData
+    image = images.server
+    prereqs = [Bookshelf]
+    size = DeviceSize.Medium
+    color = Blue
 }
 
-//export class ExperimentBench extends Machine {
-//    name = 'Bench'
-//    description = 'test some hypotheses'
-//    consumes = ResourceBlock.Hypothesis
-//    produces = ResourceBlock.Data
-//    image = images.bench
-//}
+export class Orchard extends Machine {
+   name = 'Orchard'
+   description = 'grow some food'
+   produces = ResourceBlock.Food
+   size = DeviceSize.Medium
+   prereqs = [AlgaeVat]
+   color = Green
+}
+
+export class Cabin extends Machine {
+   name = 'Cabin'
+   consumes = ResourceBlock.Food
+   produces = ResourceBlock.Meal
+   image = images.cabin
+   prereqs = [Orchard]
+   size = DeviceSize.Medium
+   color = Orange
+}
+
+export class Arbor extends Machine {
+    name = 'Arbor'
+    produces = ResourceBlock.Food
+    prereqs = [Orchard]
+    size = DeviceSize.Medium
+    color = Green
+}
 
 export class AlgaeVat extends Machine {
     name = 'Algae Vat'
     produces = ResourceBlock.Food
     prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
     size = DeviceSize.Medium
+    color = Violet
 }
-
-// reproduction
 
 export class CloningVat extends Machine {
     name = 'Cloning Vat'
     description = 'grow some replacements'
-    // consumes = ResourceBlock.Meal
     behavior = MachineOperation.SpawnCitizen 
     productionTime = 1500
-
-    height = major.third
-    // width = minor.fifth
-    // height = major.first
-
     image = images.vat
-
     prereqs = [AlgaeVat]
     size = DeviceSize.Medium
+    color = Violet
+}
+
+    
+export class Fabricator extends Machine {
+    name = 'Fabricator'
+    consumes = ResourceBlock.Mineral
+    produces = ResourceBlock.Alloy
+    size = DeviceSize.Medium
+    color = Red
+    // ...
+}
+
+// large devices!
+
+export class MiningDrill extends Machine {
+    name = 'Mining Drill'
+    size = DeviceSize.Large
+    prereqs = [ Fabricator ]
+//
+}    
+
+export class Megafabricator extends Machine {
+    name = 'Mega-Fabricator'
+    size = DeviceSize.Large
+    prereqs = [ Fabricator ]
+    color = Red
+}
+
+export class Preserve extends Machine {
+    name = 'Preserve'
+    size = DeviceSize.Large
+    prereqs = [ Arbor ]
+    color = Green
 }
 
 // providence (power, life support...)
 
-export class Bed extends Machine {
-    name = 'Bed'
-    image = images.bed
-    prereqs = [ OxygenExtractor ]
-}
-
-export class OxygenExtractor extends Machine {
-    name = 'O2 Extractor'
-    description = 'breathe deep'
-    // behavior
-    // height = 
-    image = images.vat
-    prereqs = [ WaterCondensingMachine ]
-}
-
-// export class SolarCell extends Machine {
-//     name = 'Solar Cell'
-//     description = 'feel the warmth'
-// }
-
-// export class Launchpad extends Machine {
-//     name = 'Launchpad'
-// }
-
-export class WaterCondensingMachine extends Machine {
-    name = 'H20 Condenser'
-}
 
 // export class AirScrubber extends Machine {
 //     name = 'Air Scrubber'

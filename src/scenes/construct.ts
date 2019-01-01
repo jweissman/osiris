@@ -9,6 +9,9 @@ import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
 import { Device } from "../actors/Device";
 import { Machine } from "../models/Machine";
 import { SmallRoomThreeView } from "../actors/Building/SmallRoomThreeView";
+import { MidDomeView } from "../actors/Building/MidDomeView";
+import { MediumRoomView } from "../actors/Building/MediumRoomView";
+import { LargeRoomView } from "../actors/Building/LargeRoomView";
 
 
 export class Construct extends Scene {
@@ -21,26 +24,17 @@ export class Construct extends Scene {
     dragOrigin: Vector
 
     static structureViews: { [key: string]: typeof Building } = {
-        TunnelView,
-        MissionControlView,
-        DomeView,
-        CorridorView,
         CommonAreaView,
+        CorridorView,
+        DomeView,
         LadderView,
-        SurfaceRoadView,
-
+        MidDomeView,
+        MissionControlView,
         SmallRoomThreeView,
-
-        //LabView,
-        //MineView,
-        //KitchenView,
-        //PowerPlantView,
-        //StudyView,
-        //RefineryView,
-
-        //ArcologyView,
-        //CloneMatrixView,
-
+        SurfaceRoadView,
+        TunnelView,
+        MediumRoomView,
+        LargeRoomView,
     }
     ////
     static requiredStructureList: Array<typeof Structure> = [
@@ -120,13 +114,15 @@ export class Construct extends Scene {
                         }
                     } else {
                         let deviceUnderConstruction = currentlyBuilding
-                        let bldg = deviceUnderConstruction.building
+                        if (deviceUnderConstruction.snap(this.planet)) {
+                            let bldg = deviceUnderConstruction.building
 
-                        bldg.addDevice(deviceUnderConstruction)
-                        
-                        // deviceUnderConstruction.finalize()
-                        this.planet.colony.currentlyConstructing = null
-                        this.hud.updatePalettes(this.planet.colony)
+                            bldg.addDevice(deviceUnderConstruction)
+
+                            // deviceUnderConstruction.finalize()
+                            this.planet.colony.currentlyConstructing = null
+                            this.hud.updatePalettes(this.planet.colony)
+                        }
                     }
                 }
             } else if (e.button === Input.PointerButton.Middle) {
@@ -152,6 +148,9 @@ export class Construct extends Scene {
                     this.camera.move(this.buildings[0].pos, 500)
                     this.camera.zoom(0.5, 1000)
                 }
+            } else if (e.key === Input.Keys.Esc) {
+                // cancel building in progress?
+                this.planet.colony.currentlyConstructing = null
             }
         })
     }

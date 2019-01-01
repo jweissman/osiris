@@ -1,9 +1,9 @@
 import { Label, UIActor, Color } from "excalibur";
-import { Structure, Corridor, SurfaceRoad, Ladder, Dome, SmallRoomThree, SmallRoomTwo, MediumRoom } from "../../models/Structure";
+import { Structure, Corridor, SurfaceRoad, Ladder, SmallRoomThree, SmallRoomTwo, MediumRoom, MidDome, SmallDome, LargeRoom } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket } from "../../models/Economy";
 import { ResourcesList } from "./ResourcesList";
-import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed, Fridge, ResearchServer } from "../../models/Machine";
+import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Cabin, Orchard, SolarCell, Megafabricator, Arbor, Fabricator, MiningDrill, Preserve, Workstation, Houseplant } from "../../models/Machine";
 import { flatSingle } from "../../Util";
 import { Colony } from "../Planet/Colony";
 
@@ -23,12 +23,14 @@ export class Hud extends UIActor {
         Ladder,
 
         // surface
-        Dome,
+        SmallDome,
+        MidDome,
 
         // subsurface
         SmallRoomTwo,
         SmallRoomThree,
         MediumRoom,
+        LargeRoom,
 
     ];
 
@@ -36,21 +38,26 @@ export class Hud extends UIActor {
     builtStructures: (typeof Structure)[] = []
 
     static machinesForPalette = [
-        Bed,
-        // Cabin,
-        // CookingFire,
-        Bookshelf,
-        Desk,
-        Stove,
-        Fridge,
-
         AlgaeVat,
+        Arbor,
+        Bed,
+        Bookshelf,
+        Cabin,
         CloningVat,
-
-        ResearchServer,
-
+        Desk,
+        Fabricator,
+        Fridge,
+        Houseplant,
+        Megafabricator,
+        MiningDrill,
+        Orchard,
         OxygenExtractor,
+        Preserve,
+        ResearchServer,
+        SolarCell,
+        Stove,
         WaterCondensingMachine,
+        Workstation,
     ]
 
     comprehendedMachines: (typeof Machine)[] = []
@@ -88,7 +95,7 @@ export class Hud extends UIActor {
         if (this._machinePaletteElement) {
             let left = ctx.canvas.offsetLeft;
             let top = ctx.canvas.offsetTop;
-            this._machinePaletteElement.style.left = `${left + this.game.canvasWidth - 120}px`;
+            this._machinePaletteElement.style.left = `${left + this.game.canvasWidth - 180}px`;
             this._machinePaletteElement.style.top = `${top + 100}px`;
         }
     }
@@ -119,7 +126,7 @@ export class Hud extends UIActor {
             })
         })
 
-        // console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
+        console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
 
           // rebuild palette with updated available buildings
         this._structurePaletteElement.parentElement.removeChild(this._structurePaletteElement)
@@ -156,7 +163,7 @@ export class Hud extends UIActor {
 
         this.comprehendedStructures
         .map(structure => new structure())
-        .sort((a,b) => a.dominantColor > b.dominantColor ? -1 : 1)
+        // .sort((a,b) => a.dominantColor > b.dominantColor ? -1 : 1)
         .forEach((structure: Structure) => {
             let label = structure.name
             if (!this.builtStructures.map(s => new s().name).includes(structure.name)) {
@@ -183,6 +190,7 @@ export class Hud extends UIActor {
         // Hud.machinesForPalette
         this.comprehendedMachines
             .map(Machine => new Machine())
+            .sort((a,b) => a.color > b.color ? -1 : 1)
             .forEach(machine => {
                 let label = machine.name
                 if (!this.builtMachines.map(m => new m().name).includes(machine.name)) {
@@ -208,12 +216,12 @@ export class Hud extends UIActor {
         paletteButton.textContent = label; // `${s.name}`;
 
         paletteButton.style.display = 'block';
-        paletteButton.style.fontSize = '10pt';
+        paletteButton.style.fontSize = '12pt';
 
         paletteButton.style.fontFamily = 'Helvetica';
         paletteButton.style.fontWeight = '600';
-        paletteButton.style.padding = '5px';
-        paletteButton.style.width = '100px';
+        paletteButton.style.padding = '8px';
+        paletteButton.style.width = '160px';
         paletteButton.style.textTransform = 'uppercase'
         paletteButton.style.border = '1px solid rgba(255,255,255,0.08)'
 

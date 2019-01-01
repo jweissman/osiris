@@ -6,7 +6,7 @@ import { DeviceSize } from "../../values/DeviceSize";
 import { drawRect } from "../../Util";
 
 export class CommonAreaView extends Building {
-    floorHeight: number = 8
+    floorHeight: number = 10
     edgeWidth: number = 0.5 //.1
     showLabel = true
     hideBox = true

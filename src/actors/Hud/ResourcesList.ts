@@ -9,10 +9,14 @@ export class ResourcesList extends Actor {
             [ResourceBlock.Food]: null,
             [ResourceBlock.Hypothesis]: null,
             [ResourceBlock.Ore]: null,
+
             // displayed/accruable
             [ResourceBlock.Meal]: null,
             [ResourceBlock.Mineral]: null,
             [ResourceBlock.Data]: null,
+
+            // derived/accurable
+            [ResourceBlock.Alloy]: null,
         };
 
     constructor(x: number, y: number) {
