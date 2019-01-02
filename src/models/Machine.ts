@@ -1,4 +1,4 @@
-import { ResourceBlock } from "./Economy";
+import { ResourceBlock, Economy, emptyMarket } from "./Economy";
 import { Scale } from "../values/Scale";
 import { Color, Resource } from "excalibur";
 import { DeviceSize } from "../values/DeviceSize";
@@ -60,6 +60,9 @@ export class Machine {
 
     prereqs: (typeof Machine)[] = []
 
+    economy: Economy = emptyMarket
+
+    forDome: boolean = false
 }
 
 export class CommandCenter extends Machine {
@@ -69,6 +72,13 @@ export class CommandCenter extends Machine {
     image = images.bench
 
     size = DeviceSize.Medium
+    economy = {
+        ...emptyMarket,
+        Power: { supply: 1, demand: 0 },
+        Oxygen: { supply: 1, demand: 0 },
+        Shelter: { supply: 1, demand: 0 },
+        Hope: { supply: 1, demand: 0 }
+    }
 }
 
 // small
@@ -79,16 +89,22 @@ export class OxygenExtractor extends Machine {
     description = 'breathe deep'
     image = images.vat
     prereqs = [ WaterCondensingMachine, SolarCell ]
+
+    forDome = true
 }
 
 export class SolarCell extends Machine {
     name = 'Solar Cell'
     description = 'feel the warmth'
+
+    forDome = true
 }
 
 export class WaterCondensingMachine extends Machine {
     name = 'H20 Condenser'
     prereqs = [ SolarCell ]
+
+    forDome = true
 }
 
 /// small subsurface
@@ -177,6 +193,7 @@ export class Orchard extends Machine {
    size = DeviceSize.Medium
    prereqs = [AlgaeVat]
    color = Green
+    forDome = true
 }
 
 export class Cabin extends Machine {
@@ -187,6 +204,7 @@ export class Cabin extends Machine {
    prereqs = [Orchard]
    size = DeviceSize.Medium
    color = Orange
+    forDome = true
 }
 
 export class Arbor extends Machine {
@@ -195,6 +213,7 @@ export class Arbor extends Machine {
     prereqs = [Orchard]
     size = DeviceSize.Medium
     color = Green
+    forDome = true
 }
 
 export class AlgaeVat extends Machine {
@@ -203,6 +222,14 @@ export class AlgaeVat extends Machine {
     prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
     size = DeviceSize.Medium
     color = Violet
+}
+
+export class Botany extends Machine {
+    name = 'Botany'
+    produces = ResourceBlock.Food
+    prereqs = [ OxygenExtractor, Bookshelf ]
+    size = DeviceSize.Medium
+    color = Green
 }
 
 export class CloningVat extends Machine {
@@ -254,6 +281,7 @@ export class Preserve extends Machine {
     size = DeviceSize.Large
     prereqs = [ Arbor ]
     color = Green
+    forDome = true
 }
 
 /// huge devices
@@ -263,6 +291,7 @@ export class Microcity extends Machine {
     size = DeviceSize.Huge
     prereqs = [ Megafabricator ]
     color = Orange
+    forDome = true
 }
 
 export class LogicCrystal extends Machine {
@@ -297,4 +326,5 @@ export const allMachines = [
     Workstation,
     Microcity,
     LogicCrystal,
+    Botany,
 ]

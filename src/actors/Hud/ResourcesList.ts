@@ -24,7 +24,7 @@ export class ResourcesList extends Actor {
         let rx0 = 0, ry0 = -2.5;
         let resources = [ResourceBlock.Meal, ResourceBlock.Data, ResourceBlock.Mineral];
         resources.forEach((resource, index) => {
-            let rx = rx0 + index * 20, ry = ry0 + index * 0;
+            let rx = rx0 + index * 16, ry = ry0 + index * 0;
             let entry = new ResourceListEntry(rx, ry, resource, 0);
             this.add(entry);
             this.entries[resource] = entry;

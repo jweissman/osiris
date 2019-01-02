@@ -131,11 +131,15 @@ export class Citizen extends Actor {
             let item: ResourceBlock = this.carrying;
             let sink: Device = this.planet.closestDevice(this.pos,
                 [],
-                (device) => 
-                        device.machine.consumes === item ||
-                        device.machine.behavior === MachineOperation.CollectResource ||
-                        item === ResourceBlock.Meal && device.machine.behavior === MachineOperation.CollectMeals ||
-                        item === ResourceBlock.Data && device.machine.behavior === MachineOperation.CollectData
+                (device) =>
+                    device.machine.consumes === item ||
+                    ((
+                        item === ResourceBlock.Meal ||
+                        item === ResourceBlock.Data ||
+                        item === ResourceBlock.Mineral
+                    ) && device.machine.behavior === MachineOperation.CollectResource) ||
+                    item === ResourceBlock.Meal && device.machine.behavior === MachineOperation.CollectMeals ||
+                    item === ResourceBlock.Data && device.machine.behavior === MachineOperation.CollectData
             )
 
             if (sink) {

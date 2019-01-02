@@ -2,10 +2,28 @@ import { Color } from 'excalibur';
 import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Orchard, Cabin, SolarCell, Arbor, Megafabricator, MiningDrill, Preserve, Workstation, Houseplant, Fabricator, LogicCrystal, Microcity } from './Machine';
+import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Orchard, Cabin, SolarCell, Arbor, Megafabricator, MiningDrill, Preserve, Workstation, Houseplant, Fabricator, LogicCrystal, Microcity, allMachines } from './Machine';
 import { SpaceFunction } from './SpaceFunction';
+import { DeviceSize } from '../values/DeviceSize';
 
 const { major, minor } = Scale
+
+const smallMachines = allMachines.filter(machine => (new machine()).size === DeviceSize.Small)
+const mediumMachines = allMachines.filter(machine => (new machine()).size === DeviceSize.Medium)
+const largeMachines = allMachines.filter(machine => (new machine()).size === DeviceSize.Large)
+const hugeMachines = allMachines.filter(machine => (new machine()).size === DeviceSize.Huge)
+
+const smallDome = smallMachines.filter(machine => (new machine()).forDome)
+const smallBelow = smallMachines.filter(machine => !(new machine()).forDome)
+
+const midDome = mediumMachines.filter(machine => (new machine()).forDome)
+const midBelow = mediumMachines.filter(machine => !(new machine()).forDome)
+
+const largeDome = largeMachines.filter(machine => (new machine()).forDome)
+const largeBelow = largeMachines.filter(machine => !(new machine()).forDome)
+
+const hugeDome = hugeMachines.filter(machine => (new machine()).forDome)
+const hugeBelow = hugeMachines.filter(machine => !(new machine()).forDome)
 
 export class Structure {
     name: string = '(structure name)';
@@ -150,15 +168,15 @@ class CommonArea extends Structure {
         [Orientation.Down]: [ Ladder ],
     }
 
-    machines = [
-        Stove,
-        Bed,
-        Desk,
-        Bookshelf,
-        Fridge,
-        Workstation,
-        Houseplant,
-    ]
+    machines = []
+    //    Stove,
+    //    Bed,
+    //    Desk,
+    //    Bookshelf,
+    //    Fridge,
+    //    Workstation,
+    //    Houseplant,
+    //]
 
     prereqs = [
         // Dome 
@@ -169,6 +187,7 @@ export class SmallRoomTwo extends CommonArea {
     name = 'Sm. Room (2)'
     width = major.eighth
     prereqs = [ SmallDome ]
+    machines = smallBelow
     // two small slots
 }
 
@@ -177,6 +196,7 @@ export class SmallRoomThree extends CommonArea {
     prereqs = [SmallRoomTwo]
     view = 'SmallRoomThreeView'
     width = 2 * major.eighth
+    machines = smallBelow
 }
 
 export class MediumRoom extends CommonArea {
@@ -186,12 +206,8 @@ export class MediumRoom extends CommonArea {
     width = 3 * major.eighth
     height = 2 * major.third
     // two medium slots...
-    machines = [
-        ResearchServer,
-        AlgaeVat,
-        CloningVat,
-        Fabricator,
-    ]
+    
+    machines = midBelow
 }
 
 export class LargeRoom extends CommonArea {
@@ -202,11 +218,12 @@ export class LargeRoom extends CommonArea {
     height = 4 * major.fifth
 
     // two big slots?
-    machines = [
-        MiningDrill,
-        Megafabricator,
-        // Preserve,
-    ]
+    machines = largeBelow
+    //machines = [
+    //    MiningDrill,
+    //    Megafabricator,
+    //    // Preserve,
+    //]
 }
 
 export class HugeRoom extends CommonArea {
@@ -216,7 +233,8 @@ export class HugeRoom extends CommonArea {
     height = 8 * major.eighth
 
     prereqs = [LargeRoom]
-    machines = [ LogicCrystal ] // ultrafab...
+    machines = hugeBelow
+    // machines = [ LogicCrystal ] // ultrafab...
 }
 
 /// surface bldgs
@@ -225,6 +243,7 @@ export class SmallDome extends Dome {
     name = 'Sm. Dome'
     width = 3 * major.eighth
     height = 2 * major.eighth
+    machines = smallDome
 }
 
 export class MidDome extends Dome {
@@ -233,12 +252,13 @@ export class MidDome extends Dome {
     width = 4 * major.eighth
     height = 3 * major.eighth
     prereqs = [ SmallDome, MediumRoom ]
-    machines = [
-        Cabin,
-        Orchard,
-        Arbor,
-        // Campfir
-    ]
+    //machines = [
+    //    Cabin,
+    //    Orchard,
+    //    Arbor,
+    //    // Campfir
+    //]
+    machines = midDome
 }
 
 export class LargeDome extends Dome {
@@ -247,9 +267,7 @@ export class LargeDome extends Dome {
     width = 8 * major.eighth
     height = 6 * major.eighth
     prereqs = [MidDome, LargeRoom]
-    machines = [
-        Preserve
-    ]
+    machines = largeDome
 }
 
 export class Arcology extends Dome {
@@ -258,9 +276,10 @@ export class Arcology extends Dome {
     width = 12 * major.eighth
     height = 36 * major.eighth
     prereqs = [LargeDome, HugeRoom]
-    machines = [
-        Microcity
-    ]
+    machines = hugeDome
+    //machines = [
+    //    Microcity
+    //]
 }
 
 //////

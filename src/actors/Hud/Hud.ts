@@ -46,7 +46,7 @@ export class Hud extends UIActor {
         // this.resources = new ResourcesList(50, 40)
         // this.add(this.resources)
 
-        this.status = new StatusAnalysisView(emptyMarket, 0, 0,);
+        this.status = new StatusAnalysisView(emptyMarket);
         this.add(this.status)
 
     }
@@ -71,11 +71,20 @@ export class Hud extends UIActor {
     }
 
     resourceGathered(resource: ResourceBlock) {
-        this.status.resources.increment(resource)
+        this.status.incrementResource(resource)
+    }
+
+    updateDetails(colony: Colony) {
+        this.updatePalettes(colony)
+        this.updateEconomy(colony) // update markets...
+    }
+
+    private updateEconomy(colony: Colony) {
+        // ... sum economies from all machines!
 
     }
 
-    updatePalettes(colony: Colony) {
+    private updatePalettes(colony: Colony) {
         this.updateBuildingPalette(colony)
         this.updateMachinePalette(colony)
     }

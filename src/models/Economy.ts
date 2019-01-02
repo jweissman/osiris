@@ -13,6 +13,10 @@ export enum PureValue {
     Beauty = 'Beauty'
 }
 
+let allValues = [
+    PureValue.Power, PureValue.Oxygen
+]
+
 export type Economy = { [key in PureValue]: {
     supply: number,
     demand: number
@@ -28,6 +32,18 @@ export const emptyMarket : Economy = {
     Wealth: { supply: 0, demand: 0 },
     Wisdom: { supply: 0, demand: 0 },
     Beauty: { supply: 0, demand: 0 }
+}
+
+// utility to help add markets together?
+export const sumMarkets : (ea: Economy, eb: Economy) => Economy = (ea,eb) => {
+    let newMarket = emptyMarket;
+    for (let value in PureValue) {
+        newMarket[value] = {
+            supply: ea[value].supply + eb[value].supply,
+            demand: eb[value].demand + eb[value].demand
+        }
+    }
+    return newMarket
 }
 
 export enum ResourceBlock {

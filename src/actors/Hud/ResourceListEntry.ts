@@ -7,8 +7,8 @@ export class ResourceListEntry extends Actor {
         super(x, y, 10, 10); // 10,10,blockColor(resourceBlock))
         let icon = new Actor(x, y, 10, 10, blockColor(resourceBlock)); //ResourceBlock.Meal))
         this.add(icon);
-        this.count = new Label(`x${value}`, x + 10, y + 8, 'Helvetica');
-        this.count.fontSize = 12;
+        this.count = new Label(`x${value}`, x + 10, y + 6, 'Helvetica');
+        this.count.fontSize = 10;
         this.count.color = Color.White;
         this.add(this.count);
     }

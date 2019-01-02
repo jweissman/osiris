@@ -2,7 +2,7 @@ import { Scene, Input, Vector } from "excalibur";
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad } from "../models/Structure";
+import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, SmallDome, SmallRoomTwo } from "../models/Structure";
 import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, ArcologyView, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
@@ -24,6 +24,8 @@ export class Construct extends Scene {
 
     dragging: boolean = false
     dragOrigin: Vector
+
+    defaultMessage: string = 'Welcome to the Colony, Commander.'
 
     static structureViews: { [key: string]: typeof Building } = {
         CorridorView,
@@ -49,15 +51,11 @@ export class Construct extends Scene {
     ////
     static requiredStructureList: Array<typeof Structure> = [
         MissionControl,
-
         SurfaceRoad,
-        // OxygenAccumulator,
-        // Dome,
+        SmallDome,
         MainTunnel,
         Corridor,
-        // Kitchen,
-        // Study,
-        // CloneMatrix,
+        SmallRoomTwo,
     ]
 
     public onInitialize(game: Game) {
@@ -113,27 +111,26 @@ export class Construct extends Scene {
             if (e.button == Input.PointerButton.Left) {
                 const currentlyBuilding = this.planet.currentlyConstructing
                 if (currentlyBuilding) {
+                    // this.planet.colony.currentlyConstructing = null
                     if (currentlyBuilding instanceof Building) {
                         let buildingUnderConstruction = currentlyBuilding
                         let placementValid = !buildingUnderConstruction.overlapsAny()
                         if (buildingUnderConstruction && placementValid && buildingUnderConstruction.handleClick(e.pos)) {
                             this.planet.placeBuilding(buildingUnderConstruction)
+                            this.hud.setMessage(`Welcome to OSIRIS!`)
                             this.planet.colony.currentlyConstructing = null
                             this.prepareNextBuilding(e.pos)
-                            this.hud.updatePalettes(this.planet.colony)
                         }
-                    } else {
+                    } else { // assume device?
                         let deviceUnderConstruction = currentlyBuilding
                         if (deviceUnderConstruction.snap(this.planet)) {
                             let bldg = deviceUnderConstruction.building
-
                             bldg.addDevice(deviceUnderConstruction)
-
-                            // deviceUnderConstruction.finalize()
                             this.planet.colony.currentlyConstructing = null
-                            this.hud.updatePalettes(this.planet.colony)
+                            this.hud.setMessage(this.defaultMessage)
                         }
                     }
+                    this.hud.updateDetails(this.planet.colony)
                 }
             } else if (e.button === Input.PointerButton.Middle) {
                 this.dragging = true;
@@ -189,23 +186,25 @@ export class Construct extends Scene {
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
             this.startConstructing(structure, pos)
-        } else {
-            this.hud.setMessage(`Welcome to OSIRIS!`)
-        }
+        } //else {
+            // this.hud.setMessage(`Welcome to OSIRIS!`)
+        // }
     }
 
     startConstructing(structureOrMachine: Structure | Machine, pos: Vector = new Vector(0, 0)) {
+        // console.log("START CONSTRUCTING", { structureOrMachine })
         let theNextOne = null
         if (structureOrMachine instanceof Structure) {
             let structure = structureOrMachine
             // structure.origin = pos // thread this out somehow??
-            this.hud.setMessage(`Place ${structure.name}`)
+            this.hud.setMessage(`Place ${structure.name} (${structure.description})`)
             theNextOne = this.spawnBuilding(structure, pos)
             this.camera.zoom(structure.zoom, 250)
         } else if (structureOrMachine instanceof Machine) {
             // setup machine?
             let machine = structureOrMachine
             // machine.origin = pos
+            this.hud.setMessage(`Install ${machine.name} (${machine.description})`)
 
             theNextOne = this.spawnDevice(machine, pos)
             this.camera.zoom(1.5, 250)
