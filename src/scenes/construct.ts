@@ -2,7 +2,7 @@ import { Scene, Input, Vector } from "excalibur";
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, SmallDome, SmallRoomTwo } from "../models/Structure";
+import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, SmallDome, SmallRoomTwo, SmallDomeThree } from "../models/Structure";
 import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, ArcologyView, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
@@ -14,6 +14,7 @@ import { MediumRoomView } from "../actors/Building/MediumRoomView";
 import { LargeRoomView } from "../actors/Building/LargeRoomView";
 import { HugeRoomView } from "../actors/Building/HugeRoomView";
 import { BigDomeView } from "../actors/Building/BigDomeView";
+import { SmallDomeThreeView } from "../actors/Building/SmallDomeThreeView";
 
 
 export class Construct extends Scene {
@@ -33,7 +34,8 @@ export class Construct extends Scene {
         TunnelView,
         SurfaceRoadView,
 
-        DomeView,
+        DomeView, // small dome 2
+        SmallDomeThreeView,
         MidDomeView,
         BigDomeView,
 
@@ -52,17 +54,25 @@ export class Construct extends Scene {
     static requiredStructureList: Array<typeof Structure> = [
         MissionControl,
         SurfaceRoad,
-        SmallDome,
+        // SmallDome,
+        SmallDomeThree,
         MainTunnel,
         Corridor,
         SmallRoomTwo,
     ]
+
+    update(engine, delta) {
+        super.update(engine, delta)
+
+        this.hud.updateDetails(this.planet, false)
+    }
 
     public onInitialize(game: Game) {
         this.game = game
 
 
         this.hud = new Hud(game, (structure) => {
+            // console.log('would build', { structure })
             this.startConstructing(structure)
         }, (device) => {
             this.startConstructing(device)
@@ -111,26 +121,26 @@ export class Construct extends Scene {
             if (e.button == Input.PointerButton.Left) {
                 const currentlyBuilding = this.planet.currentlyConstructing
                 if (currentlyBuilding) {
-                    // this.planet.colony.currentlyConstructing = null
                     if (currentlyBuilding instanceof Building) {
                         let buildingUnderConstruction = currentlyBuilding
                         let placementValid = !buildingUnderConstruction.overlapsAny()
                         if (buildingUnderConstruction && placementValid && buildingUnderConstruction.handleClick(e.pos)) {
                             this.planet.placeBuilding(buildingUnderConstruction)
-                            this.hud.setMessage(`Welcome to OSIRIS!`)
+                            this.hud.setMessage(this.defaultMessage)
                             this.planet.colony.currentlyConstructing = null
                             this.prepareNextBuilding(e.pos)
+                            this.hud.updateDetails(this.planet)
                         }
-                    } else { // assume device?
+                    } else {
                         let deviceUnderConstruction = currentlyBuilding
                         if (deviceUnderConstruction.snap(this.planet)) {
                             let bldg = deviceUnderConstruction.building
                             bldg.addDevice(deviceUnderConstruction)
                             this.planet.colony.currentlyConstructing = null
                             this.hud.setMessage(this.defaultMessage)
+                            this.hud.updateDetails(this.planet)
                         }
                     }
-                    this.hud.updateDetails(this.planet.colony)
                 }
             } else if (e.button === Input.PointerButton.Middle) {
                 this.dragging = true;
@@ -192,6 +202,7 @@ export class Construct extends Scene {
     }
 
     startConstructing(structureOrMachine: Structure | Machine, pos: Vector = new Vector(0, 0)) {
+        
         // console.log("START CONSTRUCTING", { structureOrMachine })
         let theNextOne = null
         if (structureOrMachine instanceof Structure) {
@@ -210,15 +221,15 @@ export class Construct extends Scene {
             this.camera.zoom(1.5, 250)
         }
 
-        this.planet.colony.currentlyConstructing = theNextOne
+        this.planet.colony.currentlyConstructing = null
         if (theNextOne) {
-            console.warn("would start constructing", { theNextOne })
+            this.planet.colony.currentlyConstructing = theNextOne
+            // console.warn("would start constructing", { theNextOne })
             this.camera.pos = theNextOne.pos
         }
     }
 
     protected spawnDevice(machine: Machine, pos: Vector): Device {
-        // let bldg = this.planet.closestBuildingByType(pos, [ CommonArea, Biodome ])
         let device = new Device(machine, pos)
         device.snap(this.planet)
         return device

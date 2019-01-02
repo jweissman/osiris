@@ -60,7 +60,7 @@ export class Machine {
 
     prereqs: (typeof Machine)[] = []
 
-    economy: Economy = emptyMarket
+    economy: Economy = emptyMarket()
 
     forDome: boolean = false
 }
@@ -73,7 +73,7 @@ export class CommandCenter extends Machine {
 
     size = DeviceSize.Medium
     economy = {
-        ...emptyMarket,
+        ...emptyMarket(),
         Power: { supply: 1, demand: 0 },
         Oxygen: { supply: 1, demand: 0 },
         Shelter: { supply: 1, demand: 0 },
@@ -91,6 +91,11 @@ export class OxygenExtractor extends Machine {
     prereqs = [ WaterCondensingMachine, SolarCell ]
 
     forDome = true
+    economy = {
+        ...emptyMarket(),
+        Oxygen: { supply: 1, demand: 0 },
+        Power: { supply: 0, demand: 1 },
+    }
 }
 
 export class SolarCell extends Machine {
@@ -98,13 +103,23 @@ export class SolarCell extends Machine {
     description = 'feel the warmth'
 
     forDome = true
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 2, demand: 0 },
+    }
 }
+
 
 export class WaterCondensingMachine extends Machine {
     name = 'H20 Condenser'
     prereqs = [ SolarCell ]
 
     forDome = true
+    economy = {
+        ...emptyMarket(),
+        Water: { supply: 1, demand: 0 },
+        Power: { supply: 0, demand: 1 },
+    }
 }
 
 /// small subsurface
@@ -117,6 +132,7 @@ export class Desk extends StudyMachine {
     name = 'Desk'
     image = images.bench
     prereqs = [ OxygenExtractor ]
+
     // color = Blue
 }
 
@@ -145,6 +161,10 @@ export class Fridge extends Machine {
     image = images.fridge
     prereqs = [Bookshelf]
     color = Yellow
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+    }
 }
 
 export class Stove extends Machine {
@@ -156,6 +176,10 @@ export class Stove extends Machine {
 
     prereqs = [Bookshelf, Fridge]
     color = Yellow
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+    }
 }
 
 export class Bed extends Machine {
@@ -163,6 +187,10 @@ export class Bed extends Machine {
     image = images.bed
     prereqs = [ OxygenExtractor ]
     color = Orange
+    economy = {
+        ...emptyMarket(),
+        Shelter: { supply: 2, demand: 0 },
+    }
 }
 export class Houseplant extends Machine {
     name = 'House Plant'
@@ -170,6 +198,10 @@ export class Houseplant extends Machine {
     produces = ResourceBlock.Food
     capacity = 1
     color = Green
+    economy = {
+        ...emptyMarket(),
+        Oxygen: { supply: 0, demand: 1 },
+    }
 }
 
 // medium
@@ -184,6 +216,10 @@ export class ResearchServer extends Machine {
     prereqs = [Bookshelf]
     size = DeviceSize.Medium
     color = Blue
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 4 },
+    }
 }
 
 export class Orchard extends Machine {
@@ -194,6 +230,10 @@ export class Orchard extends Machine {
    prereqs = [AlgaeVat]
    color = Green
     forDome = true
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 2, demand: 0 },
+    }
 }
 
 export class Cabin extends Machine {
@@ -205,6 +245,12 @@ export class Cabin extends Machine {
    size = DeviceSize.Medium
    color = Orange
     forDome = true
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+        Water: { supply: 0, demand: 1 },
+        Shelter: { supply: 4, demand: 1 },
+    }
 }
 
 export class Arbor extends Machine {

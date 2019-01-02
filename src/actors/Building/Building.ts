@@ -52,7 +52,7 @@ export class Building extends Actor {
 
         this.on('pointerenter', () => {
             this.hover = true
-            console.log("HOVER ON", { building: this })
+            // console.log("HOVER ON", { building: this })
         })
 
         // this.on('pointerdown', () => {
@@ -278,7 +278,7 @@ export class Building extends Actor {
         if (slotList.length > 0) {
             return closest(pos, slotList, (slot) => slot.pos)
         } else {
-            console.warn('no conecting structures found')
+            // console.warn('no conecting structures found')
         }
     }
 

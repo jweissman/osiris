@@ -1,31 +1,26 @@
 import { Label, UIActor, Color } from "excalibur";
 import { Structure, Corridor, SurfaceRoad, Ladder, SmallRoomThree, SmallRoomTwo, MediumRoom, MidDome, SmallDome, LargeRoom, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
-import { ResourceBlock, emptyMarket } from "../../models/Economy";
+import { ResourceBlock, emptyMarket, sumMarkets, PureValue } from "../../models/Economy";
 import { ResourcesList } from "./ResourcesList";
 import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Cabin, Orchard, SolarCell, Megafabricator, Arbor, Fabricator, MiningDrill, Preserve, Workstation, Houseplant, allMachines } from "../../models/Machine";
 import { flatSingle } from "../../Util";
 import { Colony } from "../Planet/Colony";
 import { StatusAnalysisView } from "./StatusAnalysisView";
+import { Device } from "../Device";
+import { Planet } from "../Planet/Planet";
 
 export class Hud extends UIActor {
     private restrictConstruction: boolean = false
-
-
-    // private resources: ResourcesList
     private status: StatusAnalysisView
-
     private _structurePaletteElement: HTMLDivElement
     private _machinePaletteElement: HTMLDivElement
 
     static structuresForPalette = [
-        // infra
         SurfaceRoad,
         Corridor,
         Ladder,
-
         ...allStructures
-
     ];
 
     comprehendedStructures: (typeof Structure)[] = []
@@ -38,35 +33,27 @@ export class Hud extends UIActor {
 
     constructor(private game: Game, protected onBuildingSelect = null, protected onMachineSelect = null) {
         super(0, 0, game.canvasWidth, game.canvasHeight);
-
-
         this._makeStructurePalette(onBuildingSelect)
         this._makeMachinePalette(onMachineSelect)
-
-        // this.resources = new ResourcesList(50, 40)
-        // this.add(this.resources)
-
-        this.status = new StatusAnalysisView(emptyMarket);
+        this.status = new StatusAnalysisView(emptyMarket());
         this.add(this.status)
-
     }
 
     setMessage(text: string) { this.status.setMessage(text) }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta)
-
         if (this._structurePaletteElement) {
             let left = ctx.canvas.offsetLeft;
             let top = ctx.canvas.offsetTop;
             this._structurePaletteElement.style.left = `${left + 20}px`;
-            this._structurePaletteElement.style.top = `${top + 100}px`;
+            this._structurePaletteElement.style.top = `${top + 35}px`;
         }
         if (this._machinePaletteElement) {
             let left = ctx.canvas.offsetLeft;
             let top = ctx.canvas.offsetTop;
             this._machinePaletteElement.style.left = `${left + 20}px`;
-            this._machinePaletteElement.style.top = `${top + 380}px`;
+            this._machinePaletteElement.style.top = `${top + 350}px`;
         }
     }
 
@@ -74,14 +61,20 @@ export class Hud extends UIActor {
         this.status.incrementResource(resource)
     }
 
-    updateDetails(colony: Colony) {
-        this.updatePalettes(colony)
-        this.updateEconomy(colony) // update markets...
+    updateDetails(planet: Planet, rebuildPalettes: boolean = true) {
+        if (rebuildPalettes) {
+            this.updatePalettes(planet.colony)
+        }
+        this.updateEconomy(planet)
+        this.updateMaxPop(planet.economy[PureValue.Shelter].demand, planet.maxPop)
     }
 
-    private updateEconomy(colony: Colony) {
-        // ... sum economies from all machines!
+    private updateMaxPop(curr, cap) {
+        this.status.showPopCap(curr, cap)
+    }
 
+    private updateEconomy(planet: Planet) {
+        this.status.showEconomy(planet.economy)
     }
 
     private updatePalettes(colony: Colony) {
@@ -94,7 +87,6 @@ export class Hud extends UIActor {
         if (this.restrictConstruction) {
             this.builtStructures =
                 Hud.structuresForPalette.filter((structure) => colony.buildings.some(b => b.structure instanceof structure))
-
             this.comprehendedStructures = this.comprehendedStructures.filter((structure: typeof Structure) => {
                 let s = new structure()
                 let prereqs: (typeof Structure)[] = s.prereqs
@@ -104,9 +96,6 @@ export class Hud extends UIActor {
                 })
             })
         }
-
-        // console.log("Built", { built: this.builtStructures, comprehended: this.comprehendedStructures })
-
         this._structurePaletteElement.parentElement.removeChild(this._structurePaletteElement)
         this._makeStructurePalette(this.onBuildingSelect)
     }
@@ -115,7 +104,6 @@ export class Hud extends UIActor {
         let bldgs = colony.buildings
         let availableMachines = flatSingle(bldgs.map(b => b.structure.machines))
         let devices = colony.findAllDevices()
-
         this.builtMachines = Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine))
         this.comprehendedMachines = Hud.machinesForPalette.filter((machine: typeof Machine) => {
             let canBuild = availableMachines.includes(machine);
@@ -134,7 +122,6 @@ export class Hud extends UIActor {
         this._structurePaletteElement.style.position = 'absolute'
         this._structurePaletteElement.style.border = '1px solid white'
         document.body.appendChild(this._structurePaletteElement)
-
         this.comprehendedStructures
         .map(structure => new structure())
         .forEach((structure: Structure) => {
@@ -143,24 +130,24 @@ export class Hud extends UIActor {
                 label += ' *';
             }
             let clr = structure.dominantColor
-            let _paletteButton = this.buttonFactory(label, clr); //structure);
+            let _paletteButton = this.buttonFactory(label, clr);
             this._structurePaletteElement.appendChild(
                 _paletteButton
             )
             if (fn) {
-                _paletteButton.onclick = () => { fn(structure) }
+                _paletteButton.onclick = () => {
+                    fn(structure) 
+                }
             }
         });
     }
 
     protected _makeMachinePalette(fn: (Machine) => any) {
         this._machinePaletteElement = document.createElement('div')
-        // this._machinePaletteElement.id =
         this._machinePaletteElement.style.position = 'absolute'
         this._machinePaletteElement.style.border = '1px solid white'
         document.body.appendChild(this._machinePaletteElement)
 
-        // Hud.machinesForPalette
         this.comprehendedMachines
             .map(Machine => new Machine())
             .sort((a,b) => a.color > b.color ? -1 : 1)
@@ -176,25 +163,23 @@ export class Hud extends UIActor {
                     btn.onclick = () => { fn(machine) }
                 }
             })
-        // this.machin
-
     }
 
-    private buttonFactory(label: string, color: Color) { //s: Structure) {
+    private buttonFactory(label: string, color: Color) {
         let bg = color.darken(0.6).desaturate(0.5).clone()
         bg.a = 0.8
         let fg = color.lighten(0.8).desaturate(0.4).clone()
         let paletteButton = document.createElement('button');
 
-        paletteButton.textContent = label; // `${s.name}`;
+        paletteButton.textContent = label;
 
         paletteButton.style.display = 'block';
         paletteButton.style.fontSize = '9pt';
 
         paletteButton.style.fontFamily = 'Helvetica';
         paletteButton.style.fontWeight = '600';
-        paletteButton.style.padding = '3px';
-        paletteButton.style.width = '180px';
+        paletteButton.style.padding = '1px';
+        paletteButton.style.width = '160px';
         paletteButton.style.textTransform = 'uppercase'
         paletteButton.style.border = '1px solid rgba(255,255,255,0.08)'
 

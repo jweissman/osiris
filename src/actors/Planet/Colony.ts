@@ -9,7 +9,6 @@ export class Colony extends Actor {
     navTree: NavigationTree;
     buildings: Building[] = [];
     currentlyConstructing: Building | Device = null;
-    maxPop: number = 8
 
     constructor(x: number, y: number) {
         super(x, y, 0, 0); // 1000, 1000);
@@ -40,6 +39,7 @@ export class Colony extends Actor {
         }
 
     }
+
 
     placeBuilding(building: Building) {
         building.built = true;

@@ -5,10 +5,11 @@ import { range } from '../../Util';
 import { Mountains } from './PlanetBackground';
 import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
-import { ResourceBlock } from '../../models/Economy';
+import { ResourceBlock, Economy, sumMarkets, emptyMarket, availableCapacity, PureValue } from '../../models/Economy';
 import { Colony } from './Colony';
 import { Population } from './Population';
 import { Machine, CloningVat } from '../../models/Machine';
+import { Device } from '../Device';
 
 
 export class Planet extends Actor {
@@ -62,6 +63,16 @@ export class Planet extends Actor {
         }
     }
 
+    get economy(): Economy {
+        let devices = this.colony.findAllDevices()
+        let economies = devices.map((d: Device) => d.machine.economy)
+        let theEconomy = economies.reduce(sumMarkets, emptyMarket())
+
+        let shelterDemand = this.population.citizens.length
+        theEconomy['Shelter'].demand = shelterDemand
+        return theEconomy
+    }
+
     update(engine, delta) {
         super.update(engine, delta)
 
@@ -83,11 +94,20 @@ export class Planet extends Actor {
 
     populate(pos: Vector) {
         // we could have a colony pop limit for now?
-        if (this.population.citizens.length < this.colony.maxPop) {
+        if (this.population.citizens.length < this.maxPop) {
             // let home = this.closestBuildingByType(pos, [CloneMatrix])
             let home = this.closestDevice(pos, [CloningVat])
             this.population.increase(home)
         }
+    }
+
+    get maxPop() {
+        let econ = this.economy
+        let values = [ PureValue.Shelter, PureValue.Water, PureValue.Oxygen ]
+        return Math.min(
+            ...values.map(val => availableCapacity(econ, val))
+        )
+            // availableCapacity(econ, PureValue.Shelter)
     }
 
     closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = ()=>true): Building {

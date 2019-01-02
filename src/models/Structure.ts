@@ -246,11 +246,19 @@ export class SmallDome extends Dome {
     machines = smallDome
 }
 
+export class SmallDomeThree extends Dome {
+    name = 'Sm. Dome (3)'
+    view = 'SmallDomeThreeView'
+    width = 4 * major.eighth
+    height = 3 * major.eighth
+    machines = smallDome
+}
+
 export class MidDome extends Dome {
     name = 'Mid Dome'
     view = 'MidDomeView'
-    width = 4 * major.eighth
-    height = 3 * major.eighth
+    width = 6 * major.eighth
+    height = 5 * major.eighth
     prereqs = [ SmallDome, MediumRoom ]
     //machines = [
     //    Cabin,
@@ -304,6 +312,7 @@ export class MissionControl extends Structure {
 export const allStructures =
     [
         SmallDome,
+        SmallDomeThree,
         MidDome,
         LargeDome,
         Arcology,
