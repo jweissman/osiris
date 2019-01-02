@@ -34,12 +34,12 @@ export class StatusAnalysisView extends Actor {
         this.economy = new EconomyView(market, 200, ty)
         this.add(this.economy)
 
-        this.popLabel = new Label("", 800, ty, 'Helvetica')
+        this.popLabel = new Label("", 900, ty, 'Helvetica')
         this.popLabel.fontSize = 10
         this.popLabel.color = Color.White
         this.add(this.popLabel)
 
-        this.messageLabel = new Label('hi', 1080, ty, 'Helvetica')
+        this.messageLabel = new Label('hi', 1000, ty, 'Helvetica')
         this.messageLabel.fontSize = 10
         this.messageLabel.color = Color.White
         this.add(this.messageLabel)

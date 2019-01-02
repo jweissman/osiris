@@ -12,7 +12,8 @@ export class EconomyView extends Actor {
         Joy: null,
         Wisdom: null,
         Wealth: null,
-        Beauty: null
+        Beauty: null,
+        Wonder: null
     }
 
     constructor(market: Economy, x: number, y: number) {

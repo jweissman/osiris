@@ -10,7 +10,8 @@ export enum PureValue {
     Joy = 'Joy',
     Wisdom = 'Wisdom',
     Wealth = 'Wealth',
-    Beauty = 'Beauty'
+    Beauty = 'Beauty',
+    Wonder = 'Wonder'
 }
 
 export type Economy = { [key in PureValue]: {
@@ -28,7 +29,8 @@ export function emptyMarket() : Economy {
         Joy: { supply: 0, demand: 0 },
         Wealth: { supply: 0, demand: 0 },
         Wisdom: { supply: 0, demand: 0 },
-        Beauty: { supply: 0, demand: 0 }
+        Beauty: { supply: 0, demand: 0 },
+        Wonder: { supply: 0, demand: 0 },
     }
 }
 
@@ -36,17 +38,18 @@ export function availableCapacity(market: Economy, value: PureValue) {
     return market[value].supply - market[value].demand
 }
 
-// utility to help add markets together?
 export const sumMarkets: (ea: Economy, eb: Economy) => Economy = (ea, eb) => {
-    // debugger
     let newMarket = emptyMarket();
     for (let value in PureValue) {
+        let { supply: sa, demand: da } = ea[value]
+        let { supply: sb, demand: db } = eb[value]
+        let supply = sa + sb
+        let demand = da + db
         newMarket[value] = {
-            supply: ea[value].supply + eb[value].supply,
-            demand: ea[value].demand + eb[value].demand
+            supply, //: ea[value].supply + eb[value].supply,
+            demand, //: ea[value].demand + eb[value].demand
         }
     }
-    // console.log("add markets", { ea, eb, newMarket })
     return newMarket
 }
 

@@ -76,7 +76,7 @@ export class CommandCenter extends Machine {
         ...emptyMarket(),
         Power: { supply: 1, demand: 0 },
         Oxygen: { supply: 1, demand: 0 },
-        Shelter: { supply: 1, demand: 0 },
+        // Shelter: { supply: 1, demand: 0 },
         Hope: { supply: 1, demand: 0 }
     }
 }
@@ -268,6 +268,10 @@ export class AlgaeVat extends Machine {
     prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
     size = DeviceSize.Medium
     color = Violet
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 2 },
+    }
 }
 
 export class Botany extends Machine {
@@ -287,6 +291,10 @@ export class CloningVat extends Machine {
     prereqs = [AlgaeVat]
     size = DeviceSize.Medium
     color = Violet
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 2 },
+    }
 }
 
     
@@ -296,6 +304,10 @@ export class Fabricator extends Machine {
     produces = ResourceBlock.Mineral
     size = DeviceSize.Medium
     color = Red
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 3 },
+    }
     // ...
 }
 
@@ -312,6 +324,10 @@ export class MiningDrill extends Machine {
     size = DeviceSize.Large
     prereqs = [ Fabricator ]
     produces = ResourceBlock.Ore
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 5 },
+    }
 //
 }    
 
@@ -320,6 +336,10 @@ export class Megafabricator extends Machine {
     size = DeviceSize.Large
     prereqs = [ Fabricator ]
     color = Red
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 8 },
+    }
 }
 
 export class Preserve extends Machine {
@@ -328,6 +348,10 @@ export class Preserve extends Machine {
     prereqs = [ Arbor ]
     color = Green
     forDome = true
+    economy = {
+        ...emptyMarket(),
+        Water: { supply: 0, demand: 4 },
+    }
 }
 
 /// huge devices
@@ -338,6 +362,15 @@ export class Microcity extends Machine {
     prereqs = [ Megafabricator ]
     color = Orange
     forDome = true
+    economy = {
+        ...emptyMarket(),
+        Water: { supply: 0, demand: 2 },
+        Power: { supply: 0, demand: 2 },
+        Joy: { supply: 5, demand: 0 },
+        Hope: { supply: 5, demand: 0 },
+        Beauty: { supply: 1, demand: 0 },
+        Wonder: { supply: 1, demand: 0 },
+    }
 }
 
 export class LogicCrystal extends Machine {
