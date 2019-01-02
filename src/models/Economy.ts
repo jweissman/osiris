@@ -3,9 +3,14 @@ import { Color } from "excalibur";
 // an abstract/intangible thing (or at least something we don't represent)
 export enum PureValue {
     Power = 'Power',
-    Hope = 'Hope',
-    Shelter = 'Shelter',
     Oxygen = 'Oxygen',
+    Water = 'Water',
+    Shelter = 'Shelter',
+    Hope = 'Hope',
+    Joy = 'Joy',
+    Wisdom = 'Wisdom',
+    Wealth = 'Wealth',
+    Beauty = 'Beauty'
 }
 
 export type Economy = { [key in PureValue]: {
@@ -14,22 +19,15 @@ export type Economy = { [key in PureValue]: {
 } }
 
 export const emptyMarket : Economy = {
-    Power: {
-        supply: 0,
-        demand: 0
-    },
-    Hope: {
-        supply: 0,
-        demand: 0
-    },
-    Shelter: {
-        supply: 0,
-        demand: 0
-    },
-    Oxygen: {
-        supply: 0,
-        demand: 0
-    },
+    Power: { supply: 0, demand: 0 },
+    Oxygen: { supply: 0, demand: 0 },
+    Water: { supply: 0, demand: 0 },
+    Shelter: { supply: 0, demand: 0 },
+    Hope: { supply: 0, demand: 0 },
+    Joy: { supply: 0, demand: 0 },
+    Wealth: { supply: 0, demand: 0 },
+    Wisdom: { supply: 0, demand: 0 },
+    Beauty: { supply: 0, demand: 0 }
 }
 
 export enum ResourceBlock {

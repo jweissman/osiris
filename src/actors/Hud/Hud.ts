@@ -6,13 +6,14 @@ import { ResourcesList } from "./ResourcesList";
 import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Cabin, Orchard, SolarCell, Megafabricator, Arbor, Fabricator, MiningDrill, Preserve, Workstation, Houseplant, allMachines } from "../../models/Machine";
 import { flatSingle } from "../../Util";
 import { Colony } from "../Planet/Colony";
+import { StatusAnalysisView } from "./StatusAnalysisView";
 
 export class Hud extends UIActor {
     private restrictConstruction: boolean = false
-    private messageLabel: Label
 
 
-    private resources: ResourcesList
+    // private resources: ResourcesList
+    private status: StatusAnalysisView
 
     private _structurePaletteElement: HTMLDivElement
     private _machinePaletteElement: HTMLDivElement
@@ -38,22 +39,19 @@ export class Hud extends UIActor {
     constructor(private game: Game, protected onBuildingSelect = null, protected onMachineSelect = null) {
         super(0, 0, game.canvasWidth, game.canvasHeight);
 
-        this.messageLabel = new Label('hi', 20, game.canvasHeight - 64, 'Verdana')
-        this.messageLabel.fontSize = 24
-        this.messageLabel.color = Color.White
-        this.add(this.messageLabel)
 
         this._makeStructurePalette(onBuildingSelect)
         this._makeMachinePalette(onMachineSelect)
 
-        this.resources = new ResourcesList(50, 40)
-        this.add(this.resources)
+        // this.resources = new ResourcesList(50, 40)
+        // this.add(this.resources)
 
-        // this.add(this.status)
+        this.status = new StatusAnalysisView(emptyMarket, 0, 0,);
+        this.add(this.status)
 
     }
 
-    setMessage(text: string) { this.messageLabel.text = text }
+    setMessage(text: string) { this.status.setMessage(text) }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta)
@@ -73,7 +71,7 @@ export class Hud extends UIActor {
     }
 
     resourceGathered(resource: ResourceBlock) {
-        this.resources.increment(resource)
+        this.status.resources.increment(resource)
 
     }
 

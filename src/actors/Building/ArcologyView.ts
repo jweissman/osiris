@@ -26,7 +26,7 @@ export class ArcologyView extends DomeView {
 
     }
 
-    drawShape(ctx, xoff, yoff) {
+    private drawShape(ctx, xoff, yoff) {
         let h = this.getHeight()
         let w = this.getWidth()
         ctx.beginPath();
