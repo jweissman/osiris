@@ -202,6 +202,7 @@ export class Construct extends Scene {
     }
 
     startConstructing(structureOrMachine: Structure | Machine, pos: Vector = new Vector(0, 0)) {
+        this.hud.showCard(structureOrMachine)
         
         // console.log("START CONSTRUCTING", { structureOrMachine })
         let theNextOne = null

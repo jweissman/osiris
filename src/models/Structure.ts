@@ -32,7 +32,7 @@ export class Structure {
     width: number = 10
     height: number = 10
     zoom: number = 1
-    dominantColor: Color = Color.Gray
+    color: Color = Color.Gray
 
     consumes: ResourceBlock = null
     produces: ResourceBlock = null
@@ -249,8 +249,8 @@ export class SmallDome extends Dome {
 export class SmallDomeThree extends Dome {
     name = 'Sm. Dome (3)'
     view = 'SmallDomeThreeView'
-    width = 4 * major.eighth
-    height = 3 * major.eighth
+    width = 4 * major.seventh
+    height = 3 * major.seventh
     machines = smallDome
 }
 

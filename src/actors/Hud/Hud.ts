@@ -1,4 +1,4 @@
-import { Label, UIActor, Color } from "excalibur";
+import { UIActor, Color } from "excalibur";
 import { Structure, Corridor, SurfaceRoad, Ladder, SmallRoomThree, SmallRoomTwo, MediumRoom, MidDome, SmallDome, LargeRoom, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket, sumMarkets, PureValue } from "../../models/Economy";
@@ -9,6 +9,7 @@ import { Colony } from "../Planet/Colony";
 import { StatusAnalysisView } from "./StatusAnalysisView";
 import { Device } from "../Device";
 import { Planet } from "../Planet/Planet";
+import { Card } from "./Card";
 
 export class Hud extends UIActor {
     private restrictConstruction: boolean = false
@@ -31,12 +32,17 @@ export class Hud extends UIActor {
     comprehendedMachines: (typeof Machine)[] = []
     builtMachines: (typeof Machine)[] = []
 
+    card: Card = new Card(null, 20, 800)
+
     constructor(private game: Game, protected onBuildingSelect = null, protected onMachineSelect = null) {
         super(0, 0, game.canvasWidth, game.canvasHeight);
         this._makeStructurePalette(onBuildingSelect)
         this._makeMachinePalette(onMachineSelect)
         this.status = new StatusAnalysisView(emptyMarket());
         this.add(this.status)
+
+        this.card.visible = false
+        this.add(this.card)
     }
 
     setMessage(text: string) { this.status.setMessage(text) }
@@ -55,6 +61,7 @@ export class Hud extends UIActor {
             this._machinePaletteElement.style.left = `${left + 20}px`;
             this._machinePaletteElement.style.top = `${top + 350}px`;
         }
+
     }
 
     resourceGathered(resource: ResourceBlock) {
@@ -68,6 +75,12 @@ export class Hud extends UIActor {
         this.updateEconomy(planet)
         this.updateMaxPop(planet.economy[PureValue.Shelter].demand, planet.maxPop)
     }
+
+    showCard(entity: Machine | Structure) {
+        this.card.present(entity)
+        this.card.visible = true
+    }
+
 
     private updateMaxPop(curr, cap) {
         this.status.showPopCap(curr, cap)
@@ -129,13 +142,16 @@ export class Hud extends UIActor {
             if (!this.builtStructures.map(s => new s().name).includes(structure.name)) {
                 label += ' *';
             }
-            let clr = structure.dominantColor
-            let _paletteButton = this.buttonFactory(label, clr);
+            let clr = structure.color
+            let btn = this.buttonFactory(label, clr);
             this._structurePaletteElement.appendChild(
-                _paletteButton
+                btn
             )
+
+            btn.onmouseenter = () => { this.showCard(structure) }
+            // btn.onmouseleave = () => { this.hideCard() }
             if (fn) {
-                _paletteButton.onclick = () => {
+                btn.onclick = () => {
                     fn(structure) 
                 }
             }
@@ -159,6 +175,8 @@ export class Hud extends UIActor {
                 let clr = machine.color
                 let btn = this.buttonFactory(label, clr)
                 this._machinePaletteElement.appendChild(btn)
+                btn.onmouseenter = () => { this.showCard(machine) }
+                // btn.onmouseleave = () => { this.hideCard() }
                 if (fn) {
                     btn.onclick = () => { fn(machine) }
                 }

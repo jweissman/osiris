@@ -6,25 +6,26 @@ import { DeviceSize } from "../../values/DeviceSize";
 import { drawRect } from "../../Util";
 
 export class CommonAreaView extends Building {
-    floorHeight: number = 10
+    floorHeight: number = 12
     edgeWidth: number = 0.5 //.1
     showLabel = true
     hideBox = true
-    // maybe you can set height AND width of common area view??
-    // maybe just width...
+
     colorBase() { return this.color.darken(0.3); }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
 
+        let wallColor = this.processedColor() //.darken(0.4)
+        let floorColor = this.processedColor().darken(0.4)
 
-        drawRect(ctx, this.aabb(), 0.125, this.processedColor())
+        drawRect(ctx, this.aabb(), 0.5, wallColor)
 
         drawRect(
             ctx,
             { x: this.x, y: this.y + this.getHeight() - this.floorHeight,
               width: this.getWidth(), height: this.floorHeight },
-              0,
-              this.colorBase().lighten(0.7)
+              0.2,
+              floorColor
         )
 
         super.draw(ctx, delta)

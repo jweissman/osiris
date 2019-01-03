@@ -13,6 +13,8 @@ const fire = require('../images/cooking-fire-plain.svg')
 const bed = require('../images/bed-plain.svg')
 const fridge = require('../images/fridge-plain.svg')
 const server = require('../images/research-server-plain.svg')
+const plant = require('../images/houseplant-plain.svg')
+const workstation = require('../images/workstation-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -24,7 +26,10 @@ const images = {
     bed,
     fridge,
     server,
+    plant,
+    workstation,
 }
+
 
 const { Red, Green, Blue, Orange, Violet, Yellow } = Color;
 
@@ -112,6 +117,7 @@ export class SolarCell extends Machine {
 
 export class WaterCondensingMachine extends Machine {
     name = 'H20 Condenser'
+    description = 'have a drink'
     prereqs = [ SolarCell ]
 
     forDome = true
@@ -130,6 +136,7 @@ export class StudyMachine extends Machine {
 
 export class Desk extends StudyMachine {
     name = 'Desk'
+    description = 'get to work'
     image = images.bench
     prereqs = [ OxygenExtractor ]
 
@@ -138,8 +145,10 @@ export class Desk extends StudyMachine {
 
 export class Workstation extends StudyMachine {
     name = 'Workstation'
+    description = 'hackety hack'
     prereqs = [ Bookshelf ]
     color = Blue
+    image = images.workstation
 }
 
 
@@ -184,6 +193,7 @@ export class Stove extends Machine {
 
 export class Bed extends Machine {
     name = 'Bed'
+    description = 'sweet dreams'
     image = images.bed
     prereqs = [ OxygenExtractor ]
     color = Orange
@@ -192,12 +202,15 @@ export class Bed extends Machine {
         Shelter: { supply: 2, demand: 0 },
     }
 }
+
 export class Houseplant extends Machine {
     name = 'House Plant'
+    description = 'so nice'
     prereqs = [ Bed ]
     produces = ResourceBlock.Food
     capacity = 1
     color = Green
+    image = images.plant
     economy = {
         ...emptyMarket(),
         Oxygen: { supply: 0, demand: 1 },
@@ -238,6 +251,7 @@ export class Orchard extends Machine {
 
 export class Cabin extends Machine {
    name = 'Cabin'
+   description = 'home on the plains'
    consumes = ResourceBlock.Food
    produces = ResourceBlock.Meal
    image = images.cabin
@@ -255,6 +269,7 @@ export class Cabin extends Machine {
 
 export class Arbor extends Machine {
     name = 'Arbor'
+    description = 'arbor around the clock'
     produces = ResourceBlock.Food
     prereqs = [Orchard]
     size = DeviceSize.Medium
@@ -264,6 +279,7 @@ export class Arbor extends Machine {
 
 export class AlgaeVat extends Machine {
     name = 'Algae Vat'
+    description = 'where there is a will'
     produces = ResourceBlock.Food
     prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
     size = DeviceSize.Medium
@@ -276,6 +292,7 @@ export class AlgaeVat extends Machine {
 
 export class Botany extends Machine {
     name = 'Botany'
+    description = 'plant lab'
     produces = ResourceBlock.Food
     prereqs = [ OxygenExtractor, Bookshelf ]
     size = DeviceSize.Medium
@@ -284,7 +301,7 @@ export class Botany extends Machine {
 
 export class CloningVat extends Machine {
     name = 'Cloning Vat'
-    description = 'grow some replacements'
+    description = 'we all grow'
     behavior = MachineOperation.SpawnCitizen 
     productionTime = 1500
     image = images.vat
@@ -300,6 +317,7 @@ export class CloningVat extends Machine {
     
 export class Fabricator extends Machine {
     name = 'Fabricator'
+    description = 'you made that'
     consumes = ResourceBlock.Ore
     produces = ResourceBlock.Mineral
     size = DeviceSize.Medium
@@ -321,6 +339,7 @@ export class Fabricator extends Machine {
 
 export class MiningDrill extends Machine {
     name = 'Mining Drill'
+    description = 'ore away'
     size = DeviceSize.Large
     prereqs = [ Fabricator ]
     produces = ResourceBlock.Ore

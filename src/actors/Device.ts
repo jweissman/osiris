@@ -14,7 +14,7 @@ export class Device extends Actor {
     nameLabel: Label
 
     image: any
-    imageLoaded: boolean = false
+    // imageLoaded: boolean = false
 
     building: Building // set once built?
 
@@ -39,9 +39,9 @@ export class Device extends Actor {
         this.nameLabel.color = Color.White
 
         this.image = new Image();
-        this.image.onload = function () {
-             this.imageLoaded = true
-        }
+        // this.image.onload = function () {
+            //  this.imageLoaded = true
+        // }
         this.image.src = machine.image
     }
 

@@ -33,7 +33,8 @@ export class Citizen extends Actor {
         // check wip
         if (this.workInProgress) {
             let now = (new Date()).getTime()
-            this.progress = (now - this.workStarted) / this.workDuration //0.5
+            this.progress = (now - this.workStarted) / this.workDuration
+            this.vel.x += ((Math.random())-0.5) * 0.1
         }
     }
 
@@ -48,17 +49,12 @@ export class Citizen extends Actor {
             ctx.lineWidth = 1
             let pw = 10, ph = 3
             let px = this.x - pw/2, py = this.y - 10;
-            // draw progress bar?
             ctx.strokeStyle = Color.White.toRGBA()
-            // ctx.stroke(20)
             ctx.strokeRect(px, py, pw, ph)
-
             ctx.fillStyle = Color.Violet.darken(0.9).toRGBA()
             ctx.fillRect(px, py, pw, ph)
             ctx.fillStyle = Color.Violet.toRGBA()
             ctx.fillRect(px, py, this.progress * pw, ph)
-
-            this.vel.x += (Math.random())-0.5 // * 10.0)
         }
 
         let debugPath = false

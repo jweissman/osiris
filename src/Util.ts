@@ -93,7 +93,8 @@ export function drawRect(
 
   if (edgeWidth > 0) {
     let edge = Color.White;
-    ctx.strokeStyle = `${edgeWidth}px solid ${edge.toRGBA()}`;
+    ctx.strokeStyle = edge.toRGBA();
+    ctx.lineWidth=edgeWidth
     // ctx.strokeStyle = Stroke.So
     ctx.strokeRect(
       x, y, width, height
