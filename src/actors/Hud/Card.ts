@@ -10,7 +10,7 @@ export class Card extends Actor {
     image: any
 
     constructor(private entity: Machine | Structure, x: number, y: number) {
-        super(x + 160, y, 320, 180, Color.White);
+        super(x + 160, y + 90, 320, 180, Color.White);
         let x0 = -150, y0 = -50;
         this.title = new CardTitle(entity, x0 - 3, y0); //x, y)
         this.add(this.title);
