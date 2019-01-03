@@ -43,6 +43,23 @@ export enum MachineOperation {
     CollectData
 }
 
+class Recipe {
+    behavior: MachineOperation = MachineOperation.Work
+
+    generates: ResourceBlock = null
+    stores: ResourceBlock = null
+
+    consumes: ResourceBlock[] = null
+    produces: ResourceBlock[] = null
+
+    // need to stop using this both for work time and 'generation' time
+    // productionTime: number = 500
+    generationTime: number = 3000
+    workTime: number = 10000
+
+    capacity: number = 2
+}
+
 export class Machine {
     name: string = '(machine name)'
     description: string = '(machine description)'
@@ -71,7 +88,7 @@ export class Machine {
 }
 
 export class CommandCenter extends Machine {
-    name = 'Command'
+    name = 'Command Console'
     description = 'gather resources...'
     behavior = MachineOperation.CollectResource
     image = images.bench
@@ -149,6 +166,10 @@ export class Workstation extends StudyMachine {
     prereqs = [ Bookshelf ]
     color = Blue
     image = images.workstation
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+    }
 }
 
 

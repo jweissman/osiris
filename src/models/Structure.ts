@@ -34,9 +34,9 @@ export class Structure {
     zoom: number = 1
     color: Color = Color.Gray
 
-    consumes: ResourceBlock = null
-    produces: ResourceBlock = null
-    productionTime: number = 500
+    // consumes: ResourceBlock = null
+    // produces: ResourceBlock = null
+    // productionTime: number = 500
 
     // constructor(public origin: Vector = new Vector(0, 0)) { }
 
