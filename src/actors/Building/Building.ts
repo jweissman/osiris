@@ -335,8 +335,10 @@ export class Building extends Actor {
     private updateName() {
         let fn = allSpaceFunctions.find(spaceFn => {
             let matched = true;
-            let unseenDevices = this.devices.slice() // clone?
-            spaceFn.machines.forEach(machine => {
+            let unseenDevices = this.devices.slice()
+
+            let sf = new spaceFn()
+            sf.machines.forEach(machine => {
                 let matchingDevice = unseenDevices.find(d => d.machine instanceof machine)
                 if (!matchingDevice) { matched = false; }
                 unseenDevices = deleteByValue(unseenDevices, matchingDevice)
@@ -344,7 +346,8 @@ export class Building extends Actor {
             return matched;
         })
         if (fn) {
-            this.nameLabel.text = fn.label
+            let sf = new fn()
+            this.nameLabel.text = sf.name //label
         }
     }
 }

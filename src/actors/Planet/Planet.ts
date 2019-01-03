@@ -108,9 +108,9 @@ export class Planet extends Actor {
         let theEconomyWithoutPeople = economies.reduce(sumMarkets, emptyMarket())
 
         let values = [ PureValue.Shelter, PureValue.Water, PureValue.Oxygen ]
-        return Math.min(
+        return Math.max(0, Math.min(
             ...values.map(val => availableCapacity(theEconomyWithoutPeople, val))
-        )
+        ))
     }
 
     closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = ()=>true): Building {

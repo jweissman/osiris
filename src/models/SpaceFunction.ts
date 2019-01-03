@@ -1,99 +1,104 @@
 import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine } from './Machine';
+import { Color } from 'excalibur';
 
 export class SpaceFunction {
-    static label: string = '(generic)';
-    static machines: (typeof Machine)[] = [];
+     name: string = '(generic)'
+     machines: (typeof Machine)[] = []
+     color: Color = Color.Gray
+
+     // can't image needing this, but for symmetry
+     prereqs: (typeof SpaceFunction)[] =  [] 
 }
 
 class LivingQuarters extends SpaceFunction {
-    static label = 'Living Quarters'
-    static machines = [ Bed ]
+     name = 'Living Quarters'
+     machines = [ Bed ]
 }
 
 class Barracks extends SpaceFunction {
-    static label = 'Barracks'
-    static machines = [ Bed, Bed, Bed ]
+     name = 'Barracks'
+     machines = [ Bed, Bed, Bed ]
 }
 
 class Kitchen extends SpaceFunction {
-    static label = 'Kitchen'
-    static machines = [ Stove, Fridge ]
+     name = 'Kitchen'
+     machines = [ Stove, Fridge ]
 }
 
 class LifeSupportPod extends SpaceFunction {
-    static label = 'Life Support Module'
-    static machines = [ OxygenExtractor, WaterCondensingMachine ]
+     name = 'Life Support Module'
+     machines = [ OxygenExtractor, WaterCondensingMachine ]
 }
 
 class Retreat extends SpaceFunction {
-    static label = 'Retreat'
-    static machines = [ Cabin, Cabin ]
+     name = 'Retreat'
+     machines = [ Cabin, Cabin ]
 }
 
 class CloneMatrix extends SpaceFunction {
-    static label = 'Clone Matrix'
-    static machines = [ CloningVat, CloningVat ] //
+     name = 'Clone Matrix'
+     machines = [ CloningVat, CloningVat ] //
 }
 
 class ReadingRoom extends SpaceFunction {
-    static label = 'Reading Room'
-    static machines = [ Bookshelf, Bookshelf ]
+     name = 'Reading Room'
+     machines = [ Bookshelf, Bookshelf ]
 }
 
 class Library extends SpaceFunction {
-    static label = 'Library'
-    static machines = [ Bookshelf, Bookshelf, Bookshelf ]
+     name = 'Library'
+     machines = [ Bookshelf, Bookshelf, Bookshelf ]
 }
 
 class Study extends SpaceFunction {
-    static label = 'Study'
-    static machines = [ StudyMachine, Bookshelf ]
+     name = 'Study'
+     machines = [ StudyMachine, Bookshelf ]
 }
 
 class Lab extends SpaceFunction {
-    static label = 'Lab'
-    static machines = [ Workstation, Workstation, Workstation ]
+     name = 'Lab'
+     machines = [ Workstation, Workstation, Workstation ]
 }
 
 class Archive extends SpaceFunction {
-    static label = 'Archive'
-    static machines = [ ResearchServer, ResearchServer ]
+     name = 'Archive'
+     machines = [ ResearchServer, ResearchServer ]
 }
 
 class Arboretum extends SpaceFunction {
-    static label = 'Arboretum'
-    static machines = [ Arbor, Arbor ]
+     name = 'Arboretum'
+     machines = [ Arbor, Arbor ]
 }
 
 class AlgaeFarm extends SpaceFunction {
-    static label = 'Algae Farm'
-    static machines = [ AlgaeVat, AlgaeVat ]
+     name = 'Algae Farm'
+     machines = [ AlgaeVat, AlgaeVat ]
 }
 
 class SolarArray extends SpaceFunction {
-    static label = 'Solar Array'
-    static machines = [ SolarCell, SolarCell ]
+     name = 'Solar Array'
+     machines = [ SolarCell, SolarCell ]
 }
 
 class Workshop extends SpaceFunction {
-    static label = 'Workshop'
-    static machines = [ Fabricator, Fabricator ]
+     name = 'Workshop'
+     machines = [ Fabricator, Fabricator ]
 }
 
 // 3 house plants => nursery?
 class Nursery extends SpaceFunction {
-    static label = 'Nursery'
-    static machines = [ Houseplant, Houseplant, Houseplant ]
+     name = 'Nursery'
+     machines = [ Houseplant, Houseplant, Houseplant ]
 }
 
 class Farm extends SpaceFunction {
-    static label = 'Farm'
-    static machines = [ Orchard, Orchard ]
+     name = 'Farm'
+     machines = [ Orchard, Orchard ]
 }
 
 class Factory extends SpaceFunction {
-    static label = 'Factory'
-    static machines = [ Megafabricator, Megafabricator ]
+     name = 'Factory'
+     machines = [ Megafabricator, Megafabricator ]
 }
 
 export const allSpaceFunctions = [

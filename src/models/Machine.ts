@@ -43,21 +43,25 @@ export enum MachineOperation {
     CollectData
 }
 
+// recipe is just a model for transforming things into other things
+// generation from nothing might want to be its own case
 class Recipe {
-    behavior: MachineOperation = MachineOperation.Work
+    // behavior: MachineOperation = MachineOperation.Work
 
-    generates: ResourceBlock = null
-    stores: ResourceBlock = null
+    // generates: ResourceBlock = null
+    // stores: ResourceBlock = null
 
     consumes: ResourceBlock[] = null
     produces: ResourceBlock[] = null
 
+    // spawnCitizen: boolean = false ???
+
     // need to stop using this both for work time and 'generation' time
     // productionTime: number = 500
-    generationTime: number = 3000
+    // generationTime: number = 3000
     workTime: number = 10000
 
-    capacity: number = 2
+    // capacity: number = 2
 }
 
 export class Machine {
@@ -343,6 +347,7 @@ export class Fabricator extends Machine {
     produces = ResourceBlock.Mineral
     size = DeviceSize.Medium
     color = Red
+    prereqs = [Workstation]
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 3 },
