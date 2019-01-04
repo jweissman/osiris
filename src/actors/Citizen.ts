@@ -61,7 +61,7 @@ export class Citizen extends Actor {
             ctx.fillRect(px, py, this.progress * pw, ph)
         }
 
-        let debugPath = true
+        let debugPath = false
         if (this.path && debugPath) {
             let c = Color.White.lighten(0.5)
             c.a = 0.5
@@ -129,8 +129,8 @@ export class Citizen extends Actor {
         let path = this.planet.pathBetween(this.pos.clone(), building)
         if (path.length > 0) {
             this.path = path
-            // path.pop()
-            // path.shift()
+            path.pop()
+            path.shift()
             await Promise.all(
                 path.map(step => this.glideTo(step))
             )
@@ -142,16 +142,7 @@ export class Citizen extends Actor {
     async waitToUse(device) {
         await sleep(250)
         device.interact(this)
-    //     // can't be great
-        setTimeout(() => device.interact(this), 250)
     }
-
-    async pause() {
-        await sleep(3000)
-    }
-
-    // currentRecipe: Recipe
-    // targetRecipe: Recipe
 
     // instead of sink-(source/source/source) it's just:
     // pick a recipe, gather and produce
@@ -159,19 +150,11 @@ export class Citizen extends Actor {
     private async workRecipe(recipe: Recipe) {
         console.log("WORK RECIPE", { recipe })
 
-        // await recipe.consumes.forEach(async ingredient => {
         for (let ingredient of recipe.consumes) {
             console.log("TRY TO GATHER", {ingredient})
             await this.gather(ingredient)
             console.log("OKAY, I should have gathered", { ingredient, recipe })
         }
-
-        // await Promise.all(
-            // recipe.consumes.map(ingredient => this.gather(ingredient))
-        // )
-        // we should have gathered everything?
-        // recipe.consumes.forEach(async ingredient => await this.gather(ingredient))
-
         let devices = this.planet.colony.findAllDevices()
         let maker = devices.find(d => d.operation === recipe)
         if (maker) {
@@ -192,10 +175,8 @@ export class Citizen extends Actor {
 
     private async gather(res: ResourceBlock) {
         console.log("GATHER", { res })
-        // let gathered = false
         let devices = this.planet.colony.findAllDevices()
         let gen: Device = devices.find((d: Device) =>
-            // (d.operation.type === 'store' || d.operation.type === 'generator') &&
             (d.operation.type === 'generator') &&
               d.product.some(stored => res === stored)
         )
@@ -208,15 +189,11 @@ export class Citizen extends Actor {
             console.log("attempt to interact with generator to gather", { gen, res })
             if (await gen.interact(this, retrieveResource(res))) {
                 console.log("gathered okay!")
-                // gathered = true
-                // // return true
             } else {
                 console.warn("trying to gather again in a bit?")
                 await sleep(1000)
                 await this.gather(res)
-                // setInterval(() => this.gather(res), 500)
-
-            } // { request: res })
+            }
         } else {
             // ... is there a machine that makes this as a recipe? :)
             let maker = devices.find(d => d.operation.type === 'recipe' &&
@@ -224,7 +201,6 @@ export class Citizen extends Actor {
 
             if (maker) {
                 await this.workRecipe(maker.operation)
-                // if (this)
             } else {
                 console.warn("Can't find producer of", { res })
                 await sleep(1000)
@@ -235,21 +211,15 @@ export class Citizen extends Actor {
 
     private working: boolean = false
     work() {
-        // console.log("WORK")
         if (!this.working) {
+            sleep(Math.random() * 3000)
             this.workOne()
         }
-        // really need a timer that says: when you're done, be done
-        // [ie that checks if we're working and only tries again if not?]
-        // ex probably has a timer mechanism!!
     }
 
     private async workOne() {
         if (this.working) { return }
         this.working = true
-
-        console.log("WORK ONE!!")
-
 
         let devices = this.planet.colony.findAllDevices()
         let store = shuffle(devices).find((d: Device) =>
@@ -260,8 +230,6 @@ export class Citizen extends Actor {
             let makers = devices.filter(d => d.operation.type === 'recipe')
             let recipes: Recipe[] = makers.map(m => m.operation)
 
-            // is there any just to gather to the store?
-            // but let's assume we have to make it
             // find the recipe and work it
             let recipe = shuffle(recipes).find((r: Recipe) =>
                 store.operation.stores.some(stored => r.produces === stored)
@@ -271,7 +239,6 @@ export class Citizen extends Actor {
                 console.log("TRY TO WORK RECIPE!!!", recipe)
                 await this.workRecipe(recipe)
                 // we should now be carrying the thing for the store! just deliver it?
-
                 console.log("DELIVER TO STORE...")
                 await this.pathTo(store.building)
                 console.log("INTERACT WITH STORE...!")
@@ -286,48 +253,5 @@ export class Citizen extends Actor {
         }
         await sleep(1000)
         this.working = false
-        // try to do something else
-        // setTimeout(() => this.work(), 1000)
     }
-
-
-        // pick a device with a recipe?
-        //let devices = this.planet.colony.findAllDevices()
-
-        //await this.workRecipe(makers[0].operation)
-        // or work backwards maybe from a store with capacity...!
-
-        //if (this.carrying.length > 0) {
-        //    let item: ResourceBlock = this.carrying[0];
-        //    let sink: Device = this.planet.closestDevice(this.pos,
-        //        [],
-        //        (device: Device) => device.isSinkFor(item)
-        //    )
-
-        //    if (sink) {
-        //        await this.pathTo(sink.building)
-        //        await this.glideTo(sink.pos)
-        //        await sink.interact(this)
-        //    } else {
-        //        console.log("nowhere to deliver it", this.carrying)
-        //    }
-        //} else {
-        //    let source: Device = this.planet.closestDevice(this.pos,
-        //        [],
-        //        // [ Cabin, Orchard, MiningDrill, Bookshelf ],
-        //        (d: Device) => d.machine.operation.type === 'generator' &&
-        //            d.product.length > 0
-        //    )
-
-        //    if (source) {
-        //        await this.pathTo(source.building)
-        //        await this.glideTo(source.pos)
-        //        await source.interact(this)
-        //    } else {
-        //        console.log("i guess i can try again? (sleep for a bit first)")
-        //        await new Promise((resolve, reject) => setTimeout(resolve, 150));
-        //    }
-        //}
-
-    // }
 }

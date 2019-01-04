@@ -3,13 +3,14 @@ import { Structure } from "../../models/Structure";
 import { Machine } from "../../models/Machine";
 import { CardTitle } from "./CardTitle";
 import { CardBody } from "./CardBody";
+import { SpaceFunction } from "../../models/SpaceFunction";
 
 export class Card extends Actor {
     title: CardTitle
     cardBody: CardBody
     image: any
 
-    constructor(private entity: Machine | Structure, x: number, y: number) {
+    constructor(private entity: Machine | Structure | SpaceFunction, x: number, y: number) {
         super(x + 160, y + 90, 320, 180, Color.White);
         let x0 = -150, y0 = -50;
         this.title = new CardTitle(entity, x0 - 3, y0); //x, y)
@@ -31,7 +32,7 @@ export class Card extends Actor {
         }
     }
 
-    present(entity: Machine | Structure): any {
+    present(entity: Machine | Structure | SpaceFunction): any {
         this.title.announce(entity)
         this.cardBody.show(entity)
 

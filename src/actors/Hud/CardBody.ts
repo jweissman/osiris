@@ -3,13 +3,14 @@ import { Structure } from "../../models/Structure";
 import { Machine } from "../../models/Machine";
 import { PureValue } from "../../models/Economy";
 import { SmallDomeThreeView } from "../Building/SmallDomeThreeView";
+import { SpaceFunction } from "../../models/SpaceFunction";
 
 export class CardBody extends Actor {
     description: Label
     values: Label
     notes: Label
 
-    constructor(private entity: Machine | Structure, x: number, y: number) {
+    constructor(private entity: Machine | Structure | SpaceFunction, x: number, y: number) {
         super(x, y, 0, 0)
         // resources / recipes
 
@@ -29,7 +30,7 @@ export class CardBody extends Actor {
         this.show(entity)
     }
 
-    show(entity: Machine | Structure) {
+    show(entity: Machine | Structure | SpaceFunction) {
         if (entity) {
             this.description.text = entity.description;
 

@@ -3,13 +3,14 @@ import { Color } from 'excalibur';
 
 export class SpaceFunction {
      name: string = '(generic)'
+     description: string = '(generic description)'
      machines: (typeof Machine)[] = []
      color: Color = Color.Gray
 
      prereqs: (typeof SpaceFunction)[] =  [] 
 }
 
-class LivingQuarters extends SpaceFunction {
+export class LivingQuarters extends SpaceFunction {
      name = 'Living Quarters'
      machines = [ Bed ]
 }
@@ -19,12 +20,12 @@ class Barracks extends SpaceFunction {
      machines = [ Bed, Bed, Bed ]
 }
 
-class Kitchen extends SpaceFunction {
+export class Kitchen extends SpaceFunction {
      name = 'Kitchen'
      machines = [ Stove, Fridge ]
 }
 
-class LifeSupportPod extends SpaceFunction {
+export class LifeSupportPod extends SpaceFunction {
      name = 'Life Support Module'
      machines = [ OxygenExtractor, WaterCondensingMachine ]
 }
@@ -34,7 +35,7 @@ class Retreat extends SpaceFunction {
      machines = [ Cabin, Cabin ]
 }
 
-class CloneMatrix extends SpaceFunction {
+export class CloneMatrix extends SpaceFunction {
      name = 'Clone Matrix'
      machines = [ CloningVat, CloningVat ]
 }

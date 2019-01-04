@@ -114,3 +114,5 @@ export function sleep(ms) {
 export function shuffle(arr) {
    return arr.sort(() => Math.random() > 0.5 ? 1 : -1) 
 }
+
+export const zip = (a, b) => a.map((e,i) => [e, b[i]])

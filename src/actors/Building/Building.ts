@@ -9,7 +9,7 @@ import { closest, measureDistance, drawRect, deleteByValue } from "../../Util";
 import { Graph } from "../../values/Graph";
 import { ResourceBlock } from "../../models/Economy";
 import { Device } from "../Device";
-import { allSpaceFunctions } from "../../models/SpaceFunction";
+import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 
 export class DevicePlace {
@@ -34,6 +34,8 @@ export class Building extends Actor {
     childrenBuildings: Building[] = []
 
     level: number = 1
+
+    spaceFunction: SpaceFunction
 
     private devices: Device[] = []
 
@@ -132,6 +134,7 @@ export class Building extends Actor {
             })
         }
     }
+
 
     step: number = 0
     update(engine: Game, delta: number) {
@@ -347,7 +350,10 @@ export class Building extends Actor {
         })
         if (fn) {
             let sf = new fn()
+            this.spaceFunction = sf
             this.nameLabel.text = sf.name //label
         }
     }
+
+    // get function() { }
 }

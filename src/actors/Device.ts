@@ -33,6 +33,8 @@ export class Device extends Actor {
     building: Building
     inUse: boolean = false
 
+    imageLoaded: boolean = false
+
     constructor(
         public machine: Machine,
         initialPos: Vector
@@ -50,16 +52,19 @@ export class Device extends Actor {
         this.nameLabel.color = Color.White
 
         this.image = new Image();
+        this.image.onload = () => { this.imageLoaded = true }
         this.image.src = machine.image
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
+        if (this.imageLoaded) {
         ctx.drawImage(
             this.image,
             this.pos.x - this.getWidth() / 2,
             this.pos.y - this.getHeight() / 2 - 10,
             this.getWidth(), this.getHeight()
         )
+        }
 
         let showLabel = true
         if (showLabel) {

@@ -2,7 +2,7 @@ import { Scene, Input, Vector } from "excalibur";
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, SmallDome, SmallRoomTwo, SmallDomeThree } from "../models/Structure";
+import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, SmallDome, SmallRoomTwo, SmallDomeThree, SmallRoomThree, MediumRoom } from "../models/Structure";
 import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, ArcologyView, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
@@ -15,6 +15,10 @@ import { LargeRoomView } from "../actors/Building/LargeRoomView";
 import { HugeRoomView } from "../actors/Building/HugeRoomView";
 import { BigDomeView } from "../actors/Building/BigDomeView";
 import { SmallDomeThreeView } from "../actors/Building/SmallDomeThreeView";
+import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod } from "../models/SpaceFunction";
+import { flatSingle, zip } from "../Util";
+import { DevicePlace } from "../actors/Building/Building";
+import { DeviceSize } from "../values/DeviceSize";
 
 
 export class Construct extends Scene {
@@ -27,6 +31,8 @@ export class Construct extends Scene {
     dragOrigin: Vector
 
     defaultMessage: string = 'Welcome to the Colony, Commander.'
+
+    placingFunction: SpaceFunction = null
 
     static structureViews: { [key: string]: typeof Building } = {
         CorridorView,
@@ -56,6 +62,24 @@ export class Construct extends Scene {
         MainTunnel,
         Corridor,
         SmallRoomTwo,
+    ]
+
+    //static requiredFunctionList: Array<typeof SpaceFunction> = [
+    //    LifeSupportPod,
+    //    LivingQuarters,
+    //    Kitchen,
+    //    CloneMatrix,
+    //]
+
+    static requiredStructuresAndFunctions: (typeof SpaceFunction | typeof Structure)[] = [
+        MissionControl,
+        SurfaceRoad,
+        LifeSupportPod,
+        MainTunnel,
+        Corridor,
+        Kitchen,
+        LivingQuarters,
+        CloneMatrix,
     ]
 
     update(engine, delta) {
@@ -121,6 +145,17 @@ export class Construct extends Scene {
                         let placementValid = !buildingUnderConstruction.overlapsAny()
                         if (buildingUnderConstruction && placementValid && buildingUnderConstruction.handleClick(e.pos)) {
                             this.planet.placeBuilding(buildingUnderConstruction)
+
+                            if (this.placingFunction) {
+                                let fn = this.placingFunction
+                                zip(fn.machines, buildingUnderConstruction.devicePlaces()).forEach(([machine, place]: [typeof Machine, DevicePlace]) => {
+                                    console.log("would add machine", { machine, place })
+                                    let device = new Device(new machine(), place.position)
+                                    buildingUnderConstruction.addDevice(device)
+                                })
+                                this.placingFunction = null
+                            }
+
                             this.hud.setMessage(this.defaultMessage)
                             this.planet.colony.currentlyConstructing = null
                             this.prepareNextBuilding(e.pos)
@@ -184,16 +219,27 @@ export class Construct extends Scene {
         return requiredStructures.find(structure => !actualStructureNames.includes(structure.name))
     }
 
+    private nextMissingStructureOrFunction(): Structure | SpaceFunction {
+        let reqs = Construct.requiredStructuresAndFunctions.map(req => new req())
+
+        let actualStructureNames = this.buildings.map(building => building.structure.name)
+        let actualFunctionNames = flatSingle(
+            this.buildings.map(building => building.spaceFunction && building.spaceFunction.name)
+        )
+        let actualNames = [...actualStructureNames, ...actualFunctionNames]
+        return reqs.find(req => !actualNames.includes(req.name))
+    }
+
     protected prepareNextBuilding(pos: Vector = new Vector(0,0)) {
         let structure = null;
-        let nextMissing = this.nextMissingRequiredStructure();
+        let nextMissing = this.nextMissingStructureOrFunction() //this.nextMissingRequiredStructure();
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
             this.startConstructing(structure, pos)
         }
     }
 
-    startConstructing(structureOrMachine: Structure | Machine, pos: Vector = new Vector(0, 0)) {
+    startConstructing(structureOrMachine: Structure | Machine | SpaceFunction, pos: Vector = new Vector(0, 0)) {
         this.hud.showCard(structureOrMachine)
         
         let theNextOne = null
@@ -208,6 +254,14 @@ export class Construct extends Scene {
             this.hud.setMessage(`Install ${machine.name} (${machine.description})`)
             theNextOne = this.spawnDevice(machine, pos)
             // this.camera.zoom(1.5, 250)
+        } else if (structureOrMachine instanceof SpaceFunction) {
+            let fn: SpaceFunction = structureOrMachine
+            this.hud.setMessage(`Place ${fn.name} (${fn.description})`)
+            theNextOne = this.spawnFunction(fn, pos)
+            this.placingFunction = fn
+
+            // need to gen a building with the required machines?
+            // alert("start building function!")
         }
 
         this.planet.colony.currentlyConstructing = null
@@ -236,5 +290,18 @@ export class Construct extends Scene {
         let View = Construct.structureViews[structure.view]
         let building = new View(pos, structure, this.planet)
         return building;
+    }
+
+    protected spawnFunction(fn: SpaceFunction, pos: Vector): Building {
+        let theStructure: Structure = new SmallRoomThree()
+        if (fn.machines.some(m => (new m()).size === DeviceSize.Medium)) {
+            theStructure = new MediumRoom()
+        }
+        if (fn.machines.some(m => (new m()).forDome)) {
+            theStructure = new SmallDomeThree()
+        }
+
+        let building = this.assembleBuildingFromStructure(theStructure, pos)
+        return building
     }
 } 
