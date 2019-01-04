@@ -76,7 +76,7 @@ export class Palette {
         paletteButton.style.fontSize = '9pt';
         paletteButton.style.fontFamily = 'Helvetica';
         paletteButton.style.fontWeight = '600';
-        paletteButton.style.padding = '1px';
+        paletteButton.style.padding = '2px';
         paletteButton.style.width = '160px';
         paletteButton.style.textTransform = 'uppercase';
         paletteButton.style.border = '1px solid rgba(255,255,255,0.08)';
