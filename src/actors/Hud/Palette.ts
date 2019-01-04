@@ -10,7 +10,8 @@ export class Palette {
         private y: number,
         private all: EntityKind[],
         private onButtonClick: (EntityKind) => any = null,
-        private onButtonEnter: (EntityKind) => any = null
+        private onButtonEnter: (EntityKind) => any = null,
+        private comprehend = true 
     ) {
         this.makePalette();
     }
@@ -26,14 +27,18 @@ export class Palette {
 
     updateBuilt(built: (EntityKind)[]) {
         this.built = built;
-        this.comprehended = this.all.filter((e: EntityKind) => {
-            let s = new e();
-            let prereqs: (EntityKind)[] = s.prereqs;
-            return prereqs.every((prereq: EntityKind) => {
-                let built = this.built.some((s: EntityKind) => s === prereq);
-                return built;
+        if (this.comprehend) {
+            this.comprehended = this.all.filter((e: EntityKind) => {
+                let s = new e();
+                let prereqs: (EntityKind)[] = s.prereqs;
+                return prereqs.every((prereq: EntityKind) => {
+                    let built = this.built.some((s: EntityKind) => s === prereq);
+                    return built;
+                });
             });
-        });
+        } else {
+            this.comprehended = this.built
+        }
         this.makePalette();
     }
 

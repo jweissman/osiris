@@ -2,6 +2,7 @@ import { ResourceBlock, Economy, emptyMarket } from "./Economy";
 import { Color, FontStyle, Resource } from "excalibur";
 import { DeviceSize } from "../values/DeviceSize";
 import { MechanicalOperation, mechanicalOperations } from "./MechanicalOperation";
+import { shuffle } from "../Util";
 
 const bookshelfSvg = require('../images/bookshelf-plain.svg');
 const vatSvg = require('../images/vat-plain.svg');
@@ -45,6 +46,8 @@ export class Machine {
     economy: Economy = emptyMarket()
     forDome: boolean = false
 
+    concretize(): Machine { return this; } //return shuffle(allMachines)[0] }
+    // concretions: Machine[] = []
 }
 
 export class CommandCenter extends Machine {
@@ -112,6 +115,9 @@ export class StudyMachine extends Machine {
         [ ResourceBlock.Hypothesis, ResourceBlock.Hypothesis, ResourceBlock.Hypothesis ],
         ResourceBlock.Data
     )
+    // concretions: Machine[] = [Workstation, Desk]
+
+    concretize(): Machine { return new (shuffle([Workstation, Desk])[0])() }
 }
 
 export class Desk extends StudyMachine {

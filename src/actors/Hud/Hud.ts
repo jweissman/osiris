@@ -16,6 +16,7 @@ import { Palette } from "./Palette";
 export class Hud extends UIActor {
     private structurePalette: Palette //<Structure> 
     private machinePalette: Palette //<Machine>
+    private functionPalette: Palette
     private card: Card
 
     private status: StatusAnalysisView
@@ -26,19 +27,23 @@ export class Hud extends UIActor {
         ...allStructures
     ];
     static machinesForPalette = allMachines
+    static functionsForPalette = allSpaceFunctions
 
     constructor(
         private game: Game,
         protected onBuildingSelect = null,
         protected onMachineSelect = null,
+        protected onFunctionSelect = null
     ) {
         super(0, 0, game.canvasWidth, game.canvasHeight);
 
         this.status = new StatusAnalysisView(emptyMarket());
         this.add(this.status)
 
-        this.structurePalette = new Palette(20, 35, Hud.structuresForPalette, onBuildingSelect, (e) => this.showCard(e))
-        this.machinePalette = new Palette(20, 300, allMachines, onMachineSelect, (e) => this.showCard(e))
+        let displayInfo = (e) => this.showCard(e)
+        this.structurePalette = new Palette(20, 35, Hud.structuresForPalette, onBuildingSelect, displayInfo)
+        this.machinePalette = new Palette(20, 300, allMachines, onMachineSelect, displayInfo) // (e) => this.showCard(e))
+        this.functionPalette = new Palette(220, 35, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
         this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
         this.add(this.card)
@@ -50,6 +55,7 @@ export class Hud extends UIActor {
         super.draw(ctx, delta)
         this.structurePalette.draw(ctx)
         this.machinePalette.draw(ctx)
+        this.functionPalette.draw(ctx)
     }
 
     resourceGathered(resource: ResourceBlock) {
@@ -79,6 +85,7 @@ export class Hud extends UIActor {
     private updatePalettes(colony: Colony) {
         this.updateBuildingPalette(colony)
         this.updateMachinePalette(colony)
+        this.updateFunctionPalette(colony)
     }
 
     private updateBuildingPalette(colony: Colony) {
@@ -92,6 +99,12 @@ export class Hud extends UIActor {
         let devices = colony.findAllDevices()
         let builtMachines = Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine))
         this.machinePalette.updateBuilt(builtMachines)
+    }
+
+    private updateFunctionPalette(colony: Colony) {
+        let builtReifiedFunctions = flatSingle(colony.buildings.map(b => b.spaceFunction))
+        let builtFunctions = Hud.functionsForPalette.filter((fn) => builtReifiedFunctions.some(rf => rf instanceof fn))
+        this.functionPalette.updateBuilt(builtFunctions)
     }
 
 }

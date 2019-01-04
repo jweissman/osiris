@@ -91,12 +91,14 @@ export class Construct extends Scene {
     public onInitialize(game: Game) {
         this.game = game
 
+        let buildIt = (e) => this.startConstructing(e)
 
-        this.hud = new Hud(game, (structure) => {
-            this.startConstructing(structure)
-        }, (device) => {
-            this.startConstructing(device)
-        });
+        this.hud = new Hud(game, buildIt, buildIt, buildIt)
+        //(structure) => {
+        //    this.startConstructing(structure)
+        //}, (device) => {
+        //    this.startConstructing(device)
+        //});
         this.add(this.hud)
 
         this.planet = new Planet(this.hud, game.world.color);
@@ -150,7 +152,8 @@ export class Construct extends Scene {
                                 let fn = this.placingFunction
                                 zip(fn.machines, buildingUnderConstruction.devicePlaces()).forEach(([machine, place]: [typeof Machine, DevicePlace]) => {
                                     console.log("would add machine", { machine, place })
-                                    let device = new Device(new machine(), place.position)
+                                    let m = (new machine()).concretize()
+                                    let device = new Device(m, place.position)
                                     buildingUnderConstruction.addDevice(device)
                                 })
                                 this.placingFunction = null
@@ -298,10 +301,11 @@ export class Construct extends Scene {
             theStructure = new MediumRoom()
         }
         if (fn.machines.some(m => (new m()).forDome)) {
-            theStructure = new SmallDomeThree()
+            theStructure = new SmallDome()
         }
 
         let building = this.assembleBuildingFromStructure(theStructure, pos)
+        building.reshape(building.constrainCursor(building.pos))
         return building
     }
 } 

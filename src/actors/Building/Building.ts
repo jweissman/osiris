@@ -345,6 +345,7 @@ export class Building extends Actor {
                 let matchingDevice = unseenDevices.find(d => d.machine instanceof machine)
                 if (!matchingDevice) { matched = false; }
                 unseenDevices = deleteByValue(unseenDevices, matchingDevice)
+                // return true
             })
             return matched;
         })
