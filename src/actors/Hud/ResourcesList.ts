@@ -5,17 +5,12 @@ export class ResourcesList extends Actor {
     entries: {
         [block in ResourceBlock]: ResourceListEntry;
     } = {
-            // non-accruable
             [ResourceBlock.Food]: null,
             [ResourceBlock.Hypothesis]: null,
             [ResourceBlock.Ore]: null,
-
-            // displayed/accruable
             [ResourceBlock.Meal]: null,
             [ResourceBlock.Mineral]: null,
             [ResourceBlock.Data]: null,
-
-            // derived/accurable
             [ResourceBlock.Alloy]: null,
         };
 
@@ -32,7 +27,6 @@ export class ResourcesList extends Actor {
     }
 
     increment(resource: ResourceBlock) {
-        // console.log("INCREMENT", { resource })
         let res = this.entries[resource]
         if (res) {
             res.credit(1);

@@ -5,7 +5,6 @@ import { Construct } from './scenes/Construct';
 const theWorld = new World();
 const game = new Game(theWorld);
 
-// scenes
 const construct = new Construct(game);
 game.add('construct', construct);
 

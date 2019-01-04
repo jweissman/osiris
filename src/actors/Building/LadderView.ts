@@ -4,7 +4,6 @@ import { Slot } from "../../values/Slot";
 import { Vector } from "excalibur";
 
 export class LadderView extends TunnelView {
-    // edgeWidth = 1
     originSlot: Slot = null
     constrainCursor(cursor: Vector): Vector {
        if (this.pickingOrigin) {

@@ -5,15 +5,14 @@ import { Planet } from '../actors/Planet/Planet';
 
 
 export class World {
-  static colors = [Color.Red, Color.Blue, Color.Green] // Color.Viridian, Color.Magenta, Color.Chartreuse];
+  static colors = [Color.Red, Color.Blue, Color.Green]
 
   color: Color = sample(World.colors).
       darken(0.1).
       desaturate(0.8);
-  skyColor: Color = sample([ Color.Cyan, Color.Vermillion ] ). // Color.Rose //World.colors).
+  skyColor: Color = sample([ Color.Cyan, Color.Vermillion ] ).
         lighten(0.15).
-        desaturate(0.65) // sample([Color.Blue, Color.Rose,Color.Blue]).lighten(0.1).desaturate(0.8)
-//   colony: Colony = new Colony()
+        desaturate(0.65)
 
   
 }

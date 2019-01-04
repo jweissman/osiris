@@ -9,7 +9,6 @@ import { Graph } from "../../values/Graph";
 export class TunnelView extends Building {
     pickingOrigin: boolean = true
     hideBox = true
-    // edgeWidth = 0.2
 
     colorBase() { return this.color.darken(0.2); }
 
@@ -28,7 +27,7 @@ export class TunnelView extends Building {
         let x = this.pos.x + this.getWidth()/2;
         let y = this.pos.y
         return [
-            new Vector(Math.floor(x), y) //, Math.floor(y)-4)
+            new Vector(Math.floor(x), y)
         ];
     }
 
@@ -38,7 +37,6 @@ export class TunnelView extends Building {
         let halfWidth = this.getWidth()/2
         let x = this.pos.x + halfWidth
 
-        // connect node to first slot...
         let root = g.findOrCreate(this.nodes()[0], measureDistance)
         let first = g.findOrCreate(new Vector(x,this.slotHeights()[0]), measureDistance)
         g.edge(root,first)
@@ -139,13 +137,11 @@ export class TunnelView extends Building {
         if (this.pickingOrigin) {
             this.alignToSlot(cursor)
         } else {
-            // we're determining depth of tunnel
             cursor.y = Math.max(this.planet.getTop() + 100, cursor.y)
         }
         return cursor;
     }
 
-    // expand
     reshape(cursor: Vector) {
         this.pos.y = this.planet.getTop() + 2
         if (!this.pickingOrigin) {

@@ -6,7 +6,6 @@ export class SpaceFunction {
      machines: (typeof Machine)[] = []
      color: Color = Color.Gray
 
-     // can't image needing this, but for symmetry
      prereqs: (typeof SpaceFunction)[] =  [] 
 }
 
@@ -37,7 +36,7 @@ class Retreat extends SpaceFunction {
 
 class CloneMatrix extends SpaceFunction {
      name = 'Clone Matrix'
-     machines = [ CloningVat, CloningVat ] //
+     machines = [ CloningVat, CloningVat ]
 }
 
 class ReadingRoom extends SpaceFunction {
@@ -85,7 +84,6 @@ class Workshop extends SpaceFunction {
      machines = [ Fabricator, Fabricator ]
 }
 
-// 3 house plants => nursery?
 class Nursery extends SpaceFunction {
      name = 'Nursery'
      machines = [ Houseplant, Houseplant, Houseplant ]

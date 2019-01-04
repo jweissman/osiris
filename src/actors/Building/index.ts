@@ -11,12 +11,10 @@ import { MineView } from './MineView';
 import { SurfaceRoadView } from './SurfaceRoadView';
 
 
-// import { LivingQuartersView } from './LivingQuartersView';
-
 export {
     Building,
 
-    CorridorView, // as AccessTunnelView,
+    CorridorView,
     CommonAreaView,
     DomeView,
     MissionControlView,

@@ -34,7 +34,6 @@ export class Card extends Actor {
     present(entity: Machine | Structure): any {
         this.title.announce(entity)
         this.cardBody.show(entity)
-        // description.text = entity.description;
 
         this.entity = entity
         if (this.entity instanceof Machine) {

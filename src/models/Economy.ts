@@ -46,8 +46,8 @@ export const sumMarkets: (ea: Economy, eb: Economy) => Economy = (ea, eb) => {
         let supply = sa + sb
         let demand = da + db
         newMarket[value] = {
-            supply, //: ea[value].supply + eb[value].supply,
-            demand, //: ea[value].demand + eb[value].demand
+            supply,
+            demand,
         }
     }
     return newMarket
@@ -79,13 +79,6 @@ const blockColors: { [key in ResourceBlock]: Color } = {
 
 export function blockColor(block: ResourceBlock) {
     let baseColor = blockColors[block]
-    //Color.Violet
-    //switch(block) {
-    //    case ResourceBlock.Food: baseColor = Color.Green; break
-    //    case ResourceBlock.Ore:  baseColor = Color.Red; break
-    //    case ResourceBlock.Data: baseColor = Color.Blue; break
-    //    case ResourceBlock.Meal: baseColor = Color.Yellow; break
-    //}
     return baseColor.desaturate(0.25).lighten(0.125)
 }
 

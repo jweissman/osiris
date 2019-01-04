@@ -61,7 +61,6 @@ export class DomeView extends Building {
         let y = this.pos.y + this.getHeight() - 6
         let ds = [
             new Vector(x - w/3, y),
-            // new Vector(x, y),
             new Vector(x + w/3, y),
         ]
 

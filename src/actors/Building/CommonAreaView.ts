@@ -48,7 +48,6 @@ export class CommonAreaView extends Building {
         )
         theSlots.push(rightSlot)
 
-        // top slot
         theSlots.push(
             this.buildSlot(
                 this.pos.x + this.getWidth()/2,
@@ -57,7 +56,6 @@ export class CommonAreaView extends Building {
             )
         )
 
-        // bottom slot
         theSlots.push(
             this.buildSlot(
                 this.pos.x + this.getWidth()/2,
@@ -72,7 +70,7 @@ export class CommonAreaView extends Building {
         let x = this.pos.x + this.getWidth()/2;
         let y = this.pos.y + this.getHeight()-this.floorHeight
         return [
-            new Vector(Math.floor(x), Math.floor(y)) //-16)
+            new Vector(Math.floor(x), Math.floor(y))
         ];
     }
   
@@ -86,7 +84,6 @@ export class CommonAreaView extends Building {
         let y = this.pos.y + this.getHeight() - this.floorHeight - 10 
         let ds = [
             new Vector(x - w/3, y),
-            // new Vector(x, y),
             new Vector(x + w/3, y),
         ]
 

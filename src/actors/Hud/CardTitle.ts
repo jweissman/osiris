@@ -8,7 +8,6 @@ export class CardTitle extends Actor {
     type: Label;
     constructor(private entity: Machine | Structure, x: number, y: number) {
         super(x, y, 14, 32, entity && entity.color || Color.Gray);
-        // console.log("TITLE FOR", { entity })
         this.name = new Label(entity && entity.name || '..', 20, 16)
         this.name.fontSize = 28
         this.name.color = Color.Black

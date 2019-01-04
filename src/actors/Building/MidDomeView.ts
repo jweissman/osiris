@@ -11,7 +11,6 @@ export class MidDomeView extends DomeView {
         let y = this.pos.y + this.getHeight() - 20
         let ds = [
             new Vector(x - w/3, y),
-            // new Vector(x, y),
             new Vector(x + w/3, y),
         ]
 

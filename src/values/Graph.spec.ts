@@ -112,7 +112,6 @@ describe('Graph', () => {
 
         it('can find the shortest path', () => {
             let path = graph.shortestPath('a', 'i'); 
-            // console.log("path", { path })
 
             expect(path).toEqual(
                 ['a', 'e', 'h', 'i']

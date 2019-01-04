@@ -26,7 +26,6 @@ export class Planet extends Actor {
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
         let yBase = -depth/2
-        // crust
         let crustHeight = 20
         this.createLayer(yBase, crustHeight, this.color.lighten(0.25))
 
@@ -102,7 +101,6 @@ export class Planet extends Actor {
     }
 
     get maxPop() {
-        // let econ = this.economy
         let devices = this.colony.findAllDevices()
         let economies = devices.map((d: Device) => d.machine.economy)
         let theEconomyWithoutPeople = economies.reduce(sumMarkets, emptyMarket())

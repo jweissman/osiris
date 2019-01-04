@@ -10,9 +10,7 @@ export class CardBody extends Actor {
 
     constructor(private entity: Machine | Structure, x: number, y: number) {
         super(x, y, 0, 0)
-        // resources
-
-        // economy...
+        // resources / recipes
 
         this.values = new Label('')
         this.values.fontSize = 10
@@ -28,7 +26,7 @@ export class CardBody extends Actor {
     }
 
     show(entity: Machine | Structure) {
-        if (entity) { //entity.economy) {
+        if (entity) {
             this.description.text = entity.description;
 
             if (entity instanceof Machine) {
@@ -41,13 +39,11 @@ export class CardBody extends Actor {
                         values.push(`+${delta} ${value}`)
                     } else if (delta < 0) {
                         values.push(`${delta} ${value}`)
-                        // this.add(label)
                     }
                 }
                 this.values.text = values.join(' | ')
             } else if (entity instanceof Structure) {
                 this.values.text = ''
-                // this.values.text = entity. //produces
             }
 
         }

@@ -44,7 +44,6 @@ export class Hud extends UIActor {
         this.functionPalette = new Palette(20, 300, allSpaceFunctions, onFunctionSelect, (e) => this.showCard(e))
 
         this.card = new Card(null, game.canvasWidth - 340, game.canvasHeight - 200)
-        // this.card.visible = false
         this.add(this.card)
     }
 
@@ -71,7 +70,6 @@ export class Hud extends UIActor {
     showCard(entity: Machine | Structure) {
         console.log("SHOW CARD", { entity })
         this.card.present(entity)
-        // this.card.visible = true
     }
 
     private updateMaxPop(curr, cap) {

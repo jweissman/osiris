@@ -34,9 +34,7 @@ const images = {
 const { Red, Green, Blue, Orange, Violet, Yellow } = Color;
 
 export enum MachineOperation {
-    // generic functioning: consuming a block to produce a new block
     Work,
-    // more interesting functions
     SpawnCitizen,
     CollectResource,
     CollectMeals,
@@ -46,22 +44,11 @@ export enum MachineOperation {
 // recipe is just a model for transforming things into other things
 // generation from nothing might want to be its own case
 class Recipe {
-    // behavior: MachineOperation = MachineOperation.Work
-
-    // generates: ResourceBlock = null
-    // stores: ResourceBlock = null
-
     consumes: ResourceBlock[] = null
     produces: ResourceBlock[] = null
 
-    // spawnCitizen: boolean = false ???
-
-    // need to stop using this both for work time and 'generation' time
-    // productionTime: number = 500
-    // generationTime: number = 3000
     workTime: number = 10000
 
-    // capacity: number = 2
 }
 
 export class Machine {
@@ -75,7 +62,6 @@ export class Machine {
     produces: ResourceBlock = null
 
     // need to stop using this both for work time and 'generation' time
-    // productionTime: number = 500
     generationTime: number = 3000
     workTime: number = 10000
     capacity: number = 2
@@ -102,7 +88,6 @@ export class CommandCenter extends Machine {
         ...emptyMarket(),
         Power: { supply: 1, demand: 0 },
         Oxygen: { supply: 1, demand: 0 },
-        // Shelter: { supply: 1, demand: 0 },
         Hope: { supply: 1, demand: 0 }
     }
 }
@@ -352,14 +337,8 @@ export class Fabricator extends Machine {
         ...emptyMarket(),
         Power: { supply: 0, demand: 3 },
     }
-    // ...
 }
 
-//export class HoloProjector extends Machine {
-//    name = 'Holo Projector'
-//    size = DeviceSize.Medium
-//    color = Violet
-//}
 
 // large devices!
 
@@ -373,7 +352,6 @@ export class MiningDrill extends Machine {
         ...emptyMarket(),
         Power: { supply: 0, demand: 5 },
     }
-//
 }    
 
 export class Megafabricator extends Machine {

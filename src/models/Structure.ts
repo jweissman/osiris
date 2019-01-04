@@ -34,12 +34,6 @@ export class Structure {
     zoom: number = 1
     color: Color = Color.Gray
 
-    // consumes: ResourceBlock = null
-    // produces: ResourceBlock = null
-    // productionTime: number = 500
-
-    // constructor(public origin: Vector = new Vector(0, 0)) { }
-
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ Corridor ],
         [Orientation.Right]: [ Corridor ],
@@ -48,10 +42,8 @@ export class Structure {
     }
 
     machines: (typeof Machine)[] = []
-
     prereqs: (typeof Structure)[] = []
 
-    // slotSize
 }
 
 
@@ -126,9 +118,7 @@ export class Ladder extends Structure {
 // 'abstract' structure...
 
 class Dome extends Structure {
-    // name: string = 'Biodome';
     description: string = 'Biome sweet biome';
-    // dominantColor = Color.Green
 
     view: string = 'DomeView';
     width: number  = 2 * major.eighth
@@ -144,7 +134,6 @@ class Dome extends Structure {
     machines = [
         SolarCell,
         OxygenExtractor, WaterCondensingMachine,
-        // Cabin, CookingFire
     ]
 }
 
@@ -169,17 +158,8 @@ class CommonArea extends Structure {
     }
 
     machines = []
-    //    Stove,
-    //    Bed,
-    //    Desk,
-    //    Bookshelf,
-    //    Fridge,
-    //    Workstation,
-    //    Houseplant,
-    //]
 
     prereqs = [
-        // Dome 
     ]
 }
 
@@ -219,11 +199,6 @@ export class LargeRoom extends CommonArea {
 
     // two big slots?
     machines = largeBelow
-    //machines = [
-    //    MiningDrill,
-    //    Megafabricator,
-    //    // Preserve,
-    //]
 }
 
 export class HugeRoom extends CommonArea {
@@ -234,7 +209,6 @@ export class HugeRoom extends CommonArea {
 
     prereqs = [LargeRoom]
     machines = hugeBelow
-    // machines = [ LogicCrystal ] // ultrafab...
 }
 
 /// surface bldgs
@@ -260,12 +234,6 @@ export class MidDome extends Dome {
     width = 6 * major.eighth
     height = 5 * major.eighth
     prereqs = [ SmallDome, MediumRoom ]
-    //machines = [
-    //    Cabin,
-    //    Orchard,
-    //    Arbor,
-    //    // Campfir
-    //]
     machines = midDome
 }
 
@@ -285,9 +253,7 @@ export class Arcology extends Dome {
     height = 36 * major.eighth
     prereqs = [LargeDome, HugeRoom]
     machines = hugeDome
-    //machines = [
-    //    Microcity
-    //]
+
 }
 
 //////

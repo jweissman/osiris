@@ -26,7 +26,6 @@ export class Palette {
 
     updateBuilt(built: (EntityKind)[]) {
         this.built = built;
-        // update comprehended?
         this.comprehended = this.all.filter((e: EntityKind) => {
             let s = new e();
             let prereqs: (EntityKind)[] = s.prereqs;
@@ -47,7 +46,6 @@ export class Palette {
         this._element.style.position = 'absolute';
         this._element.style.border = '1px solid white';
         document.body.appendChild(this._element);
-        // this.comprehendedMachines
         this.comprehended
             .map((elem: EntityKind) => new elem())
             .sort((a, b) => a.color > b.color ? -1 : 1)
@@ -62,7 +60,6 @@ export class Palette {
                 if (this.onButtonEnter) {
                     btn.onmouseenter = () => { this.onButtonEnter(elem); };
                 }
-                // btn.onmouseleave = () => { this.onButtonLeave() }
                 if (this.onButtonClick) {
                     btn.onclick = () => { this.onButtonClick(elem); };
                 }

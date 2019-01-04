@@ -40,7 +40,6 @@ export class Construct extends Scene {
         BigDomeView,
 
         MissionControlView,
-        // SmallRoomTwoView, [ none, same as common area? ]
         SmallRoomThreeView,
 
         CommonAreaView,
@@ -50,11 +49,9 @@ export class Construct extends Scene {
 
         ArcologyView,
     }
-    ////
     static requiredStructureList: Array<typeof Structure> = [
         MissionControl,
         SurfaceRoad,
-        // SmallDome,
         SmallDomeThree,
         MainTunnel,
         Corridor,
@@ -72,7 +69,6 @@ export class Construct extends Scene {
 
 
         this.hud = new Hud(game, (structure) => {
-            // console.log('would build', { structure })
             this.startConstructing(structure)
         }, (device) => {
             this.startConstructing(device)
@@ -107,7 +103,6 @@ export class Construct extends Scene {
 
                     currentlyBuilding.reshape(this.player.pos)
                 } else if (currentlyBuilding instanceof Device) {
-                    // console.warn("would snap device in place!")
                     currentlyBuilding.snap(this.planet, this.player.pos)
                 }
             }
@@ -166,7 +161,6 @@ export class Construct extends Scene {
                     this.camera.zoom(0.5, 1000)
                 }
             } else if (e.key === Input.Keys.Esc) {
-                // cancel building in progress?
                 this.planet.colony.currentlyConstructing = null
             }
         })
@@ -196,28 +190,21 @@ export class Construct extends Scene {
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
             this.startConstructing(structure, pos)
-        } //else {
-            // this.hud.setMessage(`Welcome to OSIRIS!`)
-        // }
+        }
     }
 
     startConstructing(structureOrMachine: Structure | Machine, pos: Vector = new Vector(0, 0)) {
         this.hud.showCard(structureOrMachine)
         
-        // console.log("START CONSTRUCTING", { structureOrMachine })
         let theNextOne = null
         if (structureOrMachine instanceof Structure) {
             let structure = structureOrMachine
-            // structure.origin = pos // thread this out somehow??
             this.hud.setMessage(`Place ${structure.name} (${structure.description})`)
             theNextOne = this.spawnBuilding(structure, pos)
             this.camera.zoom(structure.zoom, 250)
         } else if (structureOrMachine instanceof Machine) {
-            // setup machine?
             let machine = structureOrMachine
-            // machine.origin = pos
             this.hud.setMessage(`Install ${machine.name} (${machine.description})`)
-
             theNextOne = this.spawnDevice(machine, pos)
             this.camera.zoom(1.5, 250)
         }
@@ -225,7 +212,6 @@ export class Construct extends Scene {
         this.planet.colony.currentlyConstructing = null
         if (theNextOne) {
             this.planet.colony.currentlyConstructing = theNextOne
-            // console.warn("would start constructing", { theNextOne })
             this.camera.pos = theNextOne.pos
         }
     }

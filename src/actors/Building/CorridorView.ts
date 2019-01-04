@@ -12,7 +12,6 @@ export class CorridorView extends Building {
     colorBase() { return this.color.darken(0.2); }
 
     slots() {
-        // left slot -- right slot
         let theSlots: Slot[] = [];
         let slotY = this.getHeight() / 2;
 

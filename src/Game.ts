@@ -14,7 +14,7 @@ export class Game extends Engine {
       backgroundColor: world.skyColor
     });
   }
-  public start() { //loader: ex.Loader) {
+  public start() {
     let loader = new Loader();
     for (let key in Resources) {
       loader.addResource(Resources[key]);
