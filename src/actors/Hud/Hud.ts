@@ -40,7 +40,7 @@ export class Hud extends UIActor {
         this.structurePalette = new Palette(20, 35, Hud.structuresForPalette, onBuildingSelect, (e) => this.showCard(e))
         this.machinePalette = new Palette(20, 300, allMachines, onMachineSelect, (e) => this.showCard(e))
 
-        this.card = new Card(null, 20, 600) // game.canvasHeight - 200)
+        this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
         this.add(this.card)
     }
 
@@ -65,7 +65,6 @@ export class Hud extends UIActor {
     }
 
     showCard(entity: Machine | Structure) {
-        console.log("SHOW CARD", { entity })
         this.card.present(entity)
     }
 

@@ -14,6 +14,18 @@ export enum PureValue {
     Wonder = 'Wonder'
 }
 
+export const allValues = [
+    PureValue.Power,
+    PureValue.Oxygen,
+    PureValue.Water,
+    PureValue.Shelter,
+    PureValue.Hope,
+    PureValue.Wisdom,
+    PureValue.Wealth,
+    PureValue.Beauty,
+    PureValue.Wonder
+]
+
 export type Economy = { [key in PureValue]: {
     supply: number,
     demand: number
@@ -35,7 +47,7 @@ export function emptyMarket() : Economy {
 }
 
 export function availableCapacity(market: Economy, value: PureValue) {
-    return market[value].supply - market[value].demand
+    return Math.floor(market[value].supply - market[value].demand)
 }
 
 export const sumMarkets: (ea: Economy, eb: Economy) => Economy = (ea, eb) => {
@@ -71,7 +83,7 @@ const blockColors: { [key in ResourceBlock]: Color } = {
     Mineral: Color.Red,
 
     Meal: Color.Yellow.darken(0.2),
-    Hypothesis: Color.Violet.darken(0.4),
+    Hypothesis: Color.Blue.lighten(0.4),
     Ore: Color.Red.darken(0.5),
 
     Alloy: Color.LightGray.darken(0.2),

@@ -34,7 +34,6 @@ export class Palette {
                 return built;
             });
         });
-        console.log("UPDATE BUILT", { built, comprehended: this.comprehended });
         this.makePalette();
     }
 

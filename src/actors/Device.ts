@@ -1,36 +1,47 @@
 import { Actor, Label, Color, Vector } from "excalibur";
-import { Machine, MachineOperation } from "../models/Machine";
-import { Building, CommonAreaView } from "./Building";
+import { Machine } from "../models/Machine";
+import { Building } from "./Building";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
-import { SmallRoomThree, SmallRoomTwo, MediumRoom, SmallDome, MidDome, LargeRoom, allStructures } from "../models/Structure";
+import { allStructures } from "../models/Structure";
 import { getVisibleDeviceSize } from "../values/DeviceSize";
+import { Recipe, Storage } from "../models/MechanicalOperation";
+import { range, deleteByValueOnce } from "../Util";
+
+interface RetrieveResource {
+    type: 'retrieve'
+    resource: ResourceBlock
+    // count: number
+}
+
+export function retrieveResource(res: ResourceBlock): RetrieveResource {
+    return {
+        type: 'retrieve',
+        resource: res,
+        // count: 1
+    }
+}
+
+export type InteractionRequest = RetrieveResource // | ...
 
 export class Device extends Actor {
+    // could also use for storage?
     product: ResourceBlock[] = []
-    // capacity: number = 4
-
     nameLabel: Label
-
     image: any
-    // imageLoaded: boolean = false
-
-    building: Building // set once built?
-
+    building: Building
     inUse: boolean = false
 
     constructor(
-        // public building: Building,
         public machine: Machine,
-        private initialPos: Vector
+        initialPos: Vector
     ) {
         super(
             initialPos.x,
             initialPos.y,
             getVisibleDeviceSize(machine.size),
             getVisibleDeviceSize(machine.size),
-            // machine.height,
             machine.color
         )
 
@@ -39,14 +50,10 @@ export class Device extends Actor {
         this.nameLabel.color = Color.White
 
         this.image = new Image();
-        // this.image.onload = function () {
-            //  this.imageLoaded = true
-        // }
         this.image.src = machine.image
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
-        // super.draw(ctx, delta)
         ctx.drawImage(
             this.image,
             this.pos.x - this.getWidth() / 2,
@@ -57,7 +64,7 @@ export class Device extends Actor {
         let showLabel = true
         if (showLabel) {
             this.nameLabel.pos = this.getCenter()
-            this.nameLabel.pos.x -= 10 //ctx.measureText(this.machine.name).width / 2
+            this.nameLabel.pos.x -= 10
             this.nameLabel.pos.y += 8 + this.getHeight()/2
             this.nameLabel.draw(ctx, delta)
         }
@@ -69,75 +76,103 @@ export class Device extends Actor {
             ctx.fillRect(bx + blockSize * index, by - blockSize, blockSize-1, blockSize-1)
         })
     }
+    get operation() { return this.machine.operation }
 
-    get produces()       { return this.machine.produces }
-    get consumes()       { return this.machine.consumes }
-    get workTime()       { return this.machine.workTime }
-    get generationTime() { return this.machine.generationTime }
-    // get productionTime() { return this.machine.productionTime }
-    get capacity()       { return this.machine.capacity }
+    //isSinkFor(it: ResourceBlock) {
+    //    if (this.operation.type === 'recipe') {
+    //        return this.operation.consumes.includes(it) // === it
+    //    }
 
-    async interact(citizen: Citizen) {
+    //    if (this.operation.type === 'store') {
+    //        return this.operation.stores.includes(it) &&
+    //          this.product.length < this.operation.capacity
+    //    }
+
+    //    return false;
+    //}
+
+    async interact(citizen: Citizen, request: InteractionRequest): Promise<boolean> {
         if (this.inUse) {
             citizen.waitToUse(this)
-            return
+            return false
         }
 
-        if (this.product.length > 0) {
-            this.product.pop()
-            this.inUse = true
-            await citizen.progressBar(500) //this.productionTime)
-            this.inUse = false
-            citizen.carry(this.produces)
-        } else {
-            if (this.consumes && citizen.carrying === this.consumes) {
+        let worked = false
+        let op = this.operation
+        if (op.type === 'recipe') {
+            let recipe: Recipe = op
+            // do we have all the things?
+            if (citizen.carrying.some(it => recipe.consumes.includes(it))) {
                 this.inUse = true
-                await citizen.progressBar(this.workTime)
-                citizen.carry(this.produces)
+                if (citizen.isCarryingUnique(recipe.consumes)) {
+                    recipe.consumes.forEach(consumed => citizen.drop(consumed))
+                    await citizen.progressBar(recipe.workTime)
+                    citizen.carry(recipe.produces)
+
+                    worked = true
+                } else {
+                    console.log("not carrying all requirements?", { requires: recipe.consumes, has: citizen.carrying })
+                }
                 this.inUse = false
             }
-        }
-
-        if (this.machine.behavior === MachineOperation.Work) {
-            // ...
-
-        } else if (this.machine.behavior === MachineOperation.CollectResource) {
-            // generic redeem..
-            let resource = citizen.drop()
-            if (resource) {
-                this.building.redeem(resource)
-            }
-        } else if (this.machine.behavior === MachineOperation.CollectMeals) {
-            // store a meal...
-            if (citizen.carrying === ResourceBlock.Meal) {
-                let resource = citizen.drop()
-                if (resource) {
-                    this.building.redeem(resource)
+        } else if (op.type === 'store') {
+            // accept it! (whatever you have that matches...?)
+            let store: Storage = op
+            if (request) { // assume dispense request for now?
+                this.inUse = true
+                worked = this.dispense(citizen, request)
+                if (worked) {
+                    await citizen.progressBar(500)
+                }
+                this.inUse = false
+            } else if (citizen.carrying.some(it => store.stores.includes(it))) { // maybe trying to store?
+                if (this.product.length < store.capacity) {
+                    let res = null
+                    if (store.stores.some(stored => { res = citizen.drop(stored); return res })) {
+                        if (res) {
+                            this.product.push(res)
+                            this.building.redeem(res)
+                            worked = true
+                        }
+                    }
+                } else {
+                    console.warn("no capacity in this store!!")
                 }
             }
-        } else if (this.machine.behavior === MachineOperation.CollectData) {
-            // store research
-            if (citizen.carrying === ResourceBlock.Data) {
-                let resource = citizen.drop()
-                if (resource) {
-                    this.building.redeem(resource)
-                }
+        } else if (op.type === 'generator') {
+            this.inUse = true
+            worked = this.dispense(citizen, request)
+            if (worked) {
+                await citizen.progressBar(500)
             }
-        } else {
-            console.warn("no handler for this interaction", { device: this })
+            this.inUse = false
         }
+
+        return worked
+    }
+
+    private dispense(citizen: Citizen, request: InteractionRequest) {
+        if (request && request.type === 'retrieve') {
+            let canFulfill = this.product.find(p => p === request.resource)
+            if (canFulfill) {
+                deleteByValueOnce(this.product, request.resource)
+                citizen.carry(request.resource)
+                return true
+            }
+        }
+        return false
     }
 
     public produce(step: number) {
-        if (step % this.generationTime === 0) {
-            if (this.machine.behavior === MachineOperation.Work) {
-
-                if (this.produces && !this.consumes && this.product.length < this.capacity) {
-                    this.product.push(this.produces)
+        if (this.machine.operation.type === 'generator') {
+            if (step % this.machine.operation.generationTime === 0) {
+                if (this.product.length < this.machine.operation.capacity) {
+                    this.product.push(this.machine.operation.generates)
                 }
-            } else if (this.machine.behavior === MachineOperation.SpawnCitizen) {
-                setTimeout(() => this.building.populate(this.pos), 100)
             }
+
+        } else if (this.machine.operation.type === 'spawn') {
+            setTimeout(() => this.building.populate(this.pos), 100)
         }
     }
 
@@ -154,18 +189,27 @@ export class Device extends Actor {
             }
         )
 
+        let snapped = false
         if (bldg) {
+            let spot = bldg.nextDevicePlace().position
+            let d = spot.distance(pos)
+            snapped = d < 150
+        }
+
+        if (snapped) {  //bldg && d < 300) {
             this.building = bldg;
             this.pos = this.building.nextDevicePlace().position
             //devicePlaces()[
             //    this.building.devices.length
             //]
+        } else {
+            this.pos = pos
         }
 
-        return !!bldg;
+        return snapped //!!bldg;
     }
 
-    finalize() {
-        // this.building.devices.push(this)
-    }
+    // finalize() {
+    // this.building.devices.push(this)
+    // }
 }

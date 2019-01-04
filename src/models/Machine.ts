@@ -1,8 +1,7 @@
 import { ResourceBlock, Economy, emptyMarket } from "./Economy";
-import { Scale } from "../values/Scale";
-import { Color, Resource } from "excalibur";
+import { Color, FontStyle, Resource } from "excalibur";
 import { DeviceSize } from "../values/DeviceSize";
-
+import { MechanicalOperation, mechanicalOperations } from "./MechanicalOperation";
 
 const bookshelfSvg = require('../images/bookshelf-plain.svg');
 const vatSvg = require('../images/vat-plain.svg');
@@ -33,56 +32,30 @@ const images = {
 
 const { Red, Green, Blue, Orange, Violet, Yellow } = Color;
 
-export enum MachineOperation {
-    Work,
-    SpawnCitizen,
-    CollectResource,
-    CollectMeals,
-    CollectData
-}
-
-// recipe is just a model for transforming things into other things
-// generation from nothing might want to be its own case
-class Recipe {
-    consumes: ResourceBlock[] = null
-    produces: ResourceBlock[] = null
-
-    workTime: number = 10000
-
-}
+let { store, generate, recipe, spawn } = mechanicalOperations
 
 export class Machine {
     name: string = '(machine name)'
     description: string = '(machine description)'
     color: Color = Color.LightGray
-
     size: DeviceSize = DeviceSize.Small
-
-    consumes: ResourceBlock = null
-    produces: ResourceBlock = null
-
-    // need to stop using this both for work time and 'generation' time
-    generationTime: number = 3000
-    workTime: number = 10000
-    capacity: number = 2
-
-    behavior: MachineOperation = MachineOperation.Work
-
+    operation: MechanicalOperation = { type: 'noop' }
     image = images.vat
-
     prereqs: (typeof Machine)[] = []
-
     economy: Economy = emptyMarket()
-
     forDome: boolean = false
+
 }
 
 export class CommandCenter extends Machine {
     name = 'Command Console'
     description = 'gather resources...'
-    behavior = MachineOperation.CollectResource
+    operation = store(
+        [ResourceBlock.Data],
+        // ResourceBlock.Meal,
+        // ResourceBlock.Mineral
+    )
     image = images.bench
-
     size = DeviceSize.Medium
     economy = {
         ...emptyMarket(),
@@ -100,11 +73,10 @@ export class OxygenExtractor extends Machine {
     description = 'breathe deep'
     image = images.vat
     prereqs = [ WaterCondensingMachine, SolarCell ]
-
     forDome = true
     economy = {
         ...emptyMarket(),
-        Oxygen: { supply: 1, demand: 0 },
+        Oxygen: { supply: 3, demand: 0 },
         Power: { supply: 0, demand: 1 },
     }
 }
@@ -116,7 +88,7 @@ export class SolarCell extends Machine {
     forDome = true
     economy = {
         ...emptyMarket(),
-        Power: { supply: 2, demand: 0 },
+        Power: { supply: 5, demand: 0 },
     }
 }
 
@@ -129,15 +101,17 @@ export class WaterCondensingMachine extends Machine {
     forDome = true
     economy = {
         ...emptyMarket(),
-        Water: { supply: 1, demand: 0 },
+        Water: { supply: 4, demand: 0 },
         Power: { supply: 0, demand: 1 },
     }
 }
 
 /// small subsurface
 export class StudyMachine extends Machine {
-    consumes = ResourceBlock.Hypothesis
-    produces = ResourceBlock.Data
+    operation = recipe(
+        [ ResourceBlock.Hypothesis, ResourceBlock.Hypothesis, ResourceBlock.Hypothesis ],
+        ResourceBlock.Data
+    )
 }
 
 export class Desk extends StudyMachine {
@@ -166,7 +140,7 @@ export class Workstation extends StudyMachine {
 export class Bookshelf extends Machine {
     name = 'Shelf'
     description = 'brainstorm'
-    produces = ResourceBlock.Hypothesis
+    operation = generate(ResourceBlock.Hypothesis)
     image = images.bookshelf
     prereqs = [ OxygenExtractor, Desk ]
     color = Blue
@@ -176,7 +150,7 @@ export class Bookshelf extends Machine {
 export class Fridge extends Machine {
     name = 'Fridge'
     description = 'store meals'
-    behavior = MachineOperation.CollectMeals
+    operation = store([ResourceBlock.Meal], 6)
     image = images.fridge
     prereqs = [Bookshelf]
     color = Yellow
@@ -189,8 +163,10 @@ export class Fridge extends Machine {
 export class Stove extends Machine {
     name = 'Stove'
     description = 'make a meal'
-    consumes = ResourceBlock.Food
-    produces = ResourceBlock.Meal
+    operation = recipe(
+        [ResourceBlock.Food, ResourceBlock.Food],
+        ResourceBlock.Meal
+    )
     image = images.stove
 
     prereqs = [Bookshelf, Fridge]
@@ -217,13 +193,15 @@ export class Houseplant extends Machine {
     name = 'House Plant'
     description = 'so nice'
     prereqs = [ Bed ]
-    produces = ResourceBlock.Food
+    // produces = ResourceBlock.Food
+    operation = generate(ResourceBlock.Food)
     capacity = 1
     color = Green
     image = images.plant
     economy = {
         ...emptyMarket(),
-        Oxygen: { supply: 0, demand: 1 },
+        Oxygen: { supply: 1, demand: 0 },
+        Water: { supply: 0, demand: 0.1 },
     }
 }
 
@@ -233,8 +211,7 @@ export class Houseplant extends Machine {
 export class ResearchServer extends Machine {
     name = 'Research Server'
     description = 'hold data'
-    produces = ResourceBlock.Hypothesis
-    behavior = MachineOperation.CollectData
+    operation = store([ResourceBlock.Data], 10)
     image = images.server
     prereqs = [Bookshelf]
     size = DeviceSize.Medium
@@ -248,7 +225,7 @@ export class ResearchServer extends Machine {
 export class Orchard extends Machine {
    name = 'Orchard'
    description = 'grow some food'
-   produces = ResourceBlock.Food
+   operation = generate(ResourceBlock.Food)
    size = DeviceSize.Medium
    prereqs = [AlgaeVat]
    color = Green
@@ -262,8 +239,10 @@ export class Orchard extends Machine {
 export class Cabin extends Machine {
    name = 'Cabin'
    description = 'home on the plains'
-   consumes = ResourceBlock.Food
-   produces = ResourceBlock.Meal
+   operation = recipe(
+       [ ResourceBlock.Food, ResourceBlock.Food ],
+       ResourceBlock.Meal
+   )
    image = images.cabin
    prereqs = [Orchard]
    size = DeviceSize.Medium
@@ -280,7 +259,7 @@ export class Cabin extends Machine {
 export class Arbor extends Machine {
     name = 'Arbor'
     description = 'arbor around the clock'
-    produces = ResourceBlock.Food
+    operation = generate(ResourceBlock.Food)
     prereqs = [Orchard]
     size = DeviceSize.Medium
     color = Green
@@ -290,7 +269,7 @@ export class Arbor extends Machine {
 export class AlgaeVat extends Machine {
     name = 'Algae Vat'
     description = 'where there is a will'
-    produces = ResourceBlock.Food
+    operation = generate(ResourceBlock.Food)
     prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
     size = DeviceSize.Medium
     color = Violet
@@ -303,7 +282,7 @@ export class AlgaeVat extends Machine {
 export class Botany extends Machine {
     name = 'Botany'
     description = 'plant lab'
-    produces = ResourceBlock.Food
+    operation = generate(ResourceBlock.Food)
     prereqs = [ OxygenExtractor, Bookshelf ]
     size = DeviceSize.Medium
     color = Green
@@ -312,7 +291,8 @@ export class Botany extends Machine {
 export class CloningVat extends Machine {
     name = 'Cloning Vat'
     description = 'we all grow'
-    behavior = MachineOperation.SpawnCitizen 
+    // behavior = MachineOperation.SpawnCitizen 
+    operation = spawn()
     productionTime = 1500
     image = images.vat
     prereqs = [AlgaeVat]
@@ -328,8 +308,10 @@ export class CloningVat extends Machine {
 export class Fabricator extends Machine {
     name = 'Fabricator'
     description = 'you made that'
-    consumes = ResourceBlock.Ore
-    produces = ResourceBlock.Mineral
+    operation = recipe(
+        [ResourceBlock.Ore, ResourceBlock.Ore, ResourceBlock.Ore],
+         ResourceBlock.Mineral
+    )
     size = DeviceSize.Medium
     color = Red
     prereqs = [Workstation]
@@ -345,9 +327,9 @@ export class Fabricator extends Machine {
 export class MiningDrill extends Machine {
     name = 'Mining Drill'
     description = 'ore away'
+    operation = generate(ResourceBlock.Ore)
     size = DeviceSize.Large
     prereqs = [ Fabricator ]
-    produces = ResourceBlock.Ore
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 5 },

@@ -35,6 +35,11 @@ export const flatSingle = arr => [].concat(...arr);
 
 export const deleteByValue = (arr, elem) => arr.filter(e => e !== elem)
 
+export const deleteByValueOnce = (arr, elem) => {
+  let index = arr.indexOf(elem);
+  if (index !== -1) arr.splice(index, 1);
+}
+
 export function eachCons(a, n) {
   var r = []
   for (var i = 0; i < a.length - n + 1; i++) {
@@ -100,4 +105,12 @@ export function drawRect(
       x, y, width, height
     )
   }
+}
+
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function shuffle(arr) {
+   return arr.sort(() => Math.random() > 0.5 ? 1 : -1) 
 }

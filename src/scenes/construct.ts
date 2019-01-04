@@ -202,23 +202,27 @@ export class Construct extends Scene {
             this.hud.setMessage(`Place ${structure.name} (${structure.description})`)
             theNextOne = this.spawnBuilding(structure, pos)
             this.camera.zoom(structure.zoom, 250)
+            this.camera.pos = theNextOne.pos
         } else if (structureOrMachine instanceof Machine) {
             let machine = structureOrMachine
             this.hud.setMessage(`Install ${machine.name} (${machine.description})`)
             theNextOne = this.spawnDevice(machine, pos)
-            this.camera.zoom(1.5, 250)
+            // this.camera.zoom(1.5, 250)
         }
 
         this.planet.colony.currentlyConstructing = null
         if (theNextOne) {
             this.planet.colony.currentlyConstructing = theNextOne
-            this.camera.pos = theNextOne.pos
+            // this.camera.pos = theNextOne.pos
         }
     }
 
     protected spawnDevice(machine: Machine, pos: Vector): Device {
         let device = new Device(machine, pos)
-        device.snap(this.planet)
+        if (device.snap(this.planet)) {
+            this.camera.pos = device.pos
+ 
+        }
         return device
     }
 

@@ -1,5 +1,5 @@
 import { Actor } from "excalibur";
-import { Economy, PureValue } from "../../models/Economy";
+import { Economy, PureValue, availableCapacity, allValues } from "../../models/Economy";
 import { EconomicValue } from "./EconomicValue";
 
 export class EconomyView extends Actor {
@@ -20,7 +20,7 @@ export class EconomyView extends Actor {
         super(x, y, 0, 0);
 
         let index = 0
-        for (let value in PureValue) {
+        for (let value of allValues) {
             let valueLabel: EconomicValue =  new EconomicValue(value, (index++ * 34), 0)
             this.valueLabels[value] = valueLabel
             this.add(valueLabel)
@@ -32,9 +32,10 @@ export class EconomyView extends Actor {
     updateView(updatedEconomy: Economy): void {
         let market = updatedEconomy;
 
-        for (let value in PureValue) {
-            let { demand, supply } = market[value];
-            this.valueLabels[value].setCount(supply-demand)
+        for (let value of allValues) {
+            this.valueLabels[value].setCount(
+                availableCapacity(market, value)
+            )
         }
 
     }

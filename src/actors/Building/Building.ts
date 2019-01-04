@@ -309,7 +309,7 @@ export class Building extends Actor {
     }
 
     public addDevice(device: Device) {
-        device.finalize()
+        // device.finalize()
         if (device.building !== this) {
             device.building = this
         }
