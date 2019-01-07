@@ -45,7 +45,7 @@ class ReadingRoom extends SpaceFunction {
      machines = [ Bookshelf, Bookshelf ]
 }
 
-class Library extends SpaceFunction {
+export class Library extends SpaceFunction {
      name = 'Library'
      machines = [ Bookshelf, Bookshelf, Bookshelf ]
 }
@@ -60,7 +60,7 @@ class Lab extends SpaceFunction {
      machines = [ Workstation, Workstation, Workstation ]
 }
 
-class Archive extends SpaceFunction {
+export class Archive extends SpaceFunction {
      name = 'Archive'
      machines = [ ResearchServer, ResearchServer ]
 }

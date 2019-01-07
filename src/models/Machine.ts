@@ -54,7 +54,7 @@ export class CommandCenter extends Machine {
     name = 'Command Console'
     description = 'gather resources...'
     operation = store(
-        [ResourceBlock.Data],
+        [ResourceBlock.Data, ResourceBlock.Ore],
         // ResourceBlock.Meal,
         // ResourceBlock.Mineral
     )
@@ -112,7 +112,7 @@ export class WaterCondensingMachine extends Machine {
 /// small subsurface
 export class StudyMachine extends Machine {
     operation = recipe(
-        [ ResourceBlock.Hypothesis, ResourceBlock.Hypothesis, ResourceBlock.Hypothesis ],
+        [ ResourceBlock.Idea, ResourceBlock.Idea, ResourceBlock.Idea ],
         ResourceBlock.Data
     )
     // concretions: Machine[] = [Workstation, Desk]
@@ -127,6 +127,7 @@ export class Desk extends StudyMachine {
     prereqs = [ OxygenExtractor ]
 
     // color = Blue
+    concretize() { return this }
 }
 
 export class Workstation extends StudyMachine {
@@ -139,6 +140,8 @@ export class Workstation extends StudyMachine {
         ...emptyMarket(),
         Power: { supply: 0, demand: 1 },
     }
+
+    concretize() { return this }
 }
 
 
@@ -146,7 +149,7 @@ export class Workstation extends StudyMachine {
 export class Bookshelf extends Machine {
     name = 'Shelf'
     description = 'brainstorm'
-    operation = generate(ResourceBlock.Hypothesis)
+    operation = generate(ResourceBlock.Idea)
     image = images.bookshelf
     prereqs = [ OxygenExtractor, Desk ]
     color = Blue
@@ -170,7 +173,7 @@ export class Stove extends Machine {
     name = 'Stove'
     description = 'make a meal'
     operation = recipe(
-        [ResourceBlock.Food, ResourceBlock.Food],
+        [ResourceBlock.Biomass, ResourceBlock.Biomass],
         ResourceBlock.Meal
     )
     image = images.stove
@@ -200,7 +203,7 @@ export class Houseplant extends Machine {
     description = 'so nice'
     prereqs = [ Bed ]
     // produces = ResourceBlock.Food
-    operation = generate(ResourceBlock.Food)
+    operation = generate(ResourceBlock.Biomass)
     capacity = 1
     color = Green
     image = images.plant
@@ -231,14 +234,16 @@ export class ResearchServer extends Machine {
 export class Orchard extends Machine {
    name = 'Orchard'
    description = 'grow some food'
-   operation = generate(ResourceBlock.Food)
+   operation = generate(ResourceBlock.Biomass)
    size = DeviceSize.Medium
    prereqs = [AlgaeVat]
    color = Green
     forDome = true
     economy = {
         ...emptyMarket(),
-        Power: { supply: 2, demand: 0 },
+        Power: { supply: 0, demand: 1 },
+        Water: { supply: 0, demand: 1 },
+        Oxygen: { supply: 2, demand: 0 },
     }
 }
 
@@ -246,7 +251,7 @@ export class Cabin extends Machine {
    name = 'Cabin'
    description = 'home on the plains'
    operation = recipe(
-       [ ResourceBlock.Food, ResourceBlock.Food ],
+       [ ResourceBlock.Biomass, ResourceBlock.Biomass ],
        ResourceBlock.Meal
    )
    image = images.cabin
@@ -258,14 +263,14 @@ export class Cabin extends Machine {
         ...emptyMarket(),
         Power: { supply: 0, demand: 1 },
         Water: { supply: 0, demand: 1 },
-        Shelter: { supply: 4, demand: 1 },
+        Shelter: { supply: 4, demand: 0 },
     }
 }
 
 export class Arbor extends Machine {
     name = 'Arbor'
     description = 'arbor around the clock'
-    operation = generate(ResourceBlock.Food)
+    operation = generate(ResourceBlock.Biomass)
     prereqs = [Orchard]
     size = DeviceSize.Medium
     color = Green
@@ -275,7 +280,7 @@ export class Arbor extends Machine {
 export class AlgaeVat extends Machine {
     name = 'Algae Vat'
     description = 'where there is a will'
-    operation = generate(ResourceBlock.Food)
+    operation = generate(ResourceBlock.Biomass)
     prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
     size = DeviceSize.Medium
     color = Violet
@@ -288,10 +293,14 @@ export class AlgaeVat extends Machine {
 export class Botany extends Machine {
     name = 'Botany'
     description = 'plant lab'
-    operation = generate(ResourceBlock.Food)
+    operation = generate(ResourceBlock.Biomass)
     prereqs = [ OxygenExtractor, Bookshelf ]
     size = DeviceSize.Medium
     color = Green
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+    }
 }
 
 export class CloningVat extends Machine {
@@ -310,13 +319,44 @@ export class CloningVat extends Machine {
     }
 }
 
+export class DissolutionVat extends Machine {
+    name = 'Dissolution Vat'
+    description = 'back to basics'
+    // behavior = MachineOperation.SpawnCitizen 
+    operation = recipe(
+        [ ResourceBlock.Biomass, ResourceBlock.Biomass ],
+        ResourceBlock.Bioplasma
+    )
+    productionTime = 1500
+    image = images.vat
+    prereqs = [PlasmaBank]
+    size = DeviceSize.Medium
+    color = Violet
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+    }
+}
+
+export class PlasmaBank extends Machine {
+    name = 'Bioplasm Bank'
+    description = 'hold on'
+    operation = store([ ResourceBlock.Bioplasma ])
+    prereqs = [AlgaeVat]
+    color = Green
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+    }
+}
+
     
 export class Fabricator extends Machine {
     name = 'Fabricator'
     description = 'you made that'
     operation = recipe(
-        [ResourceBlock.Ore, ResourceBlock.Ore, ResourceBlock.Ore],
-         ResourceBlock.Mineral
+        [ResourceBlock.Mineral, ResourceBlock.Mineral],
+         ResourceBlock.Alloy
     )
     size = DeviceSize.Medium
     color = Red
@@ -326,6 +366,23 @@ export class Fabricator extends Machine {
         Power: { supply: 0, demand: 3 },
     }
 }
+
+export class OreRefinery extends Machine {
+    name = 'Refinery'
+    description = 'wheat from the chaff'
+    operation = recipe(
+        [ResourceBlock.Ore, ResourceBlock.Ore, ResourceBlock.Ore],
+         ResourceBlock.Mineral
+    )
+    size = DeviceSize.Medium
+    color = Red
+    prereqs = [Workstation, Fabricator]
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 2 },
+    }
+}
+
 
 
 // large devices!
@@ -417,4 +474,8 @@ export const allMachines = [
     Microcity,
     LogicCrystal,
     Botany,
+
+    OreRefinery,
+    PlasmaBank,
+    DissolutionVat,
 ]

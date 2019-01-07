@@ -6,13 +6,23 @@ import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
 import { getVisibleDeviceSize } from "../values/DeviceSize";
-import { Recipe, Storage } from "../models/MechanicalOperation";
+import { Recipe, ResourceStorage } from "../models/MechanicalOperation";
 import { range, deleteByValueOnce } from "../Util";
 
 interface RetrieveResource {
     type: 'retrieve'
     resource: ResourceBlock
     // count: number
+}
+
+interface WorkRecipe {
+    type: 'work'
+    recipe: Recipe
+}
+
+interface StoreResource {
+    type: 'store'
+    resource: ResourceBlock
 }
 
 export function retrieveResource(res: ResourceBlock): RetrieveResource {
@@ -23,7 +33,7 @@ export function retrieveResource(res: ResourceBlock): RetrieveResource {
     }
 }
 
-export type InteractionRequest = RetrieveResource // | ...
+export type InteractionRequest = StoreResource | RetrieveResource | WorkRecipe // | ...
 
 export class Device extends Actor {
     // could also use for storage?
@@ -77,34 +87,21 @@ export class Device extends Actor {
         let bx = this.x - this.getWidth()/2 + 5, by = this.y - 23
         let blockSize = 5
         this.product.forEach((produced, index) => {
-            ctx.fillStyle = blockColor(produced).desaturate(0.3).lighten(0.2).toRGBA();
+            ctx.fillStyle = blockColor(produced).toRGBA()
             ctx.fillRect(bx + blockSize * index, by - blockSize, blockSize-1, blockSize-1)
         })
     }
+
     get operation() { return this.machine.operation }
-
-    //isSinkFor(it: ResourceBlock) {
-    //    if (this.operation.type === 'recipe') {
-    //        return this.operation.consumes.includes(it) // === it
-    //    }
-
-    //    if (this.operation.type === 'store') {
-    //        return this.operation.stores.includes(it) &&
-    //          this.product.length < this.operation.capacity
-    //    }
-
-    //    return false;
-    //}
 
     async interact(citizen: Citizen, request: InteractionRequest): Promise<boolean> {
         if (this.inUse) {
-            citizen.waitToUse(this)
             return false
         }
 
         let worked = false
         let op = this.operation
-        if (op.type === 'recipe') {
+        if (op.type === 'recipe' && request.type === 'work') {
             let recipe: Recipe = op
             // do we have all the things?
             if (citizen.carrying.some(it => recipe.consumes.includes(it))) {
@@ -116,21 +113,22 @@ export class Device extends Actor {
 
                     worked = true
                 } else {
-                    console.log("not carrying all requirements?", { requires: recipe.consumes, has: citizen.carrying })
+                    console.warn("not carrying all requirements?", { requires: recipe.consumes, has: citizen.carrying })
                 }
                 this.inUse = false
             }
         } else if (op.type === 'store') {
             // accept it! (whatever you have that matches...?)
-            let store: Storage = op
-            if (request) { // assume dispense request for now?
+            let store: ResourceStorage = op
+            if (request && request.type === 'retrieve') { // assume dispense request for now?
                 this.inUse = true
                 worked = this.dispense(citizen, request)
                 if (worked) {
                     await citizen.progressBar(500)
                 }
                 this.inUse = false
-            } else if (citizen.carrying.some(it => store.stores.includes(it))) { // maybe trying to store?
+            } else if (request && request.type === 'store' &&
+                citizen.carrying.some(it => store.stores.includes(it))) { // maybe trying to store?
                 if (this.product.length < store.capacity) {
                     let res = null
                     if (store.stores.some(stored => { res = citizen.drop(stored); return res })) {
@@ -142,6 +140,7 @@ export class Device extends Actor {
                     }
                 } else {
                     console.warn("no capacity in this store!!")
+                    worked = false
                 }
             }
         } else if (op.type === 'generator') {

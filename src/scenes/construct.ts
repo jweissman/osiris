@@ -15,7 +15,7 @@ import { LargeRoomView } from "../actors/Building/LargeRoomView";
 import { HugeRoomView } from "../actors/Building/HugeRoomView";
 import { BigDomeView } from "../actors/Building/BigDomeView";
 import { SmallDomeThreeView } from "../actors/Building/SmallDomeThreeView";
-import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod } from "../models/SpaceFunction";
+import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive } from "../models/SpaceFunction";
 import { flatSingle, zip } from "../Util";
 import { DevicePlace } from "../actors/Building/Building";
 import { DeviceSize } from "../values/DeviceSize";
@@ -80,6 +80,9 @@ export class Construct extends Scene {
         Kitchen,
         LivingQuarters,
         CloneMatrix,
+        Library,
+        Archive,
+        
     ]
 
     update(engine, delta) {
@@ -151,7 +154,7 @@ export class Construct extends Scene {
                             if (this.placingFunction) {
                                 let fn = this.placingFunction
                                 zip(fn.machines, buildingUnderConstruction.devicePlaces()).forEach(([machine, place]: [typeof Machine, DevicePlace]) => {
-                                    console.log("would add machine", { machine, place })
+                                    // console.log("would add machine", { machine, place })
                                     let m = (new machine()).concretize()
                                     let device = new Device(m, place.position)
                                     buildingUnderConstruction.addDevice(device)

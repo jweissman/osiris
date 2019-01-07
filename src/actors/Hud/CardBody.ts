@@ -50,6 +50,19 @@ export class CardBody extends Actor {
 
                 // let theNotes = []
                 this.notes.text = ''
+                let op = entity.operation
+                if (op) {
+                    if (op.type === 'recipe') {
+                        this.notes.text = `Turns ${op.consumes.join(' + ')} -> ${op.produces}.`
+                    } else if (op.type === 'generator') {
+                        this.notes.text = `Generates ${op.generates}.`
+                    } else if (op.type === 'store') {
+                        this.notes.text = `Stores ${op.stores.join(' + ')}`
+                    } else if (op.type === 'spawn') {
+                        this.notes.text = 'Decants clones.'
+                    }
+                }
+                
                 // if (entity.consumes && entity.produces) {
                 //     this.notes.text = `Turns ${entity.consumes} into ${entity.produces}.`
                 // } else if (entity.produces) {

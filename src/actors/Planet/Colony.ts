@@ -98,7 +98,7 @@ export class Colony extends Actor {
         }
     }
 
-    findAllDevices() {
+    findAllDevices(): Device[] {
         return flatSingle(this.buildings.map(b => b.getDevices()))
     }
 }

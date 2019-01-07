@@ -67,30 +67,36 @@ export const sumMarkets: (ea: Economy, eb: Economy) => Economy = (ea, eb) => {
 
 export enum ResourceBlock {
     // base
-    Food = 'Food',
+    Biomass = 'Biomass',
     Ore = 'Ore',
     Data = 'Data',
+
     // derived
     Meal = 'Meal',
-    Hypothesis = 'Hypothesis',
+    Idea = 'Idea',
     Mineral = 'Mineral',
+    Bioplasma = 'Bioplasma',
+
+    // higher-order
     Alloy = "Alloy"
 }
 
+let cStep = 0.3
 const blockColors: { [key in ResourceBlock]: Color } = {
-    Food: Color.Green,
+    Biomass: Color.Green,
     Data: Color.Blue,
     Mineral: Color.Red,
 
-    Meal: Color.Yellow.darken(0.2),
-    Hypothesis: Color.Blue.lighten(0.4),
-    Ore: Color.Red.darken(0.5),
+    Meal: Color.Yellow.darken(cStep),
+    Idea: Color.Blue.lighten(cStep),
+    Ore: Color.Red.darken(cStep),
+    Bioplasma: Color.Viridian,
 
-    Alloy: Color.LightGray.darken(0.2),
+    Alloy: Color.LightGray.darken(cStep),
 }
 
 export function blockColor(block: ResourceBlock) {
     let baseColor = blockColors[block]
-    return baseColor.desaturate(0.25).lighten(0.125)
+    return baseColor.desaturate(0.3).lighten(0.1) //.desaturate(0.25).lighten(0.125)
 }
 
