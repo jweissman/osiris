@@ -2,8 +2,8 @@ import { Scene, Input, Vector } from "excalibur";
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, SmallDome, SmallRoomTwo, SmallDomeThree, SmallRoomThree, MediumRoom } from "../models/Structure";
-import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, ArcologyView, } from "../actors/Building";
+import { Structure, MissionControl, MainTunnel, Corridor, SurfaceRoad, SmallDome, SmallRoomTwo, SmallDomeThree, SmallRoomThree, MediumRoom, MediumRoomThree, LargeRoom, HugeRoom } from "../models/Structure";
+import { Building, DomeView, CorridorView, CommonAreaView, TunnelView, MissionControlView, LadderView, ArcologyView, structureViews, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { SurfaceRoadView } from "../actors/Building/SurfaceRoadView";
 import { Device } from "../actors/Device";
@@ -15,7 +15,7 @@ import { LargeRoomView } from "../actors/Building/LargeRoomView";
 import { HugeRoomView } from "../actors/Building/HugeRoomView";
 import { BigDomeView } from "../actors/Building/BigDomeView";
 import { SmallDomeThreeView } from "../actors/Building/SmallDomeThreeView";
-import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive } from "../models/SpaceFunction";
+import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive, ComputerCore } from "../models/SpaceFunction";
 import { flatSingle, zip } from "../Util";
 import { DevicePlace } from "../actors/Building/Building";
 import { DeviceSize } from "../values/DeviceSize";
@@ -34,27 +34,28 @@ export class Construct extends Scene {
 
     placingFunction: SpaceFunction = null
 
-    static structureViews: { [key: string]: typeof Building } = {
-        CorridorView,
-        LadderView,
-        TunnelView,
-        SurfaceRoadView,
+    // static structureViews: { [key: string]: typeof Building } = {
+    //     CorridorView,
+    //     LadderView,
+    //     TunnelView,
+    //     SurfaceRoadView,
 
-        DomeView, // small dome 2
-        SmallDomeThreeView,
-        MidDomeView,
-        BigDomeView,
+    //     DomeView, // small dome 2
+    //     SmallDomeThreeView,
+    //     MidDomeView,
+    //     BigDomeView,
 
-        MissionControlView,
-        SmallRoomThreeView,
+    //     MissionControlView,
+    //     SmallRoomThreeView,
 
-        CommonAreaView,
-        MediumRoomView,
-        LargeRoomView,
-        HugeRoomView,
+    //     CommonAreaView,
+    //     MediumRoomView,
+    //     LargeRoomView,
+    //     HugeRoomView,
 
-        ArcologyView,
-    }
+    //     ArcologyView,
+    // }
+
     static requiredStructureList: Array<typeof Structure> = [
         MissionControl,
         SurfaceRoad,
@@ -82,6 +83,7 @@ export class Construct extends Scene {
         CloneMatrix,
         Library,
         Archive,
+        ComputerCore,
         
     ]
 
@@ -97,14 +99,9 @@ export class Construct extends Scene {
         let buildIt = (e) => this.startConstructing(e)
 
         this.hud = new Hud(game, buildIt, buildIt, buildIt)
-        //(structure) => {
-        //    this.startConstructing(structure)
-        //}, (device) => {
-        //    this.startConstructing(device)
-        //});
         this.add(this.hud)
 
-        this.planet = new Planet(this.hud, game.world.color);
+        this.planet = new Planet(this.hud, game.world.color, (b) => this.hud.showCard(b))
         this.add(this.planet)
   
         this.player = new Player()
@@ -214,16 +211,8 @@ export class Construct extends Scene {
         this.game.input.pointers.primary.off('wheel')
     }
 
-
     get buildings() { return this.planet.colony.buildings }
 
-
-    private nextMissingRequiredStructure(): Structure {
-        let requiredStructures: Structure[] = Construct.requiredStructureList.map(s => new s())
-        let actualStructureNames: string[] = this.buildings.map(building => building.structure.name)
-
-        return requiredStructures.find(structure => !actualStructureNames.includes(structure.name))
-    }
 
     private nextMissingStructureOrFunction(): Structure | SpaceFunction {
         let reqs = Construct.requiredStructuresAndFunctions.map(req => new req())
@@ -293,17 +282,28 @@ export class Construct extends Scene {
     }
     
     private assembleBuildingFromStructure(structure: Structure, pos: Vector): Building {
-        let View = Construct.structureViews[structure.view]
+        let View = structureViews[structure.view]
         let building = new View(pos, structure, this.planet)
         return building;
     }
 
     protected spawnFunction(fn: SpaceFunction, pos: Vector): Building {
         let theStructure: Structure = new SmallRoomThree()
-        if (fn.machines.some(m => (new m()).size === DeviceSize.Medium)) {
-            theStructure = new MediumRoom()
+        let machines = fn.machines.map(m => new m())
+
+        if (machines.some(m => m.size === DeviceSize.Medium)) {
+            theStructure = new MediumRoomThree()
         }
-        if (fn.machines.some(m => (new m()).forDome)) {
+
+        if (machines.some(m => m.size === DeviceSize.Large)) {
+            theStructure = new LargeRoom()
+        }
+
+        if (machines.some(m => m.size === DeviceSize.Huge)) {
+            theStructure = new HugeRoom()
+        }
+
+        if (machines.some(m => m.forDome)) {
             theStructure = new SmallDome()
         }
 

@@ -5,7 +5,7 @@ import { Planet } from '../actors/Planet/Planet';
 
 
 export class World {
-  static colors = [Color.Red, Color.Blue, Color.Green]
+  static colors = [Color.Orange] //Red, Color.Blue, Color.Green]
 
   color: Color = sample(World.colors).
       darken(0.1).
@@ -15,4 +15,17 @@ export class World {
         desaturate(0.65)
 
   
+    static bestowName(): any {
+        let nameList = [
+            'Aragorn',
+            'Anodyne',
+            'Carolyn',
+            'Exeter',
+            'Colwreath',
+            'India',
+            'Comma',
+            'Terabithia'
+        ]
+        return sample(nameList)
+    }
 }

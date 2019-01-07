@@ -12,6 +12,7 @@ import { Planet } from "../Planet/Planet";
 import { Card } from "./Card";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { Palette } from "./Palette";
+import { Building } from "../Building";
 
 export class Hud extends UIActor {
     private structurePalette: Palette //<Structure> 
@@ -70,7 +71,7 @@ export class Hud extends UIActor {
         this.updateMaxPop(planet.economy[PureValue.Shelter].demand, planet.maxPop)
     }
 
-    showCard(entity: Machine | Structure | SpaceFunction) {
+    showCard(entity: Machine | Structure | SpaceFunction | Building) {
         this.card.present(entity)
     }
 

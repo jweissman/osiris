@@ -13,6 +13,9 @@ export class ResourcesList extends Actor {
             [ResourceBlock.Data]: null,
             [ResourceBlock.Alloy]: null,
             [ResourceBlock.Bioplasma]: null,
+            [ResourceBlock.Algorithm]: null,
+            [ResourceBlock.Argent]: null,
+            [ResourceBlock.Aurum]: null,
         };
 
     constructor(x: number, y: number) {
@@ -21,7 +24,11 @@ export class ResourcesList extends Actor {
         let resources = [
             ResourceBlock.Meal,
             ResourceBlock.Data,
-            ResourceBlock.Mineral
+            ResourceBlock.Mineral,
+
+            ResourceBlock.Bioplasma,
+            ResourceBlock.Alloy,
+            ResourceBlock.Algorithm,
         ];
         resources.forEach((resource, index) => {
             let rx = rx0 + index * 16, ry = ry0 + index * 0;

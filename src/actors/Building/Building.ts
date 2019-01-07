@@ -11,6 +11,7 @@ import { ResourceBlock } from "../../models/Economy";
 import { Device } from "../Device";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
+import { World } from "../../models/World";
 
 export class DevicePlace {
     constructor(private pos: Vector, private size: DeviceSize) {}
@@ -38,6 +39,7 @@ export class Building extends Actor {
     spaceFunction: SpaceFunction
 
     private devices: Device[] = []
+    givenName: string
 
     constructor(pos: Vector, public structure: Structure, protected planet: Planet) {
         super(
@@ -54,6 +56,7 @@ export class Building extends Actor {
 
         this.on('pointerenter', () => {
             this.hover = true
+            this.planet.currentlyViewing = this
             // console.log("HOVER ON", { building: this })
         })
 
@@ -75,11 +78,29 @@ export class Building extends Actor {
         this.levelLabel = new Label(`Lvl. ${this.level}`, 0, 0, 'Helvetica')
         this.levelLabel.fontSize = 6
         this.levelLabel.color = Color.White.darken(0.2)
+
+        // this.givenName = World.bestowName() 
     }
 
     levelUp() {
         this.level += 1
         this.levelLabel.text = `Lvl. ${this.level}`
+    }
+
+    get name() {
+        if (this.spaceFunction) {
+            return this.spaceFunction.name // `${this.givenName} ${this.spaceFunction.name}`;
+        } else {
+            return this.structure.name //`${this.givenName} ${this.structure.name}`;
+        }
+    }
+
+    get description() {
+        if (this.spaceFunction) {
+            return this.spaceFunction.description
+        } else {
+            return this.structure.description
+        }
     }
 
 

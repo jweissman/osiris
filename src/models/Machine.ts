@@ -216,11 +216,19 @@ export class Houseplant extends Machine {
 
 // medium
 
+export class MetalStorage extends Machine {
+    name = 'Metal Storage'
+    description = 'contain minerals and alloys?'
+    operation = store([ResourceBlock.Mineral, ResourceBlock.Alloy], 8)
+    prereqs = [Bookshelf]
+    color = Red
+    size = DeviceSize.Medium
+}
 
 export class ResearchServer extends Machine {
     name = 'Research Server'
     description = 'hold data'
-    operation = store([ResourceBlock.Data], 10)
+    operation = store([ResourceBlock.Data, ResourceBlock.Algorithm], 10)
     image = images.server
     prereqs = [Bookshelf]
     size = DeviceSize.Medium
@@ -404,9 +412,29 @@ export class Megafabricator extends Machine {
     size = DeviceSize.Large
     prereqs = [ Fabricator ]
     color = Red
+    operation = recipe(
+        [ResourceBlock.Alloy, ResourceBlock.Algorithm],
+        ResourceBlock.Argent
+    )
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 8 },
+    }
+}
+
+export class Mainframe extends Machine {
+    name = 'Mainframe'
+    size = DeviceSize.Large
+    color = Blue
+    prereqs = [ResearchServer]
+    operation = recipe(
+        [ ResourceBlock.Data, ResourceBlock.Data ],
+        ResourceBlock.Algorithm
+    )
+    image = images.server
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 6 },
     }
 }
 
@@ -416,9 +444,11 @@ export class Preserve extends Machine {
     prereqs = [ Arbor ]
     color = Green
     forDome = true
+    // operation = generate()
     economy = {
         ...emptyMarket(),
         Water: { supply: 0, demand: 4 },
+        Oxygen: { supply: 12, demand: 0 },
     }
 }
 
@@ -478,4 +508,6 @@ export const allMachines = [
     OreRefinery,
     PlasmaBank,
     DissolutionVat,
+    MetalStorage,
+    Mainframe,
 ]

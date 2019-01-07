@@ -19,10 +19,11 @@ export class Planet extends Actor {
     constructor(
         public hud: Hud,
         public color: Color,
-        public width: number = 2000000,
-        public depth: number = 10000000,
+        private onBuildingHover: (b: Building) => any,
+        private w: number = 2000000,
+        private depth: number = 10000000,
         ) {
-        super(0, depth/2, width, depth, color)
+        super(0, depth/2, w, depth, color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
         let yBase = -depth/2
@@ -47,6 +48,10 @@ export class Planet extends Actor {
 
         this.population = new Population(this)
         this.add(this.population)
+    }
+
+    set currentlyViewing(building: Building) {
+        this.onBuildingHover(building)
     }
 
     private createLayer(y: number, size: number, color: Color) {

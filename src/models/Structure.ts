@@ -183,10 +183,20 @@ export class MediumRoom extends CommonArea {
     name = 'Mid Room'
     prereqs = [ SmallRoomThree ]
     view = 'MediumRoomView'
-    width = 3 * major.eighth
+    width = 2 * major.eighth
     height = 2 * major.third
     // two medium slots...
     
+    machines = midBelow
+}
+
+export class MediumRoomThree extends CommonArea {
+    name = 'Mid Room (3)'
+    prereqs = [ MediumRoom ]
+    view = 'MediumRoomThreeView'
+    width = 3 * major.eighth
+    height = 2 * major.third
+
     machines = midBelow
 }
 
@@ -194,8 +204,8 @@ export class LargeRoom extends CommonArea {
     name = 'Lg. Room'
     view = 'LargeRoomView'
     prereqs = [ MediumRoom ]
-    width = 6 * major.eighth
-    height = 4 * major.fifth
+    width = 4 * major.eighth
+    height = 3 * major.fifth
 
     // two big slots?
     machines = largeBelow
@@ -286,6 +296,7 @@ export const allStructures =
         SmallRoomTwo,
         SmallRoomThree,
         MediumRoom,
+        MediumRoomThree,
         LargeRoom,
         HugeRoom,
     ]

@@ -2,7 +2,7 @@ import { Building, DevicePlace } from "./Building";
 import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Vector } from "excalibur";
-import { DeviceSize } from "../../values/DeviceSize";
+import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { drawRect } from "../../Util";
 
 export class CommonAreaView extends Building {
@@ -81,12 +81,19 @@ export class CommonAreaView extends Building {
     devicePlaces() {
         let w = this.getWidth()/2
         let x = this.pos.x + w;
-        let y = this.pos.y + this.getHeight() - this.floorHeight - 10 
+        let y = this.pos.y + this.getHeight() - this.floorHeight // - 10 
+        y -= getVisibleDeviceSize(this.devicePlaceSize) / 3.5 ///2
+
         let ds = [
-            new Vector(x - w/3, y),
-            new Vector(x + w/3, y),
+            new Vector(x - w/2, y),
+            ...(this.devicePlaceCount > 2 ? [new Vector(x,y)] : []),
+            new Vector(x + w/2, y),
         ]
 
-        return ds.map(d => new DevicePlace(d, DeviceSize.Small))
+        return ds.map(d => new DevicePlace(d, this.devicePlaceSize)) 
+        //DeviceSize.Small))
     }
+
+    devicePlaceSize: DeviceSize = DeviceSize.Small
+    devicePlaceCount: number = 2
 }

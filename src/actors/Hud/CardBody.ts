@@ -4,13 +4,14 @@ import { Machine } from "../../models/Machine";
 import { PureValue } from "../../models/Economy";
 import { SmallDomeThreeView } from "../Building/SmallDomeThreeView";
 import { SpaceFunction } from "../../models/SpaceFunction";
+import { Building } from "../Building";
 
 export class CardBody extends Actor {
     description: Label
     values: Label
     notes: Label
 
-    constructor(private entity: Machine | Structure | SpaceFunction, x: number, y: number) {
+    constructor(private entity: Machine | Structure | SpaceFunction | Building, x: number, y: number) {
         super(x, y, 0, 0)
         // resources / recipes
 
@@ -30,7 +31,7 @@ export class CardBody extends Actor {
         this.show(entity)
     }
 
-    show(entity: Machine | Structure | SpaceFunction) {
+    show(entity: Machine | Structure | SpaceFunction | Building) {
         if (entity) {
             this.description.text = entity.description;
 
@@ -68,7 +69,7 @@ export class CardBody extends Actor {
                 // } else if (entity.produces) {
                 //     this.notes.text = `Generates ${entity.produces}.`
                 // } // if entity.stores...?
-            } else if (entity instanceof Structure) {
+            } else { //} if (entity instanceof Structure) {
                 this.values.text = ''
                 this.notes.text = ''
             }

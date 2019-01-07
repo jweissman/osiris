@@ -13,8 +13,8 @@ export function getVisibleDeviceSize(size: DeviceSize): number {
     let sz = 10;
     switch (size) {
         case DeviceSize.Small: sz = major.third; break;
-        case DeviceSize.Medium: sz = major.sixth; break;
-        case DeviceSize.Large: sz = 2 * major.eighth; break;
+        case DeviceSize.Medium: sz = major.fifth; break;
+        case DeviceSize.Large: sz = major.eighth + major.third; break;
         case DeviceSize.Huge: sz = 6 * major.eighth; break;
     }
     return sz;

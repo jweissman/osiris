@@ -31,7 +31,7 @@ export class StatusAnalysisView extends Actor {
         this.resources = new ResourcesList(80, ty)
         this.add(this.resources)
 
-        this.economy = new EconomyView(market, 200, ty)
+        this.economy = new EconomyView(market, 300, ty)
         this.add(this.economy)
 
         this.popLabel = new Label("", 900, ty, 'Helvetica')

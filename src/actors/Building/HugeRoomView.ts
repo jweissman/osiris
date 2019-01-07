@@ -4,6 +4,7 @@ import { DevicePlace } from "./Building";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 
 export class HugeRoomView extends CommonAreaView {
+    devicePlaceSize = DeviceSize.Huge
     devicePlaces() {
         let w = this.getWidth()/2
         let x = this.pos.x + w;

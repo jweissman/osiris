@@ -70,33 +70,41 @@ export enum ResourceBlock {
     Biomass = 'Biomass',
     Ore = 'Ore',
     Data = 'Data',
-
     // derived
     Meal = 'Meal',
     Idea = 'Idea',
     Mineral = 'Mineral',
     Bioplasma = 'Bioplasma',
-
     // higher-order
-    Alloy = "Alloy"
+    Alloy = "Alloy",
+    Algorithm = "Algorithm",
+
+    // superb
+    Argent = "Argent",
+    Aurum = "Aurum",
 }
 
 let cStep = 0.3
 const blockColors: { [key in ResourceBlock]: Color } = {
     Biomass: Color.Green,
-    Data: Color.Blue,
+    Data: Color.Blue.lighten(cStep),
     Mineral: Color.Red,
 
     Meal: Color.Yellow.darken(cStep),
-    Idea: Color.Blue.lighten(cStep),
+    Idea: Color.Blue.lighten(cStep*2), //.desaturate(cStep),
     Ore: Color.Red.darken(cStep),
+
     Bioplasma: Color.Viridian,
 
-    Alloy: Color.LightGray.darken(cStep),
+    Alloy: Color.DarkGray.darken(cStep), //(cStep),
+    Algorithm: Color.Blue.darken(cStep), //.desaturate(cStep),
+
+    Argent: Color.LightGray.lighten(cStep),
+    Aurum: Color.Orange.lighten(cStep),
 }
 
 export function blockColor(block: ResourceBlock) {
     let baseColor = blockColors[block]
-    return baseColor.desaturate(0.3).lighten(0.1) //.desaturate(0.25).lighten(0.125)
+    return baseColor.desaturate(0.1) //.lighten(0.1) //.desaturate(0.25).lighten(0.125)
 }
 

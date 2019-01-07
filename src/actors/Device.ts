@@ -7,7 +7,7 @@ import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
 import { getVisibleDeviceSize } from "../values/DeviceSize";
 import { Recipe, ResourceStorage } from "../models/MechanicalOperation";
-import { range, deleteByValueOnce } from "../Util";
+import { range, deleteByValueOnce, drawRect } from "../Util";
 
 interface RetrieveResource {
     type: 'retrieve'
@@ -66,29 +66,46 @@ export class Device extends Actor {
         this.image.src = machine.image
     }
 
+    get imageX() { return this.pos.x - this.getWidth() / 2 }
+    get imageY() { return this.pos.y - this.getHeight() / 2 - 10 }
+
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (this.imageLoaded) {
-        ctx.drawImage(
-            this.image,
-            this.pos.x - this.getWidth() / 2,
-            this.pos.y - this.getHeight() / 2 - 10,
-            this.getWidth(), this.getHeight()
-        )
+            // drawRect(
+            //     ctx,
+            //     { x: this.imageX, y: this.imageY, width: this.getWidth(), height: this.getHeight ()},
+            //     2,
+            //     Color.Green
+            // )
+
+            ctx.drawImage(
+                this.image,
+                this.imageX,
+                this.imageY,
+
+                // this.pos.y - this.getHeight() / 2 - 10,
+                this.getWidth(),
+                this.getHeight()
+            )
         }
+
+        let iv = new Vector(this.imageX, this.imageY) //this.pos //getCenter()
+        // iv.y += this.getHeight() / 2
 
         let showLabel = true
         if (showLabel) {
-            this.nameLabel.pos = this.getCenter()
-            this.nameLabel.pos.x -= 10
-            this.nameLabel.pos.y += 8 + this.getHeight()/2
+            this.nameLabel.pos = iv // this.getCenter()
+            // this.nameLabel.pos.x -= 10
+            // this.nameLabel.pos.y += 8 + this.getHeight()/2
             this.nameLabel.draw(ctx, delta)
         }
 
-        let bx = this.x - this.getWidth()/2 + 5, by = this.y - 23
+        let { x: bx, y: by } = iv //bx = this.x - this.getWidth()/2 + 5, by = this.y - 23
         let blockSize = 5
+        let yOff = this.nameLabel.fontSize
         this.product.forEach((produced, index) => {
             ctx.fillStyle = blockColor(produced).toRGBA()
-            ctx.fillRect(bx + blockSize * index, by - blockSize, blockSize-1, blockSize-1)
+            ctx.fillRect(bx + blockSize * index, by - blockSize + yOff, blockSize-1, blockSize-1)
         })
     }
 

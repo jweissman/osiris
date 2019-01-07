@@ -34,32 +34,22 @@ export abstract class ProductionStrategy {
         setInterval(() => { this.attempt() }, this.sleepInterval)
     }
 
-    sleepInterval: number = 1250
+    sleepInterval: number = 250
     protected async pause() {
         await sleep(this.sleepInterval)
     }
 
     protected async workRecipe(recipe: Recipe) {
-        let worked = false
         for (let ingredient of recipe.consumes) {
             await this.gatherBlock(ingredient);
         }
         let knowsRecipe = (d: Device) => d.operation === recipe
         let maker = this.planet.colony.closestDeviceByType(this.pawn.pos, [], knowsRecipe)
         if (maker) {
-            await this.pawn.pathTo(maker.building);
-            await this.pawn.glideTo(maker.pos);
+            await this.visitDevice(maker)
             await this.performRecipeTask(maker, recipe)
-            // worked = true
-            // while (!(await maker.interact(this.pawn, { type: 'work', recipe }))) {
-            //     await this.pause()
-            //     console.warn("waiting for machine to become available...")
-            //     // worked = true
-            // }
         } else {
-
-        // if (!worked) {
-            await this.pause() //sleep(1000);
+            await this.pause()
             await this.workRecipe(recipe);
         }
     }
@@ -70,7 +60,6 @@ export abstract class ProductionStrategy {
           await this.pause()
           console.warn("waiting for machine to become available...")
           await this.performRecipeTask(maker, recipe)
-                // worked = true
       }
     }
 
@@ -83,15 +72,14 @@ export abstract class ProductionStrategy {
         let openStore = this.planet.colony.closestDeviceByType(this.pawn.pos, [], storesDesiredBlock)
         let stored = false
         if (openStore) {
-            await this.pawn.pathTo(openStore.building);
-            await this.pawn.glideTo(openStore.pos);
+            await this.visitDevice(openStore)
             if (await openStore.interact(this.pawn, { type: 'store', resource: res })) {
                 stored = true
             }
         }
 
         if (!stored) {
-            await this.pause() // sleep(1000)
+            await this.pause()
             await this.storeBlock(res)
         }
     }
@@ -103,8 +91,7 @@ export abstract class ProductionStrategy {
 
         let gen: Device = this.planet.colony.closestDeviceByType(this.pawn.pos, [], generatesDesiredBlock)
         if (gen) {
-            await this.pawn.pathTo(gen.building);
-            await this.pawn.glideTo(gen.pos);
+            await this.visitDevice(gen)
             if (await gen.interact(this.pawn, retrieveResource(res))) {
                 gathered = true
             }
@@ -121,5 +108,10 @@ export abstract class ProductionStrategy {
             await this.pause() // sleep(1000)
             await this.gatherBlock(res)
         }
+    }
+
+    private async visitDevice(device: Device) {
+        await this.pawn.pathTo(device.building)
+        await this.pawn.glideTo(device.pos)
     }
 }
