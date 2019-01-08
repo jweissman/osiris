@@ -175,12 +175,17 @@ export class Device extends Actor {
 
     getEffectiveOperationalCapacity(op: ResourceGenerator | ResourceStorage) {
         // should we get mad if someone asks about an op that doesn't belong to us??
-        let bonus = this.building.spaceFunction.bonuses.capacity 
+        let bonus = this.building.spaceFunction
+        ? this.building.spaceFunction.bonuses.capacity 
+        : 0
         return op.capacity + bonus
     }
 
     getEffectiveWorkTime(op: Recipe) {
-        let bonus = this.building.spaceFunction.bonuses.workSpeed
+        let bonus = this.building.spaceFunction 
+         ? this.building.spaceFunction.bonuses.workSpeed
+         : 1
+
         return Math.round(op.workTime * (1/bonus))
     } 
 
