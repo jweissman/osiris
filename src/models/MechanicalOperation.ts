@@ -38,12 +38,12 @@ function store(res: ResourceBlock[], capacity: number = 10): ResourceStorage {
     }
 }
 
-function generate(res: ResourceBlock): Generator {
+function generate(res: ResourceBlock, cap: number = 4): Generator {
     return {
         type: 'generator',
         generates: res,
         generationTime: 1000,
-        capacity: 4
+        capacity: cap
     }
 }
 

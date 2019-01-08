@@ -15,6 +15,7 @@ const fridge = require('../images/fridge-plain.svg')
 const server = require('../images/research-server-plain.svg')
 const plant = require('../images/houseplant-plain.svg')
 const workstation = require('../images/workstation-plain.svg')
+const console = require('../images/console-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -28,6 +29,7 @@ const images = {
     server,
     plant,
     workstation,
+    console,
 }
 
 
@@ -45,6 +47,8 @@ export class Machine {
     prereqs: (typeof Machine)[] = []
     economy: Economy = emptyMarket()
     forDome: boolean = false
+
+    capacity: boolean
 
     concretize(): Machine { return this; } //return shuffle(allMachines)[0] }
     // concretions: Machine[] = []
@@ -203,14 +207,27 @@ export class Houseplant extends Machine {
     description = 'so nice'
     prereqs = [ Bed ]
     // produces = ResourceBlock.Food
-    operation = generate(ResourceBlock.Biomass)
-    capacity = 1
+    operation = generate(ResourceBlock.Biomass, 1)
     color = Green
     image = images.plant
     economy = {
         ...emptyMarket(),
         Oxygen: { supply: 1, demand: 0 },
         Water: { supply: 0, demand: 0.1 },
+    }
+}
+
+export class PersonnelRegistry extends Machine {
+    name = 'Personnel Registry'
+    description = 'track everybody'
+    prereqs = [ CloningVat ]
+    operation = store([ResourceBlock.Data], 4)
+    color = Yellow
+    image = images.console
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 0.1 },
+        Wisdom: { supply: 0.1, demand: 0 },
     }
 }
 
@@ -391,6 +408,32 @@ export class OreRefinery extends Machine {
     }
 }
 
+export class ThinkingPool extends Machine {
+    name = 'Thinking Pool'
+    size = DeviceSize.Medium
+    prereqs = [ MolecularEngine ]
+    color = Color.fromHex('daa520')
+    operation = store([ResourceBlock.Aurum], 8)
+    economy = {
+        ...emptyMarket(),
+        Wisdom: { supply: 2, demand: 0 },
+        Wonder: { supply: 1, demand: 0 }
+    }
+}
+
+export class SilverForest extends Machine {
+    name = 'Silver Forest'
+    size = DeviceSize.Medium
+    prereqs = [ Megafabricator ]
+    color = Color.fromHex('c0c0c0')
+    operation = store([ResourceBlock.Argent], 12)
+    economy = {
+        ...emptyMarket(),
+        Beauty: { supply: 2, demand: 0 },
+        Wonder: { supply: 1, demand: 0 }
+    }
+    forDome = true
+}
 
 
 // large devices!
@@ -419,6 +462,22 @@ export class Megafabricator extends Machine {
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 8 },
+    }
+}
+
+export class MolecularEngine extends Machine {
+    name = 'Molecular Engine'
+    size = DeviceSize.Large
+    prereqs = [ Megafabricator ]
+    color = Violet
+    operation = recipe(
+        [ResourceBlock.Bioplasma, ResourceBlock.Algorithm],
+        ResourceBlock.Aurum
+    )
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 3 },
+        Water: { supply: 0, demand: 1 },
     }
 }
 
@@ -451,6 +510,7 @@ export class Preserve extends Machine {
         Oxygen: { supply: 12, demand: 0 },
     }
 }
+
 
 /// huge devices
 
@@ -510,4 +570,10 @@ export const allMachines = [
     DissolutionVat,
     MetalStorage,
     Mainframe,
+
+    PersonnelRegistry,
+    MolecularEngine,
+    ThinkingPool,
+    SilverForest,
+
 ]

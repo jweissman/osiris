@@ -69,12 +69,14 @@ export enum ResourceBlock {
     // base
     Biomass = 'Biomass',
     Ore = 'Ore',
-    Data = 'Data',
+    Idea = 'Idea',
+
     // derived
     Meal = 'Meal',
-    Idea = 'Idea',
+    Data = 'Data',
     Mineral = 'Mineral',
     Bioplasma = 'Bioplasma',
+
     // higher-order
     Alloy = "Alloy",
     Algorithm = "Algorithm",
