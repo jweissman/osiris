@@ -15,7 +15,10 @@ const fridge = require('../images/fridge-plain.svg')
 const server = require('../images/research-server-plain.svg')
 const plant = require('../images/houseplant-plain.svg')
 const workstation = require('../images/workstation-plain.svg')
+
 const console = require('../images/console-plain.svg')
+const consolePurple = require('../images/console-purple-plain.svg')
+const consoleGreen = require('../images/console-green-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -29,7 +32,10 @@ const images = {
     server,
     plant,
     workstation,
+
     console,
+    consolePurple,
+    consoleGreen,
 }
 
 
@@ -47,8 +53,10 @@ export class Machine {
     prereqs: (typeof Machine)[] = []
     economy: Economy = emptyMarket()
     forDome: boolean = false
+    hide: boolean = false
 
     capacity: boolean
+
 
     concretize(): Machine { return this; } //return shuffle(allMachines)[0] }
     // concretions: Machine[] = []
@@ -58,11 +66,10 @@ export class CommandCenter extends Machine {
     name = 'Command Console'
     description = 'gather resources...'
     operation = store(
-        [ResourceBlock.Data, ResourceBlock.Ore],
-        // ResourceBlock.Meal,
-        // ResourceBlock.Mineral
+        [ResourceBlock.Meal, ResourceBlock.Ore],
+        6
     )
-    image = images.bench
+    image = images.consoleGreen
     size = DeviceSize.Medium
     economy = {
         ...emptyMarket(),
@@ -71,6 +78,26 @@ export class CommandCenter extends Machine {
         Hope: { supply: 1, demand: 0 }
     }
 }
+
+export class MissionLog extends Machine {
+    name = 'Mission Log'
+    description = 'gather data'
+    operation = store(
+        [ResourceBlock.Data],
+        8
+    )
+    image = images.consolePurple
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 0.1 },
+        Hope: { supply: 1, demand: 0 }
+    }
+}
+
+//export class Energon extends Machine {
+//    name = 'Energon'
+//    description = 'food paste'
+//}
 
 // small
 /// small surface
@@ -119,8 +146,7 @@ export class StudyMachine extends Machine {
         [ ResourceBlock.Idea, ResourceBlock.Idea, ResourceBlock.Idea ],
         ResourceBlock.Data
     )
-    // concretions: Machine[] = [Workstation, Desk]
-
+    color = Blue
     concretize(): Machine { return new (shuffle([Workstation, Desk])[0])() }
 }
 
@@ -129,8 +155,6 @@ export class Desk extends StudyMachine {
     description = 'get to work'
     image = images.bench
     prereqs = [ OxygenExtractor ]
-
-    // color = Blue
     concretize() { return this }
 }
 
@@ -138,13 +162,11 @@ export class Workstation extends StudyMachine {
     name = 'Workstation'
     description = 'hackety hack'
     prereqs = [ Bookshelf ]
-    color = Blue
     image = images.workstation
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 1 },
     }
-
     concretize() { return this }
 }
 

@@ -84,6 +84,9 @@ export enum ResourceBlock {
     // superb
     Argent = "Argent",
     Aurum = "Aurum",
+
+    // hyperbolic
+    Omnium = "Omnium",
 }
 
 let cStep = 0.3
@@ -101,8 +104,10 @@ const blockColors: { [key in ResourceBlock]: Color } = {
     Alloy: Color.DarkGray.darken(cStep), //(cStep),
     Algorithm: Color.Blue.darken(cStep), //.desaturate(cStep),
 
-    Argent: Color.LightGray.lighten(cStep),
+    Argent: Color.Gray.lighten(cStep),
     Aurum: Color.Orange.lighten(cStep),
+
+    Omnium: Color.White,
 }
 
 export function blockColor(block: ResourceBlock) {

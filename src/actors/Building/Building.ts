@@ -141,16 +141,17 @@ export class Building extends Actor {
 
         }
 
-        let showDevicePlaces = false
+        let showDevicePlaces = true
         if (showDevicePlaces && this.devicePlaces().length > 0) {
             this.devicePlaces().forEach(p => {
                 let place = p.position
                 let sz = p.visibleSize
                 drawRect(ctx,
                     { x: place.x - sz/2, y: place.y - sz/2, width: sz, height: sz },
-                    1,
+                    0.1,
                     Color.White,
-                    false
+                    false,
+                    true
                 )
             })
         }
@@ -338,7 +339,7 @@ export class Building extends Actor {
             device.building = this
         }
         this.devices.push(device)
-        this.updateName()
+        this.updateFunction()
     }
 
     public hasPlaceForDevice() {
@@ -356,7 +357,7 @@ export class Building extends Actor {
         return this.devices
     }
 
-    private updateName() {
+    private updateFunction() {
         let fn = allSpaceFunctions.find(spaceFn => {
             let matched = true;
             let unseenDevices = this.devices.slice()
@@ -371,9 +372,12 @@ export class Building extends Actor {
             return matched;
         })
         if (fn) {
+            console.log("Determined building function", { fn })
             let sf = new fn()
             this.spaceFunction = sf
             this.nameLabel.text = sf.name //label
+        } else {
+            console.warn("Could not identify function!")
         }
     }
 

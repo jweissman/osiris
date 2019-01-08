@@ -5,6 +5,7 @@ import { Citizen } from "../actors/Citizen";
 import { sleep } from "../Util";
 import { ResourceBlock } from "../models/Economy";
 export abstract class ProductionStrategy {
+    private sleepInterval: number = 250
     protected isActive: boolean = false;
     constructor(protected pawn: Citizen) { }
     protected abstract async apply();
@@ -34,7 +35,6 @@ export abstract class ProductionStrategy {
         setInterval(() => { this.attempt() }, this.sleepInterval)
     }
 
-    sleepInterval: number = 250
     protected async pause() {
         await sleep(this.sleepInterval)
     }
@@ -90,13 +90,19 @@ export abstract class ProductionStrategy {
             d.product.some(stored => res === stored)
 
         let gen: Device = this.planet.colony.closestDeviceByType(this.pawn.pos, [], generatesDesiredBlock)
-        if (gen) {
-            await this.visitDevice(gen)
-            if (await gen.interact(this.pawn, retrieveResource(res))) {
+        let storesDesiredBlock = (d: Device) => (d.operation.type === 'store') &&
+              d.product.some(stored => res === stored)
+
+        let store: Device = this.planet.colony.closestDeviceByType(this.pawn.pos, [], storesDesiredBlock)
+
+        let device = gen || store
+
+        if (device) {
+            await this.visitDevice(device)
+            if (await device.interact(this.pawn, retrieveResource(res))) {
                 gathered = true
             }
-        }
-        else {
+        } else {
             let recipe = this.recipes.find(recipe => recipe.produces === res);
             if (recipe) {
                 await this.workRecipe(recipe);

@@ -3,29 +3,41 @@ import { Building, DevicePlace } from "./Building";
 import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Device } from "../Device";
-import { DeviceSize } from "../../values/DeviceSize";
+import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 
-export class MissionControlView extends Building {
+export class MediumSurfaceRoomView extends Building {
     hideBox = true
 
+    devicePlaceSize = DeviceSize.Medium
+    devicePlaceCount = 3
+
     devicePlaces() {
-        return this.nodes().map(n => {
-            n.y -= 20
-            return new DevicePlace(n, DeviceSize.Medium)
-        }) 
+        let w = this.getWidth()/2
+        let x = this.pos.x + w;
+        let y = this.pos.y + this.getHeight() //- this.floorHeight // - 10 
+        y -= getVisibleDeviceSize(this.devicePlaceSize) / 3.5 ///2
+
+        let ds = [
+            new Vector(x - w/2, y),
+            ...(this.devicePlaceCount > 2 ? [new Vector(x,y)] : []),
+            new Vector(x + w/2, y),
+        ]
+
+        return ds.map(d => new DevicePlace(d, this.devicePlaceSize)) 
+        //DeviceSize.Small))
     }
 
-    afterConstruct() {
-        let { machines } = this.structure;
-        if (machines && machines.length > 0) {
-            let machine = new machines[0]();
-            this.devicePlaces().forEach(place => {
-                let theDevice = new Device(machine, place.position)
-                this.addDevice(theDevice)
-            })
-        }
+    // afterConstruct() {
+    //     let { machines } = this.structure;
+    //     if (machines && machines.length > 0) {
+    //         let machine = new machines[0]();
+    //         this.devicePlaces().forEach(place => {
+    //             let theDevice = new Device(machine, place.position)
+    //             this.addDevice(theDevice)
+    //         })
+    //     }
 
-    }
+    // }
 
     slots() {
         let theSlots: Slot[] = []

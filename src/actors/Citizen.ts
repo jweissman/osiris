@@ -41,7 +41,11 @@ export class Citizen extends Actor {
         // check wip
         if (this.workInProgress) {
             let now = (new Date()).getTime()
-            this.progress = (now - this.workStarted) / this.workDuration
+            this.progress = 
+              Math.min(
+                  (now - this.workStarted) / this.workDuration,
+                  1
+              )
         }
     }
 

@@ -42,9 +42,9 @@ export class Hud extends UIActor {
         this.add(this.status)
 
         let displayInfo = (e) => this.showCard(e)
-        this.structurePalette = new Palette(20, 35, Hud.structuresForPalette, onBuildingSelect, displayInfo)
-        this.machinePalette = new Palette(20, 300, allMachines, onMachineSelect, displayInfo) // (e) => this.showCard(e))
-        this.functionPalette = new Palette(220, 35, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
+        this.structurePalette = new Palette('Structure', 20, 35, Hud.structuresForPalette, onBuildingSelect, displayInfo)
+        this.machinePalette = new Palette('Machine', 20, 300, allMachines, onMachineSelect, displayInfo) // (e) => this.showCard(e))
+        this.functionPalette = new Palette('Function', 220, 35, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
         this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
         this.add(this.card)

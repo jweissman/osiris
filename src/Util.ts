@@ -75,7 +75,8 @@ export function drawRect(
   rectangle: Rectangle,
   edgeWidth: number = 0,
   color: Color = Color.White,
-  filled: boolean = true
+  filled: boolean = true,
+  dashed: boolean = false
 ) {
   let { x, y, width, height } = rectangle;
 
@@ -100,6 +101,8 @@ export function drawRect(
     let edge = Color.White;
     ctx.strokeStyle = edge.toRGBA();
     ctx.lineWidth=edgeWidth
+    if (dashed) { ctx.setLineDash([5, 10]) } //ctx.lineDashOffset = 5 }
+    else { ctx.setLineDash([]) }
     // ctx.strokeStyle = Stroke.So
     ctx.strokeRect(
       x, y, width, height

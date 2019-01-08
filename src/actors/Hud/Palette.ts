@@ -6,6 +6,7 @@ export class Palette {
     built: EntityKind[] = [];
     comprehended: EntityKind[] = [];
     constructor(
+        private name: string,
         private x: number,
         private y: number,
         private all: EntityKind[],
@@ -46,14 +47,33 @@ export class Palette {
         if (this._element) {
             this._element.parentElement.removeChild(this._element);
         }
+        if (!(this.comprehended.length > 0)) { return }
+
         this._element = document.createElement('div');
         this._element.style.position = 'absolute';
-        this._element.style.border = '1px solid white';
+        this._element.style.border = 'none'; //1px solid black'; //0.5px solid white';
         document.body.appendChild(this._element);
+
+        if (this.name) {
+            let title = document.createElement('h2')
+            title.textContent = this.name
+            title.style.fontFamily = 'Verdana'
+            title.style.fontSize = '7pt'
+            title.style.fontWeight = '400'
+            title.style.color = Color.White.toRGBA()
+            title.style.backgroundColor = Color.Violet.darken(0.92).toRGBA()
+            title.style.padding = '4px'
+            title.style.margin = '0px'
+            this._element.appendChild(
+                title
+            )
+        }
+
         this.comprehended
             .map((elem: EntityKind) => new elem())
             .sort((a, b) => a.color > b.color ? -1 : 1)
             .forEach(elem => {
+                if (elem.hide) { return }
                 let label = elem.name;
                 if (!this.built.map(m => new m().name).includes(elem.name)) {
                     label += ' *';
@@ -71,19 +91,20 @@ export class Palette {
     }
 
     private buttonFactory(label: string, color: Color) {
-        let bg = color.darken(0.6).desaturate(0.5).clone();
+        let bg = color.darken(0.5).desaturate(0.5).clone();
         bg.a = 0.8;
         let fg = color.lighten(0.8).desaturate(0.4).clone();
         let paletteButton = document.createElement('button');
         paletteButton.textContent = label;
+
         paletteButton.style.display = 'block';
-        paletteButton.style.fontSize = '9pt';
-        paletteButton.style.fontFamily = 'Helvetica';
-        paletteButton.style.fontWeight = '600';
-        paletteButton.style.padding = '2px';
-        paletteButton.style.width = '160px';
+        paletteButton.style.fontSize = '7pt';
+        paletteButton.style.fontFamily = 'Verdana';
+        paletteButton.style.fontWeight = '500';
+        paletteButton.style.padding = '3px';
+        paletteButton.style.width = '124px';
         paletteButton.style.textTransform = 'uppercase';
-        paletteButton.style.border = '1px solid rgba(255,255,255,0.08)';
+        paletteButton.style.border = 'none' //1px solid rgba(255,255,255,0.08)';
         paletteButton.style.background = bg.toRGBA();
         paletteButton.style.color = fg.toRGBA();
         paletteButton.onmouseover = () => {

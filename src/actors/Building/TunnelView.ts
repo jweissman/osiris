@@ -1,6 +1,5 @@
 import { Vector } from "excalibur";
 import { Building } from "./Building";
-import { MissionControl } from "../../models/Structure";
 import { range, eachCons, measureDistance, drawRect } from "../../Util";
 import { Slot } from "../../values/Slot";
 import { Orientation, flip } from "../../values/Orientation";

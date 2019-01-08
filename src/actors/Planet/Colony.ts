@@ -1,10 +1,11 @@
 import { Actor, Vector, Traits, Color } from 'excalibur';
 import { Building } from '../Building';
 import { minBy, flatSingle } from '../../Util';
-import { Structure, MissionControl } from '../../models/Structure';
+import { Structure } from '../../models/Structure';
 import { NavigationTree } from './NavigationTree';
 import { Machine } from '../../models/Machine';
 import { Device } from '../Device';
+
 export class Colony extends Actor {
     navTree: NavigationTree;
     buildings: Building[] = [];
@@ -92,7 +93,7 @@ export class Colony extends Actor {
     }
 
     private buildNavTree() {
-        let ctrl = this.buildings.find(building => building.structure instanceof MissionControl);
+        let ctrl = this.buildings[0] //.find(building => building.structure instanceof MissionControl);
         if (ctrl) {
             this.navTree = new NavigationTree(ctrl);
         }

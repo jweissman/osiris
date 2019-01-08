@@ -44,6 +44,8 @@ export class Structure {
     machines: (typeof Machine)[] = []
     prereqs: (typeof Structure)[] = []
 
+
+    hide: boolean = false
 }
 
 
@@ -57,7 +59,7 @@ export class MainTunnel extends Structure {
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ Corridor ],
         [Orientation.Right]: [ Corridor ],
-        [Orientation.Up]: [ MissionControl ],
+        [Orientation.Up]: [ MediumSurfaceRoom ],
         [Orientation.Down]: [ ],
     }
 }
@@ -70,8 +72,8 @@ export class SurfaceRoad extends Structure {
     width: number = minor.fifth
     height: number = minor.first
     connections: { [key in Orientation]: (typeof Structure)[] } = {
-        [Orientation.Left]: [ Dome, MissionControl ],
-        [Orientation.Right]: [  Dome, MissionControl ],
+        [Orientation.Left]: [ Dome, MediumSurfaceRoom ],
+        [Orientation.Right]: [  Dome, MediumSurfaceRoom ],
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
@@ -121,7 +123,7 @@ class Dome extends Structure {
     description: string = 'Biome sweet biome';
 
     view: string = 'DomeView';
-    width: number  = 2 * major.eighth
+    width: number  = 2 * major.sixth
     height: number = major.eighth
     zoom = 0.2
     connections: { [key in Orientation]: (typeof Structure)[] } = {
@@ -223,26 +225,51 @@ export class HugeRoom extends CommonArea {
 
 /// surface bldgs
 
+export class MediumSurfaceRoom extends Dome {
+    name = 'Mid Surf Bldg'
+    description = 'home away from home';
+
+    view: string = 'MediumSurfaceRoomView';
+
+    width: number = 6 * major.eighth
+    height: number = 1 * major.sixth
+
+    zoom = 0.1
+
+    prereqs = [ SmallDome ]
+
+    connections: { [key in Orientation]: (typeof Structure)[] } = {
+        [Orientation.Left]: [ SurfaceRoad ],
+        [Orientation.Right]: [ SurfaceRoad ],
+        [Orientation.Up]: [ MainTunnel ],
+        [Orientation.Down]: [ MainTunnel ],
+    }
+
+    machines = midBelow
+
+    hide = true // need another one which cares about connecting to roads
+}
+
 export class SmallDome extends Dome {
     name = 'Sm. Dome'
-    width = 3 * major.eighth
-    height = 2 * major.eighth
+    width = 2 * major.seventh
+    height = major.seventh
     machines = smallDome
 }
 
 export class SmallDomeThree extends Dome {
     name = 'Sm. Dome (3)'
     view = 'SmallDomeThreeView'
-    width = 4 * major.seventh
-    height = 3 * major.seventh
+    width = 3 * major.fifth
+    height = 2 * major.fifth
     machines = smallDome
 }
 
 export class MidDome extends Dome {
     name = 'Mid Dome'
     view = 'MidDomeView'
-    width = 6 * major.eighth
-    height = 5 * major.eighth
+    width = 3 * major.seventh
+    height = 2 * major.seventh
     prereqs = [ SmallDome, MediumRoom ]
     machines = midDome
 }
@@ -250,8 +277,8 @@ export class MidDome extends Dome {
 export class LargeDome extends Dome {
     name = 'Lg. Dome'
     view = 'BigDomeView'
-    width = 8 * major.eighth
-    height = 6 * major.eighth
+    width = 4 * major.eighth
+    height = 3 * major.eighth
     prereqs = [MidDome, LargeRoom]
     machines = largeDome
 }
@@ -268,22 +295,22 @@ export class Arcology extends Dome {
 
 //////
 
-export class MissionControl extends Structure {
-    name: string = 'Mission Control';
-    description: string = 'Keeping everything on track';
-    view: string = 'MissionControlView';
-    width: number = 6 * major.eighth
-    height: number = 1 * major.sixth
-    zoom = 0.1
-    connections: { [key in Orientation]: (typeof Structure)[] } = {
-        [Orientation.Left]: [ SurfaceRoad ],
-        [Orientation.Right]: [ SurfaceRoad ],
-        [Orientation.Up]: [ MainTunnel ],
-        [Orientation.Down]: [ MainTunnel ],
-    }
+// export class MissionControl extends Structure {
+//     name: string = 'Mission Control';
+//     description: string = 'Keeping everything on track';
+//     view: string = 'MissionControlView';
+//     width: number = 6 * major.eighth
+//     height: number = 1 * major.sixth
+//     zoom = 0.1
+//     connections: { [key in Orientation]: (typeof Structure)[] } = {
+//         [Orientation.Left]: [ SurfaceRoad ],
+//         [Orientation.Right]: [ SurfaceRoad ],
+//         [Orientation.Up]: [ MainTunnel ],
+//         [Orientation.Down]: [ MainTunnel ],
+//     }
 
-    machines = [ CommandCenter ]
-}
+//     machines = [ CommandCenter ]
+// }
 
 export const allStructures =
     [
@@ -292,6 +319,7 @@ export const allStructures =
         MidDome,
         LargeDome,
         Arcology,
+        MediumSurfaceRoom,
 
         SmallRoomTwo,
         SmallRoomThree,

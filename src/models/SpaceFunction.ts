@@ -1,5 +1,6 @@
-import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe } from './Machine';
+import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog } from './Machine';
 import { Color } from 'excalibur';
+import { Structure, MediumSurfaceRoom } from './Structure';
 
 export class SpaceFunction {
      name: string = '(generic)'
@@ -8,7 +9,20 @@ export class SpaceFunction {
      color: Color = Color.Gray
 
      prereqs: (typeof SpaceFunction)[] =  [] 
+
+     structure: typeof Structure = null
+     hide: boolean = false
 }
+
+export class MissionControl extends SpaceFunction {
+     hide = true
+     name = 'Mission Control'
+     description = 'keeping everything on track'
+     structure = MediumSurfaceRoom
+     prereqs = [] //ComputerCore, Factory, Farm ]
+     machines = [ CommandCenter, MissionLog ]
+}
+
 
 export class LivingQuarters extends SpaceFunction {
      name = 'Living Quarters'
@@ -146,4 +160,6 @@ export const allSpaceFunctions = [
     Lab,
 
     ComputerCore,
+
+    MissionControl,
 ]
