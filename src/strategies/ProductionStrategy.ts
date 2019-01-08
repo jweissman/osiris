@@ -67,7 +67,7 @@ export abstract class ProductionStrategy {
     protected async storeBlock(res: ResourceBlock) {
 
         let storesDesiredBlock = (d: Device) => d.operation.type === 'store' &&
-            d.product.length < d.operation.capacity &&
+            d.product.length < d.getEffectiveOperationalCapacity(d.operation) && //operation.capacity &&
             d.operation.stores.includes(res)
         let openStore = this.planet.colony.closestDeviceByType(this.pawn.pos, [], storesDesiredBlock)
         let stored = false

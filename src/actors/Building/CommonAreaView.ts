@@ -3,7 +3,8 @@ import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Vector } from "excalibur";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
-import { drawRect } from "../../Util";
+import { drawRect, drawPatternedRect } from "../../Util";
+import { BackgroundPattern } from "./BackgroundPatterns";
 
 export class CommonAreaView extends Building {
     floorHeight: number = 12
@@ -18,7 +19,8 @@ export class CommonAreaView extends Building {
         let wallColor = this.processedColor() //.darken(0.4)
         let floorColor = this.processedColor().darken(0.4)
 
-        drawRect(ctx, this.aabb(), 0.5, wallColor)
+        // drawRect(ctx, this.aabb(), 0.5, wallColor)
+        drawPatternedRect(ctx, this.aabb(), this.backgroundPattern)
 
         drawRect(
             ctx,
@@ -30,6 +32,7 @@ export class CommonAreaView extends Building {
 
         super.draw(ctx, delta)
     }
+
 
     slots() {
         let theSlots = []

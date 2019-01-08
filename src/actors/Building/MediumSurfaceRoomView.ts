@@ -4,6 +4,7 @@ import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Device } from "../Device";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
+import { drawPatternedRect } from "../../Util";
 
 export class MediumSurfaceRoomView extends Building {
     hideBox = true
@@ -84,7 +85,14 @@ export class MediumSurfaceRoomView extends Building {
 
         ctx.fillStyle = color.toRGBA()
 
-        ctx.fillRect(this.pos.x, this.pos.y, this.getWidth(), this.getHeight())
+        // ctx.fillRect(this.pos.x, this.pos.y, this.getWidth(), this.getHeight())
+        // let rect = 
+            // { x: this.pos.x, y: this.pos.y, width: this.getWidth(), height: this.getHeight() };
+        drawPatternedRect(
+            ctx,
+            this.aabb(),
+            this.backgroundPattern
+        )
 
         // a little flag :)
         let flagpoleHeight = 18

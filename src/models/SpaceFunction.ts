@@ -1,6 +1,7 @@
-import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog } from './Machine';
+import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog, Botany } from './Machine';
 import { Color } from 'excalibur';
 import { Structure, MediumSurfaceRoom } from './Structure';
+import { BackgroundPattern } from '../actors/Building/BackgroundPatterns';
 
 export class SpaceFunction {
      name: string = '(generic)'
@@ -12,6 +13,15 @@ export class SpaceFunction {
 
      structure: typeof Structure = null
      hide: boolean = false
+     background: BackgroundPattern = BackgroundPattern.Beige
+
+     bonuses: {
+          capacity: number, // every store/generator gets this??
+          workSpeed: number, // 2 should double work speed (dur *= 1/multiplier)
+     } = {
+          capacity: 0, // boost cap by one
+          workSpeed: 1.00 // 20% bonus to work speed
+     }
 }
 
 export class MissionControl extends SpaceFunction {
@@ -21,6 +31,7 @@ export class MissionControl extends SpaceFunction {
      structure = MediumSurfaceRoom
      prereqs = [] //ComputerCore, Factory, Farm ]
      machines = [ CommandCenter, MissionLog ]
+     background = BackgroundPattern.Window
 }
 
 
@@ -40,6 +51,11 @@ export class Kitchen extends SpaceFunction {
      name = 'Kitchen'
      description = 'stay together'
      machines = [ Stove, Fridge ]
+     bonuses = {
+          capacity: 2,
+          workSpeed: 1.1
+     }
+     background = BackgroundPattern.Checker
 }
 
 export class LifeSupportPod extends SpaceFunction {
@@ -70,6 +86,7 @@ export class Library extends SpaceFunction {
      name = 'Library'
      description = 'take a look'
      machines = [ Bookshelf, Bookshelf, Bookshelf ]
+     background = BackgroundPattern.Books
 }
 
 class Study extends SpaceFunction {
@@ -78,8 +95,8 @@ class Study extends SpaceFunction {
      machines = [ StudyMachine, Bookshelf ]
 }
 
-class Lab extends SpaceFunction {
-     name = 'Lab'
+class ComputerLab extends SpaceFunction {
+     name = 'Computer Lab'
      description = 'make it happen'
      machines = [ Workstation, Workstation, Workstation ]
 }
@@ -118,6 +135,7 @@ class Nursery extends SpaceFunction {
      name = 'Nursery'
      description = 'quiet please'
      machines = [ Houseplant, Houseplant, Houseplant ]
+     background = BackgroundPattern.Leafy
 }
 
 class Farm extends SpaceFunction {
@@ -137,6 +155,13 @@ export class ComputerCore extends SpaceFunction {
      name = 'Computer Core'
      description = 'let us calculate'
      machines = [ Mainframe, Mainframe ]
+     background = BackgroundPattern.Tech
+}
+
+export class LifeSciencesLab extends SpaceFunction {
+     name = 'Life Sciences Lab'
+     description = 'where do i come from'
+     machines = [ Botany, Botany ]
 }
 
 export const allSpaceFunctions = [
@@ -157,9 +182,10 @@ export const allSpaceFunctions = [
     Nursery,
     Farm,
     Factory,
-    Lab,
+    ComputerLab,
 
     ComputerCore,
 
     MissionControl,
+    LifeSciencesLab,
 ]

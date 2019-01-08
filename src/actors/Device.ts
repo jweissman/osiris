@@ -6,7 +6,7 @@ import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
 import { getVisibleDeviceSize } from "../values/DeviceSize";
-import { Recipe, ResourceStorage } from "../models/MechanicalOperation";
+import { Recipe, ResourceStorage, MechanicalOperation, ResourceGenerator } from "../models/MechanicalOperation";
 import { range, deleteByValueOnce, drawRect } from "../Util";
 
 interface RetrieveResource {
@@ -125,7 +125,8 @@ export class Device extends Actor {
                 this.inUse = true
                 if (citizen.isCarryingUnique(recipe.consumes)) {
                     recipe.consumes.forEach(consumed => citizen.drop(consumed))
-                    await citizen.progressBar(recipe.workTime)
+                    let workTime = this.getEffectiveWorkTime(recipe)
+                    await citizen.progressBar(workTime) // recipe.workTime)
                     citizen.carry(recipe.produces)
 
                     worked = true
@@ -146,7 +147,7 @@ export class Device extends Actor {
                 this.inUse = false
             } else if (request && request.type === 'store' &&
                 citizen.carrying.some(it => store.stores.includes(it))) { // maybe trying to store?
-                if (this.product.length < store.capacity) {
+                if (this.product.length < this.getEffectiveOperationalCapacity(store)) { // store.capacity) {
                     let res = null
                     if (store.stores.some(stored => { res = citizen.drop(stored); return res })) {
                         if (res) {
@@ -171,6 +172,18 @@ export class Device extends Actor {
 
         return worked
     }
+
+    getEffectiveOperationalCapacity(op: ResourceGenerator | ResourceStorage) {
+        // should we get mad if someone asks about an op that doesn't belong to us??
+        let bonus = this.building.spaceFunction.bonuses.capacity 
+        return op.capacity + bonus
+    }
+
+    getEffectiveWorkTime(op: Recipe) {
+        let bonus = this.building.spaceFunction.bonuses.workSpeed
+        return Math.round(op.workTime * (1/bonus))
+    } 
+
 
     private dispense(citizen: Citizen, request: InteractionRequest) {
         if (request && request.type === 'retrieve') {

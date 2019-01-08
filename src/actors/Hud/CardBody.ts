@@ -69,7 +69,18 @@ export class CardBody extends Actor {
                 // } else if (entity.produces) {
                 //     this.notes.text = `Generates ${entity.produces}.`
                 // } // if entity.stores...?
-            } else { //} if (entity instanceof Structure) {
+            } else if (entity instanceof SpaceFunction) { //} if (entity instanceof Structure) {
+                let { capacity, workSpeed } = entity.bonuses
+                let bonusMessages = [];
+                if (capacity > 0) {
+                    bonusMessages.push(`+${capacity} cap`)
+                }
+                if (workSpeed > 1.0) {
+                    bonusMessages.push(`+${Math.floor((workSpeed*100)-100)}% efficiency` )
+                }
+                this.values.text = bonusMessages.join('; ') //; 
+                this.notes.text = ''
+            } else {
                 this.values.text = ''
                 this.notes.text = ''
             }

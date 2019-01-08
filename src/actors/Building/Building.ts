@@ -12,6 +12,8 @@ import { Device } from "../Device";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { World } from "../../models/World";
+import { Machine } from "../../models/Machine";
+import { BackgroundPattern } from "./BackgroundPatterns";
 
 export class DevicePlace {
     constructor(private pos: Vector, private size: DeviceSize) {}
@@ -21,10 +23,9 @@ export class DevicePlace {
 }
 
 export class Building extends Actor {
-    edgeWidth: number = 0 //.1
+    edgeWidth: number = 0
 
     nameLabel: Label
-    levelLabel: Label
 
     built: boolean = false
     hover: boolean = false
@@ -33,8 +34,6 @@ export class Building extends Actor {
     hideBox: boolean = false
     parentSlot: Slot
     childrenBuildings: Building[] = []
-
-    level: number = 1
 
     spaceFunction: SpaceFunction
 
@@ -75,16 +74,6 @@ export class Building extends Actor {
         // this.nameLabel.fontSize = 11
         this.nameLabel.color = Color.White
 
-        this.levelLabel = new Label(`Lvl. ${this.level}`, 0, 0, 'Helvetica')
-        this.levelLabel.fontSize = 6
-        this.levelLabel.color = Color.White.darken(0.2)
-
-        // this.givenName = World.bestowName() 
-    }
-
-    levelUp() {
-        this.level += 1
-        this.levelLabel.text = `Lvl. ${this.level}`
     }
 
     get name() {
@@ -115,11 +104,6 @@ export class Building extends Actor {
             this.nameLabel.pos.x -= ctx.measureText(this.structure.name).width / 2
             this.nameLabel.draw(ctx, delta)
 
-            // this.levelLabel.text = `Lvl. ${this.level}`
-            // this.levelLabel.pos = this.getCenter()
-            // this.levelLabel.pos.y += 10
-            // this.levelLabel.pos.x -= ctx.measureText(this.structure.name).width / 4
-            // this.levelLabel.draw(ctx, delta)
         }
 
         let debug = false;
@@ -363,9 +347,10 @@ export class Building extends Actor {
             let unseenDevices = this.devices.slice()
 
             let sf = new spaceFn()
-            sf.machines.forEach(machine => {
+            sf.machines.forEach((machine: typeof Machine) => {
                 let matchingDevice = unseenDevices.find(d => d.machine instanceof machine)
                 if (!matchingDevice) { matched = false; }
+
                 unseenDevices = deleteByValue(unseenDevices, matchingDevice)
                 // return true
             })
@@ -381,5 +366,11 @@ export class Building extends Actor {
         }
     }
 
-    // get function() { }
+    get backgroundPattern() {
+        if (this.spaceFunction) {
+            return this.spaceFunction.background
+        } else {
+            return BackgroundPattern.Grid
+        }
+    }
 }

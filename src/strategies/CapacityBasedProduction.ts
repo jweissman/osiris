@@ -8,7 +8,7 @@ export class CapacityBasedProduction extends ProductionStrategy {
         if (this.isActive) { return; }
         this.isActive = true
         const storeWithCapacity = (d: Device) => d.operation.type === 'store' &&
-            d.product.length < d.operation.capacity
+            d.product.length < d.getEffectiveOperationalCapacity(d.operation) //operation.capacity
         const store: Device = shuffle(this.devices).find(storeWithCapacity)
         if (store && store.operation.type === 'store') {
             const storage: ResourceStorage = store.operation

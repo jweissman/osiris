@@ -1,5 +1,6 @@
 import { Vector, Color } from "excalibur";
 import { Rectangle } from "./values/Rectangle";
+import { getBackgroundPattern, BackgroundPattern } from "./actors/Building/BackgroundPatterns";
 
 const extremumBy = (arr, pluck, extremum) => {
   return arr.reduce(function(best, next) {
@@ -68,6 +69,26 @@ export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, c:
   ctx.strokeStyle = c.toRGBA()
   ctx.lineWidth = lineWidth
   ctx.stroke()
+}
+
+// let gridPattern;
+// let loadingPattern  = false
+export function drawPatternedRect(
+  ctx: CanvasRenderingContext2D,
+  rect: Rectangle,
+  pattern: BackgroundPattern = BackgroundPattern.Grid
+) {
+  const gridPattern = getBackgroundPattern(ctx, pattern) // BackgroundPattern.Grid)
+  if (gridPattern) {
+    let { x, y, width, height } = rect;
+    ctx.fillStyle = gridPattern
+    ctx.fillRect(x,y,width,height)
+
+    ctx.lineWidth = 2
+    ctx.setLineDash([])
+    ctx.strokeStyle = Color.White.toRGBA()
+    ctx.strokeRect(x,y,width,height)
+  }
 }
 
 export function drawRect(
