@@ -72,6 +72,10 @@ export class Hud extends UIActor {
         this.status.incrementResource(resource)
     }
 
+    resourceExpended(resource: ResourceBlock) {
+        this.status.decrementResource(resource)
+    }
+
     updateDetails(planet: Planet, rebuildPalettes: boolean = true) {
         if (rebuildPalettes) {
             this.updatePalettes(planet.colony)

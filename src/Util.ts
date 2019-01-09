@@ -69,3 +69,13 @@ export function shuffle(arr) {
 }
 
 export const zip = (a, b) => a.map((e,i) => [e, b[i]])
+
+export const countOccurrences = (arr) => {
+  let counts = {}
+  arr.forEach((elem) => {
+    counts[elem] = counts[elem] || 0
+    counts[elem] += 1
+  })
+  return counts
+}
+

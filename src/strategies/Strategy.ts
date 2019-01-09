@@ -7,7 +7,7 @@ import { retrieveResource } from "../values/InteractionRequest";
 import { Recipe, MechanicalOperation } from "../models/MechanicalOperation";
 
 export abstract class Strategy {
-    private sleepInterval: number = 1250
+    private sleepInterval: number = 250
     protected isActive: boolean = false;
     constructor(protected pawn: Citizen) { }
     protected abstract async apply();
@@ -45,7 +45,6 @@ export abstract class Strategy {
     }
 
     protected async gatherBlock(res: ResourceBlock) {
-        console.log("GATHER", { res })
         let gathered = false
         let generatesDesiredBlock = (d: Device) => (d.operation.type === 'generator') &&
             d.product.some(stored => res === stored)
@@ -58,7 +57,6 @@ export abstract class Strategy {
         let device: Device = gen || store
 
         if (device) {
-            console.log("FOUND DEVICE WHICH GENS OR STORES", { device, pos: device.pos })
             await this.visitDevice(device)
             if (await device.interact(this.pawn, retrieveResource(res))) {
                 gathered = true
@@ -72,18 +70,13 @@ export abstract class Strategy {
         }
 
         if (!gathered) {
-            await this.pause() // sleep(1000)
+            await this.pause()
             await this.gatherBlock(res)
         }
     }
 
     protected async visitDevice(device: Device) {
-        // console.log("VISIT DEVICE!!!", { device, building: device.building })
-        await this.pawn.pathTo(device.building) //pos) //building)
-
-        let target = device.pos.add(device.building.pos)
-        // console.log("VISIT DEVICE AT", { target })
-        await this.pawn.glideTo(target)
+        await this.pawn.visit(device)
     }
 
 

@@ -79,6 +79,20 @@ export class Colony extends Actor {
         return path;
     }
 
+    pathBetweenPoints(origin: Vector, destination: Vector): Vector[] {
+        if (!this.navTree) {
+            this.buildNavTree();
+        }
+        let srcNode = this.navTree.closestNode(origin);
+        let dest = destination; //.nodes()[0];
+        let destNode = this.navTree.closestNode(dest);
+        let path = this.navTree.seekPath(srcNode, destNode);
+        console.log("PATH FOUND BTWN POINTS", { srcNode, destNode, path })
+        return path;
+    }
+
+
+
     closestDeviceByType(cursor: Vector, machineTypes: (typeof Machine)[] = [], predicate: (Device) => boolean = () => true) {
         let devices = this.findPoweredDevices()
         devices = devices.filter(d => 

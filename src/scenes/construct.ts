@@ -114,7 +114,7 @@ export class Construct extends Scene {
 
                             if (this.placingFunction) {
                                 let fn = this.placingFunction
-                                console.log({ fn, bldg: buildingUnderConstruction })
+                                // console.log({ fn, bldg: buildingUnderConstruction })
                                 zip(fn.machines, buildingUnderConstruction.devicePlaces()).forEach(([machine, place]: [typeof Machine, DevicePlace]) => {
                                     console.log("would add machine", { machine, place })
                                     let m = (new machine()).concretize()

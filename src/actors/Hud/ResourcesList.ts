@@ -48,4 +48,11 @@ export class ResourcesList extends Actor {
             res.credit(1);
         }
     }
+
+    decrement(resource: ResourceBlock) {
+        let res = this.entries[resource]
+        if (res) {
+            res.debit(1)
+        }
+    }
 }

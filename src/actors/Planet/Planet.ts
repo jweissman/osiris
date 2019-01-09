@@ -105,13 +105,17 @@ export class Planet extends Actor {
         this.hud.resourceGathered(resource)
     }
 
+    spend(resource: ResourceBlock): any {
+        this.hud.resourceExpended(resource)
+    }
+
     placeBuilding(building: Building) {
         this.colony.placeBuilding(building)
     }
 
     populate(pos: Vector, elite: boolean = false) {
         if (this.population.citizens.length < this.maxPop) {
-            console.log("POPULATIN'!")
+            // console.log("POPULATIN'!")
             // let home = this.closestDevice(pos, [CloningVat])
             this.population.increase(pos, elite) //home)
         } else {
@@ -140,6 +144,11 @@ export class Planet extends Actor {
 
     pathBetween(origin: Vector, destination: Building): Vector[] {
         return this.colony.pathBetween(origin, destination)
+    }
+
+    pathBetweenPoints(origin: Vector, destination: Vector): Vector[] {
+        return this.colony.pathBetweenPoints(origin, destination)
+
     }
 
     get timeFactor() {

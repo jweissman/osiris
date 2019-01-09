@@ -100,6 +100,15 @@ export class Citizen extends Actor {
         }
     }
 
+    async progressBar(duration: number) {
+        this.workInProgress = true
+        this.workStarted = (new Date()).getTime()
+        this.workDuration = duration
+        await new Promise((resolve, reject) => setTimeout(resolve, duration));
+        this.workInProgress = false
+    }
+
+
     carry(c: ResourceBlock) {
         this.carrying.push(c);
     }
@@ -132,40 +141,43 @@ export class Citizen extends Actor {
         return null
     }
 
+    async visit(device: Device) {
+
+        let path = this.planet.pathBetween(this.pos.clone(), device.building)
+        path.pop()
+        path.shift()
+        if (path.length > 1) {
+            await this.followPath(path)
+        }
+        // await this.glideTo(device.pos)
+        // await this.pathTo(device.building)
+        let target = device.pos.add(device.building.pos)
+        await this.glideTo(target)
+    }
+
     glideTo(pos: Vector) {
         if (pos) {
             return this.actions.moveTo(pos.x, pos.y, this.walkSpeed).asPromise()
         }
     }
 
-    async progressBar(duration: number) {
-        this.workInProgress = true
-        this.workStarted = (new Date()).getTime()
-        this.workDuration = duration
-        await new Promise((resolve, reject) => setTimeout(resolve, duration));
-        this.workInProgress = false
-    }
-
-    // currentBuilding: Building
-    async pathTo(building: Building) {
-        if (this.path.length > 0) {
-            throw new Error("Already pathing!!")
-        }
-        // console.log("PATH TO", { building, pos: this.pos })
-        let path = //this.currentBuilding
-            // ? this.planet.pathBetween(this.currentBuilding.pos.clone(), building)
-            this.planet.pathBetween(this.pos.clone(), building) //pos) //building)
-
-        // console.log("FOUND PATH", { path })
+    async followPath(path: Vector[]) {
         if (path.length > 0) {
             this.path = path
-            path.shift()
+            // path.pop()
+            // path.shift()
             await Promise.all(
                 path.map(step => this.glideTo(step))
             )
             this.path = []
         }
-        // this.currentBuilding = building
+    }
+
+    // currentBuilding: Building
+    async pathTo(building: Building) {
+        if (this.path.length > 0) { throw new Error("Already pathing!!") }
+        let path = this.planet.pathBetween(this.pos.clone(), building)
+        await this.followPath(path)
         return true;
     }
 

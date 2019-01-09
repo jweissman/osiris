@@ -67,7 +67,7 @@ export class Building extends Actor {
 
 
         this.on('pointerdown', () => {
-            console.log("CLICKED BUILDING", { building: this })
+            // console.log("CLICKED BUILDING", { building: this })
             this.toggleActive();
         })
 
@@ -140,7 +140,7 @@ export class Building extends Actor {
 
         let tryProduce = this.placed;
         if (tryProduce) {
-            this.devices.forEach(device => device.produce(this.step));
+            this.devices.forEach(device => device.tryProduce(this.step));
         }
 
         // this.devices.forEach(d => d.update(engine, delta))
@@ -260,11 +260,13 @@ export class Building extends Actor {
         this.planet.gather(res)
     }
 
-    public populate(pos: Vector, elite: boolean = false) {
-        console.log("(bldg) ATTEMPT TO POP")
-        this.planet.populate(pos, elite) //this.pos)
+    public debit(res: ResourceBlock) {
+        this.planet.spend(res)
     }
 
+    public populate(pos: Vector, elite: boolean = false) {
+        this.planet.populate(pos, elite) //this.pos)
+    }
 
     protected aabb(): Rectangle {
         return {
@@ -420,7 +422,7 @@ export class Building extends Actor {
             return matched;
         })
         if (fn) {
-            console.log("Determined building function", { fn })
+            // console.log("Determined building function", { fn })
             let sf = new fn()
             this.spaceFunction = sf
             this.nameLabel.text = sf.name

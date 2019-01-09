@@ -47,7 +47,7 @@ export class Device extends Actor {
         this.image.src = machine.image
 
         this.on('pointerenter', () => {
-            console.log("HOVER ON", { device: this })
+            // console.log("HOVER ON", { device: this })
             this.hover = true
             if (this.building) {
                 // setInterval(() => {
@@ -57,7 +57,7 @@ export class Device extends Actor {
         })
 
         this.on('pointerdown', () => {
-            console.log("CLICKED DEVICE", { device: this })
+            // console.log("CLICKED DEVICE", { device: this })
             // this.toggleActive();
         })
 
@@ -171,8 +171,9 @@ export class Device extends Actor {
                     let res = null
                     if (store.stores.some(stored => { res = citizen.drop(stored); return res })) {
                         if (res) {
-                            this.product.push(res)
-                            this.building.redeem(res)
+                            this.produceResource(res)
+                            // this.product.push(res)
+                            // this.building.redeem(res)
                             worked = true
                         }
                     }
@@ -215,28 +216,34 @@ export class Device extends Actor {
             if (canFulfill) {
                 deleteByValueOnce(this.product, request.resource)
                 citizen.carry(request.resource)
+                this.building.debit(request.resource)
                 return true
             }
         }
         return false
     }
 
-    public produce(step: number) {
+    public tryProduce(step: number) {
         if (this.building.isActive && this.built) {
             if (this.machine.operation.type === 'generator') {
                 if (step % this.machine.operation.generationTime === 0) {
                     if (this.product.length < this.machine.operation.capacity) {
-                        this.product.push(this.machine.operation.generates)
+                        this.produceResource(this.machine.operation.generates)
                     }
                 }
 
             } else if (this.machine.operation.type === 'spawn') {
                 if (step % 1000 == 0) {
-                    console.log("WOULD SPAWN")
+                    // console.log("WOULD SPAWN")
                     setTimeout(() => this.building.populate(this.pos.add(this.building.pos)), 100)
                 }
             }
         }
+    }
+
+    public produceResource(res: ResourceBlock) {
+        this.product.push(res)
+        this.building.redeem(res)
     }
 
     snap(planet: Planet, pos: Vector = this.pos) {

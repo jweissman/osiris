@@ -12,8 +12,14 @@ export class ResourceListEntry extends Actor {
         this.count.color = Color.White;
         this.add(this.count);
     }
+
     credit(amt: number) {
         this.value += amt;
         this.count.text = `x${this.value}`;
+    }
+
+    debit(amt: number) {
+        this.value -= amt
+        this.count.text = `x${this.value}`
     }
 }

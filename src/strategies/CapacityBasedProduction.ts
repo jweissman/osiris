@@ -5,9 +5,6 @@ import { ProductionStrategy } from "./ProductionStrategy";
 
 export class CapacityBasedProduction extends ProductionStrategy {
     async apply() {
-        console.warn("APPLY CAPACITY BASED PRODUCTION!!")
-        // if (this.isActive) { return; }
-        // this.isActive = true
         const storeWithCapacity = (d: Device) => d.operation.type === 'store' &&
             d.product.length < d.getEffectiveOperationalCapacity(d.operation) //operation.capacity
         const store: Device = shuffle(this.devices).find(storeWithCapacity)
@@ -21,7 +18,10 @@ export class CapacityBasedProduction extends ProductionStrategy {
             }
         }
         await this.pause()
-        // this.isActive = false
+    }
+
+    private tryWorkingForStore(store: Storage) {
+
     }
 
 }

@@ -50,6 +50,10 @@ export class StatusAnalysisView extends Actor {
         this.resources.increment(res)
     }
 
+    decrementResource(res: ResourceBlock) {
+        this.resources.decrement(res)
+    }
+
     setMessage(text: string) { this.messageLabel.text = text }
 
     showEconomy(updatedEconomy: Economy): any {
