@@ -15,6 +15,7 @@ import { Palette } from "./Palette";
 import { Building } from "../Building";
 
 export class Hud extends UIActor {
+    private hidePalettes: boolean = true
     private structurePalette: Palette //<Structure> 
     private machinePalette: Palette //<Machine>
     private functionPalette: Palette
@@ -29,6 +30,8 @@ export class Hud extends UIActor {
     ];
     static machinesForPalette = allMachines
     static functionsForPalette = allSpaceFunctions
+
+
 
     constructor(
         private game: Game,
@@ -50,13 +53,19 @@ export class Hud extends UIActor {
         this.add(this.card)
     }
 
+    showPalettes() {
+        this.hidePalettes = false
+    }
+
     setMessage(text: string) { this.status.setMessage(text) }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta)
-        this.structurePalette.draw(ctx)
-        this.machinePalette.draw(ctx)
-        this.functionPalette.draw(ctx)
+        if (!this.hidePalettes) {
+            this.structurePalette.draw(ctx)
+            this.machinePalette.draw(ctx)
+            this.functionPalette.draw(ctx)
+        }
     }
 
     resourceGathered(resource: ResourceBlock) {

@@ -38,20 +38,7 @@ export class CardBody extends Actor {
             this.description.text = entity.description;
 
             if (entity instanceof Machine || entity instanceof Device) {
-                //let values = []
-                //let econ = entity.economy
-                //for (let value in PureValue) {
-                //    let { supply, demand } = econ[value]
-                //    let delta = supply - demand
-                //    if (delta > 0) {
-                //        values.push(`+${delta} ${value}`)
-                //    } else if (delta < 0) {
-                //        values.push(`${delta} ${value}`)
-                //    }
-                //}
-                this.values.text =  this.describeEconomy(entity.economy) //values.join(' | ')
-
-                // let theNotes = []
+                this.values.text =  this.describeEconomy(entity.economy)
                 this.notes.text = ''
                 let op = entity.operation
                 if (op) {
@@ -65,13 +52,7 @@ export class CardBody extends Actor {
                         this.notes.text = 'Decants clones.'
                     }
                 }
-                
-                // if (entity.consumes && entity.produces) {
-                //     this.notes.text = `Turns ${entity.consumes} into ${entity.produces}.`
-                // } else if (entity.produces) {
-                //     this.notes.text = `Generates ${entity.produces}.`
-                // } // if entity.stores...?
-            } else if (entity instanceof SpaceFunction) { //} if (entity instanceof Structure) {
+            } else if (entity instanceof SpaceFunction) {
                 let { capacity, workSpeed } = entity.bonuses
                 let bonusMessages = [];
                 if (capacity > 0) {

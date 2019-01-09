@@ -171,12 +171,11 @@ export class Building extends Actor {
         if (emptyUnlessActive && !this.isActive) {
             return emptyMarket()
         } else {
-            // add devices
             let machineEconomies = this.devices.map(d => d.machine.economy)
 
             let buildingEconomy = {
                 ...emptyMarket(),
-                Oxygen: { demand: 0.1, supply: 0 },
+                Oxygen: { demand: 0.1, supply: 0 }, // structural demand
                 // Water: { demand: 0.1, supply: 0 },
             }
 
@@ -190,13 +189,19 @@ export class Building extends Actor {
     private toggleActive() {
         if (!this.structure.infra) {
             if (this.active) {
+                if (this.devices.some(d => d.inUse)) { return }
                 this.active = false
-            } else {
-                this.active = true
-                let agg = [ this.planet.economy, this.economy(false) ].reduce(sumMarkets, emptyMarket())
-                // console.log("---> activate", { agg, eq: equilibrium(agg) })
-                if (!equilibrium(agg)) {
-                    this.active = false
+                if (!equilibrium(this.planet.economy)) {
+                    this.active = true
+                }
+            } else { // this.active is false now
+                let agg = [
+                    this.planet.economy,
+                    this.economy(false)
+                ].reduce(sumMarkets, emptyMarket())
+
+                if (equilibrium(agg)) {
+                    this.active = true
                 }
             }
         }

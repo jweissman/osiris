@@ -230,17 +230,19 @@ export class Device extends Actor {
     }
 
     public produce(step: number) {
-        if (this.machine.operation.type === 'generator') {
-            if (step % this.machine.operation.generationTime === 0) {
-                if (this.product.length < this.machine.operation.capacity) {
-                    this.product.push(this.machine.operation.generates)
+        if (this.building.isActive) {
+            if (this.machine.operation.type === 'generator') {
+                if (step % this.machine.operation.generationTime === 0) {
+                    if (this.product.length < this.machine.operation.capacity) {
+                        this.product.push(this.machine.operation.generates)
+                    }
                 }
-            }
 
-        } else if (this.machine.operation.type === 'spawn') {
-            if (step % 1000 == 0) {
-                console.log("WOULD SPAWN")
-                setTimeout(() => this.building.populate(this.pos.add(this.building.pos)), 100)
+            } else if (this.machine.operation.type === 'spawn') {
+                if (step % 1000 == 0) {
+                    console.log("WOULD SPAWN")
+                    setTimeout(() => this.building.populate(this.pos.add(this.building.pos)), 100)
+                }
             }
         }
     }

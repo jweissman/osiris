@@ -40,9 +40,14 @@ export abstract class ProductionStrategy {
     }
 
     protected async workRecipe(recipe: Recipe) {
-        for (let ingredient of recipe.consumes) {
-            await this.gatherBlock(ingredient);
-        }
+        // if (!this.pawn.isCarryingUnique(recipe.consumes)) {
+            // for (let ingredient of recipe.consumes) {
+                // await this.gatherBlock(ingredient);
+            // }
+        // }
+        // hmmmmmm -- don't do this twice...
+        await this.gatherIngredients(recipe)
+
         let knowsRecipe = (d: Device) => d.operation === recipe
         let maker = this.planet.colony.closestDeviceByType(this.pawn.pos, [], knowsRecipe)
         if (maker) {
@@ -54,18 +59,25 @@ export abstract class ProductionStrategy {
         }
     }
 
+    protected async gatherIngredients(recipe: Recipe) {
+        if (!this.pawn.isCarryingUnique(recipe.consumes)) {
+            for (let ingredient of recipe.consumes) {
+                await this.gatherBlock(ingredient);
+            }
+        }
+    }
+
     protected async performRecipeTask(maker: Device, recipe: Recipe) {
-      let worked = await maker.interact(this.pawn, { type: 'work', recipe })
-      if (!worked) {
-          await this.pause()
-          console.warn("waiting for machine to become available...")
-          await this.performRecipeTask(maker, recipe)
-      }
+        let worked = await maker.interact(this.pawn, { type: 'work', recipe })
+        if (!worked) {
+            await this.pause()
+            console.warn("waiting for machine to become available...")
+            await this.performRecipeTask(maker, recipe)
+        }
     }
 
 
     protected async storeBlock(res: ResourceBlock) {
-
         let storesDesiredBlock = (d: Device) => d.operation.type === 'store' &&
             d.product.length < d.getEffectiveOperationalCapacity(d.operation) && //operation.capacity &&
             d.operation.stores.includes(res)
@@ -88,14 +100,13 @@ export abstract class ProductionStrategy {
         let gathered = false
         let generatesDesiredBlock = (d: Device) => (d.operation.type === 'generator') &&
             d.product.some(stored => res === stored)
-
         let gen: Device = this.planet.colony.closestDeviceByType(this.pawn.pos, [], generatesDesiredBlock)
+
         let storesDesiredBlock = (d: Device) => (d.operation.type === 'store') &&
               d.product.some(stored => res === stored)
-
         let store: Device = this.planet.colony.closestDeviceByType(this.pawn.pos, [], storesDesiredBlock)
 
-        let device = gen || store
+        let device: Device = gen || store
 
         if (device) {
             await this.visitDevice(device)

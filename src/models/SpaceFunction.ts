@@ -1,4 +1,4 @@
-import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog, Botany } from './Machine';
+import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog, Botany, OrientationConsole, PersonnelRegistry } from './Machine';
 import { Color } from 'excalibur';
 import { Structure, MediumSurfaceRoom } from './Structure';
 import { BackgroundPattern } from '../actors/Building/BackgroundPatterns';
@@ -74,6 +74,12 @@ export class CloneMatrix extends SpaceFunction {
      name = 'Clone Matrix'
      description = 'clone home'
      machines = [ CloningVat, CloningVat ]
+}
+
+export class CloneReception extends SpaceFunction {
+     name = 'Clone Reception'
+     description = 'welcome clone'
+     machines = [ CloningVat, OrientationConsole, PersonnelRegistry ]
 }
 
 class ReadingRoom extends SpaceFunction {
@@ -188,4 +194,6 @@ export const allSpaceFunctions = [
 
     MissionControl,
     LifeSciencesLab,
+
+    CloneReception,
 ]

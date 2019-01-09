@@ -90,17 +90,20 @@ export class Citizen extends Actor {
     }
 
     isCarryingUnique(resources: ResourceBlock[]): boolean {
-        let isCarrying = true
+        let isCarrying = false
         let carryingCopy = this.carrying.slice()
         if (this.carrying.length > 0) {
+            let missingItem = false
             resources.forEach(resToFind => {
                 if (carryingCopy.find(res => res === resToFind)) {
                     deleteByValueOnce(carryingCopy, resToFind)
                 } else {
-                    isCarrying = false;
+                    missingItem = true;
                 }
             })
+            isCarrying = !missingItem
         }
+        // console.log("IS CARRYING", { resources, carrying: this.carrying, result: isCarrying })
         return isCarrying
     }
 

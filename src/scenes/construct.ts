@@ -7,7 +7,7 @@ import { Building, structureViews, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { Device } from "../actors/Device";
 import { Machine } from "../models/Machine";
-import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive, ComputerCore, MissionControl, SolarArray } from "../models/SpaceFunction";
+import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive, ComputerCore, MissionControl, SolarArray, CloneReception } from "../models/SpaceFunction";
 import { flatSingle, zip } from "../Util";
 import { DevicePlace } from "../actors/Building/Building";
 import { DeviceSize } from "../values/DeviceSize";
@@ -35,10 +35,11 @@ export class Construct extends Scene {
         MainTunnel,
         Corridor,
         LivingQuarters,
-        CloneMatrix,
-        Kitchen,
-        Library,
-        Archive,
+        // CloneMatrix,
+        // CloneReception,
+        // Kitchen,
+        // Library,
+        // Archive,
         // ComputerCore,
         
     ]
@@ -71,7 +72,8 @@ export class Construct extends Scene {
 
         this.prepareNextBuilding()
         this.camera.zoom(0.001)
-        this.camera.zoom(2, 10000)
+        this.camera.zoom(1.5, 10000)
+        // this.camera.pos.y = this.planet.getTop()
     }
 
     public onActivate() {
@@ -195,9 +197,12 @@ export class Construct extends Scene {
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
             this.startConstructing(structure, pos)
+        } else {
+            this.hud.showPalettes()
         }
     }
 
+    firstBuilding: boolean = true
     startConstructing(structureOrMachine: Structure | Machine | SpaceFunction, pos: Vector = new Vector(0, 0)) {
         this.hud.showCard(structureOrMachine)
         
@@ -206,8 +211,11 @@ export class Construct extends Scene {
             let structure = structureOrMachine
             this.hud.setMessage(`Place ${structure.name} (${structure.description})`)
             theNextOne = this.spawnBuilding(structure, pos)
-            this.camera.zoom(structure.zoom, 250)
-            this.camera.pos = theNextOne.pos
+            if (this.firstBuilding) {
+                this.camera.zoom(structure.zoom, 250)
+                this.camera.pos = theNextOne.pos
+                this.firstBuilding = false
+            } 
         } else if (structureOrMachine instanceof Machine) {
             let machine = structureOrMachine
             this.hud.setMessage(`Install ${machine.name} (${machine.description})`)

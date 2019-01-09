@@ -16,7 +16,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="console-green.svg">
+   sodipodi:docname="console-red.svg">
   <defs
      id="defs2">
     <linearGradient
@@ -212,17 +212,7 @@
        x2="31.853014"
        y2="30.335043"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.13810367,0,0,0.69309355,37.77033,0.46768718)" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient897"
-       id="linearGradient847-32-4"
-       x1="31.124928"
-       y1="16.599894"
-       x2="31.853014"
-       y2="30.335043"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.13810367,0,0,0.3940103,18.810227,6.5959046)" />
+       gradientTransform="matrix(0.13810367,0,0,0.69309355,21.139378,6.0249587)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -250,7 +240,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -403,17 +393,9 @@
        id="rect839-6-07"
        width="2.623045"
        height="14.866959"
-       x="40.817497"
-       y="7.756516"
+       x="24.186546"
+       y="13.313787"
        ry="0.41585675" />
-    <rect
-       style="opacity:0.919;fill:url(#linearGradient847-32-4);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.00466537;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.94509804;paint-order:stroke markers fill"
-       id="rect839-6-2"
-       width="2.623045"
-       height="8.4515791"
-       x="21.857395"
-       y="10.739462"
-       ry="0.23640653" />
   </g>
   <g
      inkscape:groupmode="layer"

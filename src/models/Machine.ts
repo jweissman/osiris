@@ -19,6 +19,7 @@ const workstation = require('../images/workstation-plain.svg')
 const console = require('../images/console-plain.svg')
 const consolePurple = require('../images/console-purple-plain.svg')
 const consoleGreen = require('../images/console-green-plain.svg')
+const consoleRed = require('../images/console-red-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -36,6 +37,7 @@ const images = {
     console,
     consolePurple,
     consoleGreen,
+    consoleRed,
 }
 
 
@@ -251,10 +253,99 @@ export class PersonnelRegistry extends Machine {
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 0.1 },
-        Wisdom: { supply: 0.1, demand: 0 },
+        Wisdom: { supply: 1, demand: 0 },
     }
 }
 
+export class OrientationConsole extends Machine {
+    name = 'Orientation Console'
+    description = 'welcome to the colony'
+    prereqs = [CloningVat]
+    operation = generate(ResourceBlock.Data, 1)
+    image = images.consoleRed
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 0.1 },
+        Hope: { supply: 1, demand: 0 },
+    }
+}
+
+export class CloningVat extends Machine {
+    name = 'Cloning Vat'
+    description = 'we all grow'
+    // behavior = MachineOperation.SpawnCitizen 
+    operation = spawn()
+    productionTime = 1500
+    image = images.vat
+    prereqs = [AlgaeVat]
+    size = DeviceSize.Small
+    color = Violet
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 2 },
+    }
+}
+
+export class DissolutionVat extends Machine {
+    name = 'Dissolution Vat'
+    description = 'back to basics'
+    // behavior = MachineOperation.SpawnCitizen 
+    operation = recipe(
+        [ ResourceBlock.Biomass, ResourceBlock.Biomass ],
+        ResourceBlock.Bioplasma
+    )
+    productionTime = 1500
+    image = images.vat
+    prereqs = [PlasmaBank]
+    size = DeviceSize.Small
+    color = Violet
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+    }
+}
+
+export class PlasmaBank extends Machine {
+    name = 'Bioplasm Bank'
+    description = 'hold on'
+    operation = store([ ResourceBlock.Bioplasma ])
+    prereqs = [AlgaeVat]
+    color = Green
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+    }
+}
+
+    
+export class Fabricator extends Machine {
+    name = 'Fabricator'
+    description = 'you made that'
+    operation = recipe(
+        [ResourceBlock.Mineral, ResourceBlock.Mineral],
+         ResourceBlock.Alloy
+    )
+    size = DeviceSize.Small
+    color = Red
+    prereqs = [Workstation]
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 3 },
+    }
+}
+
+export class AlgaeVat extends Machine {
+    name = 'Algae Vat'
+    description = 'where there is a will'
+    operation = generate(ResourceBlock.Biomass)
+    prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
+    size = DeviceSize.Small
+    color = Violet
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 2 },
+    }
+}
 // medium
 
 export class MetalStorage extends Machine {
@@ -326,18 +417,6 @@ export class Arbor extends Machine {
     forDome = true
 }
 
-export class AlgaeVat extends Machine {
-    name = 'Algae Vat'
-    description = 'where there is a will'
-    operation = generate(ResourceBlock.Biomass)
-    prereqs = [ OxygenExtractor, Bookshelf, Fridge ]
-    size = DeviceSize.Medium
-    color = Violet
-    economy = {
-        ...emptyMarket(),
-        Power: { supply: 0, demand: 2 },
-    }
-}
 
 export class Botany extends Machine {
     name = 'Botany'
@@ -352,69 +431,6 @@ export class Botany extends Machine {
     }
 }
 
-export class CloningVat extends Machine {
-    name = 'Cloning Vat'
-    description = 'we all grow'
-    // behavior = MachineOperation.SpawnCitizen 
-    operation = spawn()
-    productionTime = 1500
-    image = images.vat
-    prereqs = [AlgaeVat]
-    size = DeviceSize.Medium
-    color = Violet
-    economy = {
-        ...emptyMarket(),
-        Power: { supply: 0, demand: 2 },
-    }
-}
-
-export class DissolutionVat extends Machine {
-    name = 'Dissolution Vat'
-    description = 'back to basics'
-    // behavior = MachineOperation.SpawnCitizen 
-    operation = recipe(
-        [ ResourceBlock.Biomass, ResourceBlock.Biomass ],
-        ResourceBlock.Bioplasma
-    )
-    productionTime = 1500
-    image = images.vat
-    prereqs = [PlasmaBank]
-    size = DeviceSize.Medium
-    color = Violet
-    economy = {
-        ...emptyMarket(),
-        Power: { supply: 0, demand: 1 },
-    }
-}
-
-export class PlasmaBank extends Machine {
-    name = 'Bioplasm Bank'
-    description = 'hold on'
-    operation = store([ ResourceBlock.Bioplasma ])
-    prereqs = [AlgaeVat]
-    color = Green
-    economy = {
-        ...emptyMarket(),
-        Power: { supply: 0, demand: 1 },
-    }
-}
-
-    
-export class Fabricator extends Machine {
-    name = 'Fabricator'
-    description = 'you made that'
-    operation = recipe(
-        [ResourceBlock.Mineral, ResourceBlock.Mineral],
-         ResourceBlock.Alloy
-    )
-    size = DeviceSize.Medium
-    color = Red
-    prereqs = [Workstation]
-    economy = {
-        ...emptyMarket(),
-        Power: { supply: 0, demand: 3 },
-    }
-}
 
 export class OreRefinery extends Machine {
     name = 'Refinery'
@@ -599,5 +615,7 @@ export const allMachines = [
     MolecularEngine,
     ThinkingPool,
     SilverForest,
+
+    OrientationConsole,
 
 ]

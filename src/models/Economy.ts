@@ -66,12 +66,7 @@ export const sumMarkets: (ea: Economy, eb: Economy) => Economy = (ea, eb) => {
 }
 
 export const equilibrium: (e: Economy) => boolean = (e) => {
-    for (let value of allValues) {
-        if (availableCapacity(e, value) < 0) {
-            return false
-        }
-    }
-    return true
+    return allValues.every(value => availableCapacity(e, value) >= 0)
 }
 
 export enum ResourceBlock {
