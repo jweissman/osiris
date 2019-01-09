@@ -42,6 +42,7 @@ export class Device extends Actor {
     image: any
     building: Building
     inUse: boolean = false
+    hover: boolean = false
 
     imageLoaded: boolean = false
 
@@ -64,43 +65,67 @@ export class Device extends Actor {
         this.image = new Image();
         this.image.onload = () => { this.imageLoaded = true }
         this.image.src = machine.image
+
+        this.on('pointerenter', () => {
+            console.log("HOVER ON", { device: this })
+            this.hover = true
+            if (this.building) {
+                // setInterval(() => {
+                this.building.planet.currentlyViewing = this
+                // }, 75)
+            }
+        })
+
+        this.on('pointerdown', () => {
+            console.log("CLICKED DEVICE", { device: this })
+            // this.toggleActive();
+        })
+
+        this.on('pointerleave', () => {
+            this.hover = false
+            if (this.building) {
+                this.building.planet.currentlyViewing = null
+            }
+        })
     }
 
     get imageX() { return this.pos.x - this.getWidth() / 2 }
     get imageY() { return this.pos.y - this.getHeight() / 2 - 10 }
 
+    get economy() { return this.machine.economy }
+
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (this.imageLoaded) {
-            // drawRect(
-            //     ctx,
-            //     { x: this.imageX, y: this.imageY, width: this.getWidth(), height: this.getHeight ()},
-            //     2,
-            //     Color.Green
-            // )
-
             ctx.drawImage(
                 this.image,
                 this.imageX,
                 this.imageY,
 
-                // this.pos.y - this.getHeight() / 2 - 10,
                 this.getWidth(),
                 this.getHeight()
             )
+
+            if (this.hover) {
+                let c = Color.White
+                c.a = 0.6
+                drawRect(
+                    ctx,
+                    { x: this.imageX, y: this.imageY, width: this.getWidth(), height: this.getHeight() },
+                    0,
+                    c
+                )
+            }
         }
 
-        let iv = new Vector(this.imageX, this.imageY) //this.pos //getCenter()
-        // iv.y += this.getHeight() / 2
+        let iv = new Vector(this.imageX, this.imageY)
 
         let showLabel = true
         if (showLabel) {
-            this.nameLabel.pos = iv // this.getCenter()
-            // this.nameLabel.pos.x -= 10
-            // this.nameLabel.pos.y += 8 + this.getHeight()/2
+            this.nameLabel.pos = iv
             this.nameLabel.draw(ctx, delta)
         }
 
-        let { x: bx, y: by } = iv //bx = this.x - this.getWidth()/2 + 5, by = this.y - 23
+        let { x: bx, y: by } = iv
         let blockSize = 5
         let yOff = this.nameLabel.fontSize
         this.product.forEach((produced, index) => {
@@ -109,6 +134,9 @@ export class Device extends Actor {
         })
     }
 
+    get name() { return this.machine.name }
+    get description() { return this.machine.description }
+    get size() { return this.machine.size }
     get operation() { return this.machine.operation }
 
     async interact(citizen: Citizen, request: InteractionRequest): Promise<boolean> {
@@ -210,7 +238,10 @@ export class Device extends Actor {
             }
 
         } else if (this.machine.operation.type === 'spawn') {
-            setTimeout(() => this.building.populate(this.pos), 100)
+            if (step % 1000 == 0) {
+                console.log("WOULD SPAWN")
+                setTimeout(() => this.building.populate(this.pos.add(this.building.pos)), 100)
+            }
         }
     }
 

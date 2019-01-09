@@ -22,8 +22,8 @@ export class Citizen extends Actor {
 
     private productionStrategy: ProductionStrategy
 
-    constructor(private device: Device, protected planet: Planet) {
-        super(device.x, device.y, Scale.minor.first, Scale.minor.third, Color.White)
+    constructor(private home: Vector, protected planet: Planet) {
+        super(home.x, home.y, Scale.minor.first, Scale.minor.third, Color.White)
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
         this.productionStrategy = new CapacityBasedProduction(this)

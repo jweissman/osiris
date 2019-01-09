@@ -1,17 +1,18 @@
 import { Label, Actor, FontStyle } from "excalibur";
 import { Structure } from "../../models/Structure";
 import { Machine } from "../../models/Machine";
-import { PureValue } from "../../models/Economy";
+import { PureValue, Economy } from "../../models/Economy";
 import { SmallDomeThreeView } from "../Building/SmallDomeThreeView";
 import { SpaceFunction } from "../../models/SpaceFunction";
 import { Building } from "../Building";
+import { Device } from "../Device";
 
 export class CardBody extends Actor {
     description: Label
     values: Label
     notes: Label
 
-    constructor(private entity: Machine | Structure | SpaceFunction | Building, x: number, y: number) {
+    constructor(private entity: Machine | Structure | SpaceFunction | Building | Device, x: number, y: number) {
         super(x, y, 0, 0)
         // resources / recipes
 
@@ -31,23 +32,24 @@ export class CardBody extends Actor {
         this.show(entity)
     }
 
-    show(entity: Machine | Structure | SpaceFunction | Building) {
+
+    show(entity: Machine | Structure | SpaceFunction | Building | Device) {
         if (entity) {
             this.description.text = entity.description;
 
-            if (entity instanceof Machine) {
-                let values = []
-                let econ = entity.economy
-                for (let value in PureValue) {
-                    let { supply, demand } = econ[value]
-                    let delta = supply - demand
-                    if (delta > 0) {
-                        values.push(`+${delta} ${value}`)
-                    } else if (delta < 0) {
-                        values.push(`${delta} ${value}`)
-                    }
-                }
-                this.values.text = values.join(' | ')
+            if (entity instanceof Machine || entity instanceof Device) {
+                //let values = []
+                //let econ = entity.economy
+                //for (let value in PureValue) {
+                //    let { supply, demand } = econ[value]
+                //    let delta = supply - demand
+                //    if (delta > 0) {
+                //        values.push(`+${delta} ${value}`)
+                //    } else if (delta < 0) {
+                //        values.push(`${delta} ${value}`)
+                //    }
+                //}
+                this.values.text =  this.describeEconomy(entity.economy) //values.join(' | ')
 
                 // let theNotes = []
                 this.notes.text = ''
@@ -80,6 +82,9 @@ export class CardBody extends Actor {
                 }
                 this.values.text = bonusMessages.join('; ') //; 
                 this.notes.text = entity.machines.map(m => (new m()).name).join(' + ')
+            } else if (entity instanceof Building) {
+                this.values.text =  this.describeEconomy(entity.economy(false)) //values.join(' | ')
+                this.notes.text = entity.getDevices().map(d => d.machine.name).join(' + ')
             } else {
                 this.values.text = ''
                 this.notes.text = ''
@@ -87,5 +92,20 @@ export class CardBody extends Actor {
 
         }
         // other bonuses? behaviors?
+    }
+
+    private describeEconomy(e: Economy): string {
+        let values = []
+        let econ = e // entity.economy
+        for (let value in PureValue) {
+            let { supply, demand } = econ[value]
+            let delta = supply - demand
+            if (delta > 0) {
+                values.push(`+${delta} ${value}`)
+            } else if (delta < 0) {
+                values.push(`${delta} ${value}`)
+            }
+        }
+        return values.join(' | ')
     }
 }

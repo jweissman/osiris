@@ -71,7 +71,7 @@ export class Hud extends UIActor {
         this.updateMaxPop(planet.economy[PureValue.Shelter].demand, planet.maxPop)
     }
 
-    showCard(entity: Machine | Structure | SpaceFunction | Building) {
+    showCard(entity: Machine | Structure | SpaceFunction | Building | Device) {
         this.card.present(entity)
     }
 

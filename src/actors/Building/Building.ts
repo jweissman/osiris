@@ -44,13 +44,15 @@ export class Building extends Actor {
     private active: boolean = true
     // private built: boolean = false
 
-    constructor(pos: Vector, public structure: Structure, protected planet: Planet) {
+    constructor(pos: Vector, public structure: Structure, public planet: Planet) {
         super(
           pos.x,
           pos.y,
           structure.width,
           structure.height,
-          planet.color
+          structure.infra ? planet.color.darken(0.3) : Color.Transparent
+        //   Color.Transparent
+        //   planet.color
         )
         this.anchor = new Vector(0,0)
 
@@ -59,9 +61,12 @@ export class Building extends Actor {
 
         this.on('pointerenter', () => {
             this.hover = true
-            this.planet.currentlyViewing = this
+            if (!this.devices.some(d => d.hover)) {
+                this.planet.currentlyViewing = this
+            }
             // console.log("HOVER ON", { building: this })
         })
+
 
         this.on('pointerdown', () => {
             console.log("CLICKED BUILDING", { building: this })
@@ -70,6 +75,7 @@ export class Building extends Actor {
 
         this.on('pointerleave', () => {
             this.hover = false
+            // this.planet.currentlyViewing = null
         })
 
         this.collisionType = CollisionType.PreventCollision
@@ -85,7 +91,8 @@ export class Building extends Actor {
         if (!this.hideBox) {
             drawRect(ctx, this.aabb(), this.edgeWidth, this.processedColor())
         }
-        this.devices.forEach(device => device.draw(ctx, delta))
+        // this.devices.forEach(device => device.draw(ctx, delta))
+        super.draw(ctx, delta)
 
         if (this.showLabel) {
             this.nameLabel.pos = this.getCenter()
@@ -133,10 +140,14 @@ export class Building extends Actor {
     step: number = 0
     update(engine: Game, delta: number) {
         super.update(engine, delta)
+
         let tryProduce = this.placed;
         if (tryProduce) {
             this.devices.forEach(device => device.produce(this.step));
         }
+
+        // this.devices.forEach(d => d.update(engine, delta))
+
         this.step += 1
     }
 
@@ -156,8 +167,8 @@ export class Building extends Actor {
         }
     }
 
-    get economy(): Economy {
-        if (!this.isActive) {
+    economy(emptyUnlessActive: boolean = true): Economy {
+        if (emptyUnlessActive && !this.isActive) {
             return emptyMarket()
         } else {
             // add devices
@@ -182,7 +193,7 @@ export class Building extends Actor {
                 this.active = false
             } else {
                 this.active = true
-                let agg = [ this.planet.economy, this.economy ].reduce(sumMarkets, emptyMarket())
+                let agg = [ this.planet.economy, this.economy(false) ].reduce(sumMarkets, emptyMarket())
                 // console.log("---> activate", { agg, eq: equilibrium(agg) })
                 if (!equilibrium(agg)) {
                     this.active = false
@@ -247,6 +258,7 @@ export class Building extends Actor {
     }
 
     public populate(pos: Vector) {
+        console.log("(bldg) ATTEMPT TO POP")
         this.planet.populate(pos) //this.pos)
     }
 
@@ -369,6 +381,9 @@ export class Building extends Actor {
             device.building = this
         }
         this.devices.push(device)
+        device.pos.subEqual(this.pos) // = this.devicePlaces()[0].position
+        // console.log("DEVICE IS AT", { pos: device.pos })
+        this.add(device)
         this.updateFunction()
         this.toggleActive()
     }

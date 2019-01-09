@@ -7,7 +7,7 @@ import { Building, structureViews, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { Device } from "../actors/Device";
 import { Machine } from "../models/Machine";
-import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive, ComputerCore, MissionControl } from "../models/SpaceFunction";
+import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive, ComputerCore, MissionControl, SolarArray } from "../models/SpaceFunction";
 import { flatSingle, zip } from "../Util";
 import { DevicePlace } from "../actors/Building/Building";
 import { DeviceSize } from "../values/DeviceSize";
@@ -30,14 +30,15 @@ export class Construct extends Scene {
     static requiredStructuresAndFunctions: (typeof SpaceFunction | typeof Structure)[] = [
         MissionControl,
         SurfaceRoad,
-        LifeSupportPod,
+        SolarArray,
+        // LifeSupportPod,
         MainTunnel,
         Corridor,
         LivingQuarters,
-        // CloneMatrix,
-        // Kitchen,
-        // Library,
-        // Archive,
+        CloneMatrix,
+        Kitchen,
+        Library,
+        Archive,
         // ComputerCore,
         
     ]
@@ -56,7 +57,13 @@ export class Construct extends Scene {
         this.hud = new Hud(game, buildIt, buildIt, buildIt)
         this.add(this.hud)
 
-        this.planet = new Planet(this.hud, game.world.color, (b) => this.hud.showCard(b))
+        this.planet = new Planet(
+            this.hud,
+            game.world.color,
+            (b) => this.hud.showCard(b),
+            (d) => this.hud.showCard(d)
+        )
+
         this.add(this.planet)
   
         this.player = new Player()

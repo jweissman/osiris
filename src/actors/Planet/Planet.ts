@@ -20,6 +20,7 @@ export class Planet extends Actor {
         public hud: Hud,
         public color: Color,
         private onBuildingHover: (b: Building) => any,
+        private onDeviceHover: (d: Device) => any,
         private w: number = 2000000,
         private depth: number = 10000000,
         ) {
@@ -50,8 +51,14 @@ export class Planet extends Actor {
         this.add(this.population)
     }
 
-    set currentlyViewing(building: Building) {
-        this.onBuildingHover(building)
+    set currentlyViewing(buildingOrDevice: Building | Device) {
+        if (buildingOrDevice instanceof Building) {
+            let b: Building = buildingOrDevice
+            this.onBuildingHover(b)
+        } else if (buildingOrDevice instanceof Device) {
+            let d: Device = buildingOrDevice
+            this.onDeviceHover(d)
+        }
     }
 
     private createLayer(y: number, size: number, color: Color) {
@@ -72,7 +79,7 @@ export class Planet extends Actor {
         // let economies = devices.map((d: Device) => d.machine.economy)
 
         let buildings = this.colony.buildings
-        let economies = buildings.map(b => b.economy)
+        let economies = buildings.map(b => b.economy())
         let theEconomy = economies.reduce(sumMarkets, emptyMarket())
 
         let popularDemand = this.population.citizens.length
@@ -103,8 +110,11 @@ export class Planet extends Actor {
 
     populate(pos: Vector) {
         if (this.population.citizens.length < this.maxPop) {
-            let home = this.closestDevice(pos, [CloningVat])
-            this.population.increase(home)
+            console.log("POPULATIN'!")
+            // let home = this.closestDevice(pos, [CloningVat])
+            this.population.increase(pos) //home)
+        } else {
+            console.warn("too many citizens already to populate more!")
         }
     }
 

@@ -118,6 +118,6 @@ export abstract class ProductionStrategy {
 
     private async visitDevice(device: Device) {
         await this.pawn.pathTo(device.building)
-        await this.pawn.glideTo(device.pos)
+        await this.pawn.glideTo(device.pos.add(device.building.pos))
     }
 }

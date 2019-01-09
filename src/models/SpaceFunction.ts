@@ -119,7 +119,7 @@ class AlgaeFarm extends SpaceFunction {
      machines = [ AlgaeVat, AlgaeVat ]
 }
 
-class SolarArray extends SpaceFunction {
+export class SolarArray extends SpaceFunction {
      name = 'Solar Array'
      description = 'warm up'
      machines = [ SolarCell, SolarCell ]
