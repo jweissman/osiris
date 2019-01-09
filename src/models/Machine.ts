@@ -3,6 +3,7 @@ import { Color, FontStyle, Resource } from "excalibur";
 import { DeviceSize } from "../values/DeviceSize";
 import { MechanicalOperation, mechanicalOperations } from "./MechanicalOperation";
 import { shuffle } from "../Util";
+import { Device } from "../actors/Device";
 
 const bookshelfSvg = require('../images/bookshelf-plain.svg');
 const vatSvg = require('../images/vat-plain.svg');
@@ -20,6 +21,9 @@ const console = require('../images/console-plain.svg')
 const consolePurple = require('../images/console-purple-plain.svg')
 const consoleGreen = require('../images/console-green-plain.svg')
 const consoleRed = require('../images/console-red-plain.svg')
+const megaconsole = require('../images/mega-console-plain.svg')
+
+const fabricator = require('../images/fabricator-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -38,6 +42,9 @@ const images = {
     consolePurple,
     consoleGreen,
     consoleRed,
+    megaconsole,
+
+    fabricator,
 }
 
 
@@ -49,6 +56,9 @@ export class Machine {
     name: string = '(machine name)'
     description: string = '(machine description)'
     color: Color = Color.LightGray
+
+    // cost: ResourceBlock[] = [ResourceBlock.Mineral]
+
     size: DeviceSize = DeviceSize.Small
     operation: MechanicalOperation = { type: 'noop' }
     image = images.vat
@@ -62,13 +72,17 @@ export class Machine {
 
     concretize(): Machine { return this; } //return shuffle(allMachines)[0] }
     // concretions: Machine[] = []
+
+    onPlacement(device: Device) {
+        // ...whatever we need to script here?
+    }
 }
 
 export class CommandCenter extends Machine {
     name = 'Command Console'
     description = 'gather resources...'
     operation = store(
-        [ResourceBlock.Meal, ResourceBlock.Ore],
+        [ResourceBlock.Mineral],
         6
     )
     image = images.consoleGreen
@@ -77,9 +91,18 @@ export class CommandCenter extends Machine {
     economy = {
         ...emptyMarket(),
         Power: { supply: 5, demand: 0 },
-        Oxygen: { supply: 4, demand: 0 },
-        Water: { supply: 4, demand: 0 },
-        Hope: { supply: 1, demand: 0 }
+        Oxygen: { supply: 2, demand: 0 },
+        Water: { supply: 2, demand: 0 },
+        Hope: { supply: 1, demand: 0 },
+        Shelter: { supply: 1, demand: 0}
+    }
+
+    onPlacement(device: Device) {
+        // autobuild this machine...?
+        // go ahead and populate minerals?
+        // build an elite citizen?
+        let { building } = device //.building
+        building.populate(device.pos.add(device.building.pos), true)
     }
 }
 
@@ -332,6 +355,7 @@ export class Fabricator extends Machine {
         ...emptyMarket(),
         Power: { supply: 0, demand: 3 },
     }
+    image = images.fabricator
 }
 
 export class AlgaeVat extends Machine {
@@ -514,6 +538,7 @@ export class MolecularEngine extends Machine {
         [ResourceBlock.Bioplasma, ResourceBlock.Algorithm],
         ResourceBlock.Aurum
     )
+    image = images.megaconsole
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 3 },

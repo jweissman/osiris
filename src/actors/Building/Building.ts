@@ -5,7 +5,7 @@ import { Slot } from "../../values/Slot";
 import { Orientation, flip, compass } from "../../values/Orientation";
 import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
-import { closest, measureDistance, drawRect, deleteByValue } from "../../Util";
+import { closest, measureDistance, deleteByValue } from "../../Util";
 import { Graph } from "../../values/Graph";
 import { ResourceBlock, emptyMarket, Economy, sumMarkets, equilibrium } from "../../models/Economy";
 import { Device } from "../Device";
@@ -15,6 +15,7 @@ import { World } from "../../models/World";
 import { Machine } from "../../models/Machine";
 import { BackgroundPattern } from "./BackgroundPatterns";
 import { EconomicValue } from "../Hud/EconomicValue";
+import { drawRect } from "../../Painting";
 
 export class DevicePlace {
     constructor(private pos: Vector, private size: DeviceSize) {}
@@ -51,8 +52,6 @@ export class Building extends Actor {
           structure.width,
           structure.height,
           structure.infra ? planet.color.darken(0.3) : Color.Transparent
-        //   Color.Transparent
-        //   planet.color
         )
         this.anchor = new Vector(0,0)
 
@@ -64,7 +63,6 @@ export class Building extends Actor {
             if (!this.devices.some(d => d.hover)) {
                 this.planet.currentlyViewing = this
             }
-            // console.log("HOVER ON", { building: this })
         })
 
 
@@ -75,7 +73,6 @@ export class Building extends Actor {
 
         this.on('pointerleave', () => {
             this.hover = false
-            // this.planet.currentlyViewing = null
         })
 
         this.collisionType = CollisionType.PreventCollision
@@ -262,9 +259,9 @@ export class Building extends Actor {
         this.planet.gather(res)
     }
 
-    public populate(pos: Vector) {
+    public populate(pos: Vector, elite: boolean = false) {
         console.log("(bldg) ATTEMPT TO POP")
-        this.planet.populate(pos) //this.pos)
+        this.planet.populate(pos, elite) //this.pos)
     }
 
 
@@ -390,6 +387,7 @@ export class Building extends Actor {
         // console.log("DEVICE IS AT", { pos: device.pos })
         this.add(device)
         this.updateFunction()
+        device.machine.onPlacement(device)
         this.toggleActive()
     }
 

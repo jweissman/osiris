@@ -108,11 +108,11 @@ export class Planet extends Actor {
         this.colony.placeBuilding(building)
     }
 
-    populate(pos: Vector) {
+    populate(pos: Vector, elite: boolean = false) {
         if (this.population.citizens.length < this.maxPop) {
             console.log("POPULATIN'!")
             // let home = this.closestDevice(pos, [CloningVat])
-            this.population.increase(pos) //home)
+            this.population.increase(pos, elite) //home)
         } else {
             console.warn("too many citizens already to populate more!")
         }

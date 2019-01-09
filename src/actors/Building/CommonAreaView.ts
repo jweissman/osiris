@@ -3,8 +3,9 @@ import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Vector, Color } from "excalibur";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
-import { drawRect, drawPatternedRect } from "../../Util";
+// import { drawRect, drawPatternedRect } from "../../Util";
 import { BackgroundPattern } from "./BackgroundPatterns";
+import { drawPatternedRect, drawRect } from "../../Painting";
 
 export class CommonAreaView extends Building {
     floorHeight: number = 12
@@ -16,8 +17,8 @@ export class CommonAreaView extends Building {
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
 
-        let wallColor = this.processedColor() //.darken(0.4)
-        let floorColor = this.processedColor().darken(0.4)
+        // let wallColor = this.processedColor() //.darken(0.4)
+        let floorColor = this.planet.color.darken(0.6) //Color.Violet.darken(0.92)
 
         // drawRect(ctx, this.aabb(), 0.5, wallColor)
         drawPatternedRect(ctx, this.aabb(), this.backgroundPattern)

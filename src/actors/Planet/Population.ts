@@ -10,8 +10,8 @@ export class Population extends Actor {
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling));
     }
 
-    increase(pos) { //home: Device) {
-        let citizen = new Citizen(pos, this.planet);
+    increase(pos, elite: boolean = false) {
+        let citizen = new Citizen(pos, this.planet, elite);
         citizen.work();
         this.citizens.push(citizen);
         this.add(citizen);

@@ -4,7 +4,8 @@ import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Device } from "../Device";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
-import { drawPatternedRect, drawRect } from "../../Util";
+import { drawPatternedRect, drawRect } from "../../Painting";
+// import { drawPatternedRect, drawRect } from "../../Util";
 
 export class MediumSurfaceRoomView extends Building {
     hideBox = true

@@ -87,7 +87,7 @@ export class Colony extends Actor {
         )
 
         if (devices && devices.length > 0) {
-            let proximity = (d) => cursor.distance(d)
+            let proximity = (d) => cursor.distance(d.pos.add(d.building.pos))
             return minBy(devices, proximity)
         }
     }

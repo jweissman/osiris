@@ -8,6 +8,7 @@ import { Device } from "./Device";
 import { Scale } from "../values/Scale";
 import { ProductionStrategy } from "../strategies/ProductionStrategy";
 import { CapacityBasedProduction } from "../strategies/CapacityBasedProduction";
+import { drawStar } from "../Painting";
 
 export class Citizen extends Actor {
 
@@ -22,8 +23,8 @@ export class Citizen extends Actor {
 
     private productionStrategy: ProductionStrategy
 
-    constructor(private home: Vector, protected planet: Planet) {
-        super(home.x, home.y, Scale.minor.first, Scale.minor.third, Color.White)
+    constructor(private home: Vector, protected planet: Planet, private elite: boolean = false) {
+        super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White)
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
         this.productionStrategy = new CapacityBasedProduction(this)
@@ -51,6 +52,12 @@ export class Citizen extends Actor {
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta)
+
+        if (this.elite) {
+            // draw a little star?
+            drawStar(ctx, this.pos.x + 6, this.pos.y - 9)
+        }
+
         if (this.carrying) {
             this.carrying.forEach((carried, idx) => {
                 ctx.fillStyle = blockColor(carried).toRGBA()

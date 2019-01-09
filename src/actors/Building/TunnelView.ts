@@ -1,15 +1,16 @@
 import { Vector } from "excalibur";
 import { Building } from "./Building";
-import { range, eachCons, measureDistance, drawRect } from "../../Util";
+import { range, eachCons, measureDistance } from "../../Util";
 import { Slot } from "../../values/Slot";
 import { Orientation, flip } from "../../values/Orientation";
 import { Graph } from "../../values/Graph";
+import { drawRect } from "../../Painting";
 
 export class TunnelView extends Building {
     pickingOrigin: boolean = true
     hideBox = true
 
-    colorBase() { return this.color.darken(0.2); }
+    colorBase() { return this.planet.color.darken(0.2); }
 
     draw(ctx, delta) {
         let rect = this.aabb()

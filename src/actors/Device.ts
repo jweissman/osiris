@@ -7,7 +7,8 @@ import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
 import { getVisibleDeviceSize } from "../values/DeviceSize";
 import { Recipe, ResourceStorage, MechanicalOperation, ResourceGenerator } from "../models/MechanicalOperation";
-import { range, deleteByValueOnce, drawRect } from "../Util";
+import { range, deleteByValueOnce } from "../Util";
+import { drawRect } from "../Painting";
 
 interface RetrieveResource {
     type: 'retrieve'
