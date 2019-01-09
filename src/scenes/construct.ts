@@ -33,12 +33,12 @@ export class Construct extends Scene {
         LifeSupportPod,
         MainTunnel,
         Corridor,
-        Kitchen,
         LivingQuarters,
-        CloneMatrix,
-        Library,
-        Archive,
-        ComputerCore,
+        // CloneMatrix,
+        // Kitchen,
+        // Library,
+        // Archive,
+        // ComputerCore,
         
     ]
 

@@ -174,7 +174,6 @@ export class Device extends Actor {
     }
 
     getEffectiveOperationalCapacity(op: ResourceGenerator | ResourceStorage) {
-        // should we get mad if someone asks about an op that doesn't belong to us??
         let bonus = this.building.spaceFunction
         ? this.building.spaceFunction.bonuses.capacity 
         : 0
@@ -215,12 +214,9 @@ export class Device extends Actor {
         }
     }
 
-    // todo only snap when close enough? try to prevent some mis-clicks?
     snap(planet: Planet, pos: Vector = this.pos) {
         let bldg = planet.colony.closestBuildingByType(pos,
-            // hmmm
             allStructures,
-            // machines count < device slots count
             (bldg: Building) => {
                 let hasSpace = bldg.hasPlaceForDevice()
                 return hasSpace && bldg.structure.machines.some(Machine => this.machine instanceof Machine)
@@ -235,20 +231,13 @@ export class Device extends Actor {
             snapped = d < 150
         }
 
-        if (snapped) {  //bldg && d < 300) {
+        if (snapped) {
             this.building = bldg;
             this.pos = this.building.nextDevicePlace().position
-            //devicePlaces()[
-            //    this.building.devices.length
-            //]
         } else {
             this.pos = pos
         }
 
-        return snapped //!!bldg;
+        return snapped
     }
-
-    // finalize() {
-    // this.building.devices.push(this)
-    // }
 }

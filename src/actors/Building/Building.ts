@@ -345,14 +345,11 @@ export class Building extends Actor {
         let fn = allSpaceFunctions.find(spaceFn => {
             let matched = true;
             let unseenDevices = this.devices.slice()
-
             let sf = new spaceFn()
             sf.machines.forEach((machine: typeof Machine) => {
                 let matchingDevice = unseenDevices.find(d => d.machine instanceof machine)
                 if (!matchingDevice) { matched = false; }
-
                 unseenDevices = deleteByValue(unseenDevices, matchingDevice)
-                // return true
             })
             return matched;
         })
@@ -360,7 +357,7 @@ export class Building extends Actor {
             console.log("Determined building function", { fn })
             let sf = new fn()
             this.spaceFunction = sf
-            this.nameLabel.text = sf.name //label
+            this.nameLabel.text = sf.name
         } else {
             console.warn("Could not identify function!")
         }
