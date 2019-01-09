@@ -10,7 +10,7 @@ export abstract class ProductionStrategy {
     constructor(protected pawn: Citizen) { }
     protected abstract async apply();
     protected get planet(): Planet { return this.pawn.currentPlanet; }
-    protected get devices(): Device[] { return this.planet.colony.findAllDevices(); }
+    protected get devices(): Device[] { return this.planet.colony.findPoweredDevices(); }
     protected get operations(): MechanicalOperation[] { return this.devices.map(d => d.operation); }
     protected get recipes(): Recipe[] {
         let recipes: Recipe[] = [];

@@ -4,7 +4,7 @@ import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Device } from "../Device";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
-import { drawPatternedRect } from "../../Util";
+import { drawPatternedRect, drawRect } from "../../Util";
 
 export class MediumSurfaceRoomView extends Building {
     hideBox = true
@@ -93,6 +93,12 @@ export class MediumSurfaceRoomView extends Building {
             this.aabb(),
             this.backgroundPattern
         )
+        if (!this.isActive) {
+            // draw overlay rect that darkens
+            let c = Color.Black
+            c.a = 0.6
+            drawRect(ctx, this.aabb(), 0, c)
+        }
 
         // a little flag :)
         let flagpoleHeight = 18

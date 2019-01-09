@@ -33,6 +33,7 @@ export class Structure {
     height: number = 10
     zoom: number = 1
     color: Color = Color.Gray
+    infra: boolean = false
 
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ Corridor ],
@@ -62,6 +63,7 @@ export class MainTunnel extends Structure {
         [Orientation.Up]: [ MediumSurfaceRoom ],
         [Orientation.Down]: [ ],
     }
+    infra = true
 }
 
 
@@ -77,6 +79,7 @@ export class SurfaceRoad extends Structure {
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
     }
+    infra = true
 }
 
 export class Corridor extends Structure {
@@ -99,6 +102,7 @@ export class Corridor extends Structure {
         [Orientation.Down]: [ ],
     }
     prereqs = [SurfaceRoad] //MainTunnel]
+    infra = true
 }
 
 export class Ladder extends Structure {
@@ -115,6 +119,7 @@ export class Ladder extends Structure {
         [Orientation.Right]: [ ],
     }
     prereqs = [Corridor, SmallRoomThree]
+    infra = true
 }
 
 // 'abstract' structure...

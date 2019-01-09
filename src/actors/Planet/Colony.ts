@@ -43,7 +43,7 @@ export class Colony extends Actor {
 
 
     placeBuilding(building: Building) {
-        building.built = true;
+        building.placed = true;
         if (building.parentSlot) {
             building.parentSlot.parent.childrenBuildings.push(building);
             this.buildNavTree();
@@ -80,7 +80,7 @@ export class Colony extends Actor {
     }
 
     closestDeviceByType(cursor: Vector, machineTypes: (typeof Machine)[] = [], predicate: (Device) => boolean = () => true) {
-        let devices = this.findAllDevices()
+        let devices = this.findPoweredDevices()
         devices = devices.filter(d => 
             (machineTypes.length > 0 ? machineTypes.some(machine => d.machine instanceof machine) : true)
              && predicate(d)
@@ -101,5 +101,13 @@ export class Colony extends Actor {
 
     findAllDevices(): Device[] {
         return flatSingle(this.buildings.map(b => b.getDevices()))
+    }
+
+    findPoweredDevices(): Device[] {
+        return flatSingle(this.activeBuildings.map(b => b.getDevices()))
+    }
+
+    protected get activeBuildings() {
+        return this.buildings.filter(b => b.isActive)
     }
 }

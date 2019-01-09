@@ -68,8 +68,11 @@ export class Planet extends Actor {
     }
 
     get economy(): Economy {
-        let devices = this.colony.findAllDevices()
-        let economies = devices.map((d: Device) => d.machine.economy)
+        // let devices = this.colony.findPoweredDevices()
+        // let economies = devices.map((d: Device) => d.machine.economy)
+
+        let buildings = this.colony.buildings
+        let economies = buildings.map(b => b.economy)
         let theEconomy = economies.reduce(sumMarkets, emptyMarket())
 
         let popularDemand = this.population.citizens.length
@@ -106,7 +109,7 @@ export class Planet extends Actor {
     }
 
     get maxPop() {
-        let devices = this.colony.findAllDevices()
+        let devices = this.colony.findPoweredDevices()
         let economies = devices.map((d: Device) => d.machine.economy)
         let theEconomyWithoutPeople = economies.reduce(sumMarkets, emptyMarket())
 

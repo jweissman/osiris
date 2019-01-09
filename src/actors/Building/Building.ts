@@ -7,13 +7,14 @@ import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
 import { closest, measureDistance, drawRect, deleteByValue } from "../../Util";
 import { Graph } from "../../values/Graph";
-import { ResourceBlock } from "../../models/Economy";
+import { ResourceBlock, emptyMarket, Economy, sumMarkets, equilibrium } from "../../models/Economy";
 import { Device } from "../Device";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { World } from "../../models/World";
 import { Machine } from "../../models/Machine";
 import { BackgroundPattern } from "./BackgroundPatterns";
+import { EconomicValue } from "../Hud/EconomicValue";
 
 export class DevicePlace {
     constructor(private pos: Vector, private size: DeviceSize) {}
@@ -27,7 +28,7 @@ export class Building extends Actor {
 
     nameLabel: Label
 
-    built: boolean = false
+    placed: boolean = false
     hover: boolean = false
     showLabel: boolean = false
     facing: Orientation = Orientation.Right
@@ -39,6 +40,9 @@ export class Building extends Actor {
 
     private devices: Device[] = []
     givenName: string
+
+    private active: boolean = true
+    // private built: boolean = false
 
     constructor(pos: Vector, public structure: Structure, protected planet: Planet) {
         super(
@@ -59,10 +63,10 @@ export class Building extends Actor {
             // console.log("HOVER ON", { building: this })
         })
 
-        // this.on('pointerdown', () => {
-        //     console.log("CLICKED BUILDING", { building: this })
-        //     this.levelUp();
-        // })
+        this.on('pointerdown', () => {
+            console.log("CLICKED BUILDING", { building: this })
+            this.toggleActive();
+        })
 
         this.on('pointerleave', () => {
             this.hover = false
@@ -71,25 +75,9 @@ export class Building extends Actor {
         this.collisionType = CollisionType.PreventCollision
 
         this.nameLabel = new Label(this.structure.name, 0, 0, 'Helvetica')
-        // this.nameLabel.fontSize = 11
         this.nameLabel.color = Color.White
 
-    }
-
-    get name() {
-        if (this.spaceFunction) {
-            return this.spaceFunction.name // `${this.givenName} ${this.spaceFunction.name}`;
-        } else {
-            return this.structure.name //`${this.givenName} ${this.structure.name}`;
-        }
-    }
-
-    get description() {
-        if (this.spaceFunction) {
-            return this.spaceFunction.description
-        } else {
-            return this.structure.description
-        }
+        if (this.structure.infra) { this.active = true }
     }
 
 
@@ -145,12 +133,66 @@ export class Building extends Actor {
     step: number = 0
     update(engine: Game, delta: number) {
         super.update(engine, delta)
-        let tryProduce = this.built;
+        let tryProduce = this.placed;
         if (tryProduce) {
             this.devices.forEach(device => device.produce(this.step));
         }
         this.step += 1
     }
+
+    get name() {
+        if (this.spaceFunction) {
+            return this.spaceFunction.name
+        } else {
+            return this.structure.name
+        }
+    }
+
+    get description() {
+        if (this.spaceFunction) {
+            return this.spaceFunction.description
+        } else {
+            return this.structure.description
+        }
+    }
+
+    get economy(): Economy {
+        if (!this.isActive) {
+            return emptyMarket()
+        } else {
+            // add devices
+            let machineEconomies = this.devices.map(d => d.machine.economy)
+
+            let buildingEconomy = {
+                ...emptyMarket(),
+                Oxygen: { demand: 0.1, supply: 0 },
+                // Water: { demand: 0.1, supply: 0 },
+            }
+
+            let aggregate = [...machineEconomies, buildingEconomy]
+                .reduce(sumMarkets, emptyMarket())
+
+            return aggregate
+        }
+    }
+
+    private toggleActive() {
+        if (!this.structure.infra) {
+            if (this.active) {
+                this.active = false
+            } else {
+                this.active = true
+                let agg = [ this.planet.economy, this.economy ].reduce(sumMarkets, emptyMarket())
+                // console.log("---> activate", { agg, eq: equilibrium(agg) })
+                if (!equilibrium(agg)) {
+                    this.active = false
+                }
+            }
+        }
+    }
+
+    get isActive() { return !!this.active }
+
 
     setup(): void { }
 
@@ -249,10 +291,14 @@ export class Building extends Actor {
 
     protected processedColor(): Color {
         let clr = this.colorBase().clone();
-        if (!this.built)  { 
+        if (!this.placed)  { 
             if (this.overlapsAny()) { clr = Color.Red }
             clr.a = 0.8
         }
+        if (!this.active) {
+            clr = clr.darken(0.8)
+        }
+
         if (this.hover) { clr.a = 0.5 }
         return clr;
     }
@@ -324,6 +370,7 @@ export class Building extends Actor {
         }
         this.devices.push(device)
         this.updateFunction()
+        this.toggleActive()
     }
 
     public hasPlaceForDevice() {

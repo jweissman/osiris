@@ -14,7 +14,7 @@ export enum PureValue {
     Wonder = 'Wonder'
 }
 
-export const allValues = [
+export const allValues: PureValue[] = [
     PureValue.Power,
     PureValue.Oxygen,
     PureValue.Water,
@@ -63,6 +63,15 @@ export const sumMarkets: (ea: Economy, eb: Economy) => Economy = (ea, eb) => {
         }
     }
     return newMarket
+}
+
+export const equilibrium: (e: Economy) => boolean = (e) => {
+    for (let value of allValues) {
+        if (availableCapacity(e, value) < 0) {
+            return false
+        }
+    }
+    return true
 }
 
 export enum ResourceBlock {

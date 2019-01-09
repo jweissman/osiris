@@ -49,6 +49,7 @@ export const getBackgroundPattern = (ctx, pattern: BackgroundPattern) => {
     let bg = backgroundPatterns[pattern]
     if (!bg.loading) {
         if (!bg.pattern) {
+            // bg.image.
             bg.pattern = ctx.createPattern(bg.image, 'repeat');
         }
         return bg.pattern

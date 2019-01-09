@@ -79,7 +79,7 @@ export class CardBody extends Actor {
                     bonusMessages.push(`+${Math.floor((workSpeed*100)-100)}% efficiency` )
                 }
                 this.values.text = bonusMessages.join('; ') //; 
-                this.notes.text = ''
+                this.notes.text = entity.machines.map(m => (new m()).name).join(' + ')
             } else {
                 this.values.text = ''
                 this.notes.text = ''

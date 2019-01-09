@@ -71,10 +71,12 @@ export class CommandCenter extends Machine {
     )
     image = images.consoleGreen
     size = DeviceSize.Medium
+    // infra = true
     economy = {
         ...emptyMarket(),
-        Power: { supply: 1, demand: 0 },
-        Oxygen: { supply: 1, demand: 0 },
+        Power: { supply: 3, demand: 0 },
+        Oxygen: { supply: 2, demand: 0 },
+        Water: { supply: 2, demand: 0 },
         Hope: { supply: 1, demand: 0 }
     }
 }

@@ -1,7 +1,7 @@
 import { Building, DevicePlace } from "./Building";
 import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
-import { Vector } from "excalibur";
+import { Vector, Color } from "excalibur";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { drawRect, drawPatternedRect } from "../../Util";
 import { BackgroundPattern } from "./BackgroundPatterns";
@@ -21,6 +21,12 @@ export class CommonAreaView extends Building {
 
         // drawRect(ctx, this.aabb(), 0.5, wallColor)
         drawPatternedRect(ctx, this.aabb(), this.backgroundPattern)
+        if (!this.isActive) {
+            // draw overlay rect that darkens
+            let c = Color.Black
+            c.a = 0.6
+            drawRect(ctx, this.aabb(), 0, c)
+        }
 
         drawRect(
             ctx,
