@@ -2,7 +2,7 @@ import { ResourceBlock, Economy, emptyMarket } from "./Economy";
 import { Color, FontStyle, Resource } from "excalibur";
 import { DeviceSize } from "../values/DeviceSize";
 import { MechanicalOperation, mechanicalOperations } from "./MechanicalOperation";
-import { shuffle } from "../Util";
+import { shuffle, range } from "../Util";
 import { Device } from "../actors/Device";
 
 const bookshelfSvg = require('../images/bookshelf-plain.svg');
@@ -57,7 +57,7 @@ export class Machine {
     description: string = '(machine description)'
     color: Color = Color.LightGray
 
-    // cost: ResourceBlock[] = [ResourceBlock.Mineral]
+    cost: ResourceBlock[] = [ResourceBlock.Mineral]
 
     size: DeviceSize = DeviceSize.Small
     operation: MechanicalOperation = { type: 'noop' }
@@ -70,8 +70,7 @@ export class Machine {
     capacity: boolean
 
 
-    concretize(): Machine { return this; } //return shuffle(allMachines)[0] }
-    // concretions: Machine[] = []
+    concretize(): Machine { return this; } 
 
     onPlacement(device: Device) {
         // ...whatever we need to script here?
@@ -80,10 +79,10 @@ export class Machine {
 
 export class CommandCenter extends Machine {
     name = 'Command Console'
-    description = 'gather resources...'
+    description = 'commander, we need your help'
     operation = store(
         [ResourceBlock.Mineral],
-        6
+        12
     )
     image = images.consoleGreen
     size = DeviceSize.Medium
@@ -99,7 +98,11 @@ export class CommandCenter extends Machine {
 
     onPlacement(device: Device) {
         // autobuild this machine...?
+        device.built = true
         // go ahead and populate minerals?
+        for (let i in range(12)) {
+            device.product.push(ResourceBlock.Mineral)
+        }
         // build an elite citizen?
         let { building } = device //.building
         building.populate(device.pos.add(device.building.pos), true)

@@ -1,5 +1,5 @@
 import { shuffle } from "../Util";
-import { Device, retrieveResource as retrieveResource } from "../actors/Device";
+import { Device } from "../actors/Device";
 import { Recipe, ResourceStorage } from "../models/MechanicalOperation";
 import { ProductionStrategy } from "./ProductionStrategy";
 

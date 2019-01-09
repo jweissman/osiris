@@ -9,6 +9,8 @@ import { Scale } from "../values/Scale";
 import { ProductionStrategy } from "../strategies/ProductionStrategy";
 import { CapacityBasedProduction } from "../strategies/CapacityBasedProduction";
 import { drawStar } from "../Painting";
+import { ConstructionStrategy } from "../strategies/ConstructionStrategy";
+import { ProxmityBasedConstruction } from "../strategies/ProximityBasedConstruction";
 
 export class Citizen extends Actor {
 
@@ -22,12 +24,14 @@ export class Citizen extends Actor {
     progress: number
 
     private productionStrategy: ProductionStrategy
+    private constructionStrategy: ConstructionStrategy
 
     constructor(private home: Vector, protected planet: Planet, private elite: boolean = false) {
         super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White)
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
         this.productionStrategy = new CapacityBasedProduction(this)
+        this.constructionStrategy = new ProxmityBasedConstruction(this)
     }
 
     get isWorking() { return this.isWorking }
@@ -77,7 +81,7 @@ export class Citizen extends Actor {
             ctx.fillRect(px, py, this.progress * pw, ph)
         }
 
-        let debugPath = false
+        let debugPath = true
         if (this.path && debugPath) {
             let c = Color.White.lighten(0.5)
             c.a = 0.5
@@ -86,7 +90,7 @@ export class Citizen extends Actor {
                 ctx.moveTo(a.x,a.y)
                 ctx.lineTo(b.x,b.y)
                 ctx.strokeStyle = c.toRGBA()
-                ctx.lineWidth = 10
+                ctx.lineWidth = 4
                 ctx.stroke()
             })
         }
@@ -125,7 +129,9 @@ export class Citizen extends Actor {
     }
 
     glideTo(pos: Vector) {
-        return this.actions.moveTo(pos.x, pos.y, this.walkSpeed).asPromise()
+        if (pos) {
+            return this.actions.moveTo(pos.x, pos.y, this.walkSpeed).asPromise()
+        }
     }
 
     async progressBar(duration: number) {
@@ -136,12 +142,17 @@ export class Citizen extends Actor {
         this.workInProgress = false
     }
 
+    // currentBuilding: Building
     async pathTo(building: Building) {
         if (this.path.length > 0) {
             throw new Error("Already pathing!!")
         }
+        console.log("PATH TO", { building, pos: this.pos })
+        let path = //this.currentBuilding
+            // ? this.planet.pathBetween(this.currentBuilding.pos.clone(), building)
+            this.planet.pathBetween(this.pos.clone(), building)
 
-        let path = this.planet.pathBetween(this.pos.clone(), building)
+        console.log("FOUND PATH", { path })
         if (path.length > 0) {
             this.path = path
             path.pop()
@@ -151,11 +162,18 @@ export class Citizen extends Actor {
             )
             this.path = []
         }
+        // this.currentBuilding = building
         return true;
     }
 
     work() {
-        this.productionStrategy.attempt()
+        // this.isWorking = true
+        // await this.
+        if (!this.planet.colony.findAllDevices().every((d: Device) => d.built)) {
+            this.constructionStrategy.attempt()
+        } else {
+            this.productionStrategy.attempt()
+        }
     }
 
 }

@@ -403,7 +403,7 @@ export class Building extends Actor {
     }
 
     public getDevices() {
-        return this.devices
+        return this.devices //.filter(d => d.built)
     }
 
     private updateFunction() {

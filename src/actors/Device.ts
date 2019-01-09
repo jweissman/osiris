@@ -1,7 +1,7 @@
 import { Actor, Label, Color, Vector } from "excalibur";
 import { Machine } from "../models/Machine";
 import { Building } from "./Building";
-import { ResourceBlock, blockColor } from "../models/Economy";
+import { ResourceBlock, blockColor, emptyMarket } from "../models/Economy";
 import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
@@ -9,34 +9,11 @@ import { getVisibleDeviceSize } from "../values/DeviceSize";
 import { Recipe, ResourceStorage, MechanicalOperation, ResourceGenerator } from "../models/MechanicalOperation";
 import { range, deleteByValueOnce } from "../Util";
 import { drawRect } from "../Painting";
-
-interface RetrieveResource {
-    type: 'retrieve'
-    resource: ResourceBlock
-    // count: number
-}
-
-interface WorkRecipe {
-    type: 'work'
-    recipe: Recipe
-}
-
-interface StoreResource {
-    type: 'store'
-    resource: ResourceBlock
-}
-
-export function retrieveResource(res: ResourceBlock): RetrieveResource {
-    return {
-        type: 'retrieve',
-        resource: res,
-        // count: 1
-    }
-}
-
-export type InteractionRequest = StoreResource | RetrieveResource | WorkRecipe // | ...
+import { InteractionRequest } from "../values/InteractionRequest";
 
 export class Device extends Actor {
+    // constructionMaterials: ResourceBlock[] = []
+
     // could also use for storage?
     product: ResourceBlock[] = []
     nameLabel: Label
@@ -46,6 +23,8 @@ export class Device extends Actor {
     hover: boolean = false
 
     imageLoaded: boolean = false
+
+    built: boolean = false
 
     constructor(
         public machine: Machine,
@@ -93,10 +72,11 @@ export class Device extends Actor {
     get imageX() { return this.pos.x - this.getWidth() / 2 }
     get imageY() { return this.pos.y - this.getHeight() / 2 - 10 }
 
-    get economy() { return this.machine.economy }
+    get economy() { return this.built ? this.machine.economy : emptyMarket() }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (this.imageLoaded) {
+            if (!this.built) { ctx.globalAlpha = 0.5 }
             ctx.drawImage(
                 this.image,
                 this.imageX,
@@ -105,6 +85,7 @@ export class Device extends Actor {
                 this.getWidth(),
                 this.getHeight()
             )
+            if (!this.built) { ctx.globalAlpha = 1.0 }
 
             if (this.hover) {
                 let c = Color.White
@@ -140,8 +121,18 @@ export class Device extends Actor {
     get size() { return this.machine.size }
     get operation() { return this.machine.operation }
 
+    async assemble(citizen: Citizen) {
+        if (citizen.isCarryingUnique(this.machine.cost)) {
+            for (let res of this.machine.cost) {
+                await citizen.progressBar(1000)
+                citizen.drop(res)
+            }
+            this.built = true
+        }
+    }
+
     async interact(citizen: Citizen, request: InteractionRequest): Promise<boolean> {
-        if (this.inUse) {
+        if (this.inUse || !this.built) {
             return false
         }
 
@@ -231,7 +222,7 @@ export class Device extends Actor {
     }
 
     public produce(step: number) {
-        if (this.building.isActive) {
+        if (this.building.isActive && this.built) {
             if (this.machine.operation.type === 'generator') {
                 if (step % this.machine.operation.generationTime === 0) {
                     if (this.product.length < this.machine.operation.capacity) {

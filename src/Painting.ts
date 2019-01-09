@@ -74,7 +74,7 @@ export function drawRect(
 }
 
 export function drawStar(ctx, cx, cy, outerRadius=3.6, innerRadius=1.4, spikes=5, ) {
-  console.warn("DRAW STAR")
+  // console.warn("DRAW STAR")
     var rot = Math.PI / 2 * 3;
     var x = cx;
     var y = cy;
