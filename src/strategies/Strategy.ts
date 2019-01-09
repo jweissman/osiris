@@ -30,8 +30,10 @@ export abstract class Strategy {
             return;
         }
         if (!this.isActive) {
+            this.isActive = true
             // note apply will need to set this.isActive around its critical section
             await this.apply();
+            this.isActive = false
         }
 
         await this.pause()
@@ -76,11 +78,11 @@ export abstract class Strategy {
     }
 
     protected async visitDevice(device: Device) {
-        console.log("VISIT DEVICE!!!", { device, building: device.building })
-        await this.pawn.pathTo(device.building)
+        // console.log("VISIT DEVICE!!!", { device, building: device.building })
+        await this.pawn.pathTo(device.building) //pos) //building)
 
         let target = device.pos.add(device.building.pos)
-        console.log("VISIT DEVICE AT", { target })
+        // console.log("VISIT DEVICE AT", { target })
         await this.pawn.glideTo(target)
     }
 

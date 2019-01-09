@@ -5,6 +5,7 @@ import { Resources } from './Resources';
 export class Game extends Engine {
 
   static citizenSpeed: number = 100
+    static debugPath: boolean = false
 
   constructor(public world: World) {
     super({

@@ -10,6 +10,7 @@ import { Colony } from './Colony';
 import { Population } from './Population';
 import { Machine, CloningVat } from '../../models/Machine';
 import { Device } from '../Device';
+import { AccelerateTime, MechanicalOperation } from '../../models/MechanicalOperation';
 
 
 export class Planet extends Actor {
@@ -139,5 +140,13 @@ export class Planet extends Actor {
 
     pathBetween(origin: Vector, destination: Building): Vector[] {
         return this.colony.pathBetween(origin, destination)
+    }
+
+    get timeFactor() {
+        let devices = this.colony.findPoweredDevices()
+        let ops: MechanicalOperation[] = devices.map(d => d.operation) //.filter(op => op.type === 'accelerate')
+        return ops
+            .map(op => op.type === 'accelerate' ? op.factor : 1)
+            .reduce((acc, val) => val * acc, 1.0)
     }
 }

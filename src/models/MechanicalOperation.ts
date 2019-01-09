@@ -1,6 +1,12 @@
 import { ResourceBlock } from "./Economy";
 
-export type MechanicalOperation = Recipe | ResourceGenerator | ResourceStorage | SpawnClone | Noop;
+export type MechanicalOperation =
+    Recipe |
+    ResourceGenerator |
+    ResourceStorage |
+    SpawnClone |
+    AccelerateTime |
+    Noop
 
 export interface Noop {
     type: 'noop'
@@ -28,6 +34,11 @@ export interface ResourceStorage {
 
 export interface SpawnClone {
     type: 'spawn'
+}
+
+export interface AccelerateTime {
+    type: 'accelerate'
+    factor: number
 }
 
 function store(res: ResourceBlock[], capacity: number = 10): ResourceStorage {
@@ -62,9 +73,17 @@ function spawn(): SpawnClone {
     }
 }
 
+function accelerateTime(): AccelerateTime {
+    return {
+        type: 'accelerate',
+        factor: 2
+    }
+}
+
 export const mechanicalOperations = {
     store,
     generate,
     recipe,
-    spawn
+    spawn,
+    accelerateTime,
 }

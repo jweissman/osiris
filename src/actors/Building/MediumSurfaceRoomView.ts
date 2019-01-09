@@ -5,6 +5,7 @@ import { Slot } from "../../values/Slot";
 import { Device } from "../Device";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { drawPatternedRect, drawRect } from "../../Painting";
+import { measureDistance, eachCons } from "../../Util";
 // import { drawPatternedRect, drawRect } from "../../Util";
 
 export class MediumSurfaceRoomView extends Building {
@@ -29,6 +30,22 @@ export class MediumSurfaceRoomView extends Building {
         //DeviceSize.Small))
     }
 
+    graph(sg) {
+        let g = super.graph(sg)
+        let find = (s: Vector) => g.findOrCreate(s, measureDistance)
+        let slots: Vector[] = this.slots().map(s => s.pos)
+        // draw from left slot to each device place to right slot?
+        let leftSlot = find(slots[0]), rightSlot = find(slots[slots.length-1])
+        let devices = this.devicePlaces().map(d => find(d.position))
+        g.edge(leftSlot, devices[0])
+        eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
+        g.edge(devices[devices.length-1], rightSlot)
+
+        g.edge(devices[1], find(slots[1]))
+
+        return g
+    }
+  
     // afterConstruct() {
     //     let { machines } = this.structure;
     //     if (machines && machines.length > 0) {
@@ -43,6 +60,14 @@ export class MediumSurfaceRoomView extends Building {
 
     slots() {
         let theSlots: Slot[] = []
+        let slotY = this.getHeight();
+        theSlots.push(
+            this.buildSlot(
+                this.pos.x, this.pos.y + slotY,
+                Orientation.Left
+            )
+        )
+
         theSlots.push(
             this.buildSlot(
                 this.pos.x + this.getWidth() / 2,
@@ -51,13 +76,7 @@ export class MediumSurfaceRoomView extends Building {
             )
         )
 
-        let slotY = this.getHeight();
-        theSlots.push(
-            this.buildSlot(
-                this.pos.x, this.pos.y + slotY,
-                Orientation.Left
-            )
-        )
+
 
         theSlots.push(
             this.buildSlot(

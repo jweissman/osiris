@@ -104,7 +104,8 @@ export class Colony extends Actor {
     }
 
     findPoweredDevices(): Device[] {
-        return flatSingle(this.activeBuildings.map(b => b.getDevices())).filter(d => d.built)
+        return flatSingle(this.activeBuildings.map(b => b.getDevices()))
+            .filter(d => d.built) /// ....
     }
 
     protected get activeBuildings() {

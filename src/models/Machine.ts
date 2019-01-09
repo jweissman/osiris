@@ -50,7 +50,7 @@ const images = {
 
 const { Red, Green, Blue, Orange, Violet, Yellow } = Color;
 
-let { store, generate, recipe, spawn } = mechanicalOperations
+let { store, generate, recipe, spawn, accelerateTime } = mechanicalOperations
 
 export class Machine {
     name: string = '(machine name)'
@@ -171,6 +171,7 @@ export class WaterCondensingMachine extends Machine {
 }
 
 /// small subsurface
+
 export class StudyMachine extends Machine {
     operation = recipe(
         [ ResourceBlock.Idea, ResourceBlock.Idea, ResourceBlock.Idea ],
@@ -502,6 +503,17 @@ export class SilverForest extends Machine {
     forDome = true
 }
 
+export class TimeCrystal extends Machine {
+    name = 'Time Crystal'
+    size = DeviceSize.Medium
+    color = Color.fromHex('e5e4e2')
+    operation = accelerateTime()
+    prereqs = []
+    // onPlacement(device: Device) {
+        // device.building.planet.updateSpeeds()
+    // }
+}
+
 
 // large devices!
 
@@ -645,5 +657,6 @@ export const allMachines = [
     SilverForest,
 
     OrientationConsole,
+    TimeCrystal,
 
 ]

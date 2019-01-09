@@ -14,7 +14,7 @@ import { ProxmityBasedConstruction } from "../strategies/ProximityBasedConstruct
 
 export class Citizen extends Actor {
 
-    walkSpeed: number = Game.citizenSpeed
+    // walkSpeed: number = Game.citizenSpeed
     carrying: ResourceBlock[] = [] // null
     path: Vector[] = []
 
@@ -36,6 +36,10 @@ export class Citizen extends Actor {
 
     get isWorking() { return this.isWorking }
     get currentPlanet() { return this.planet }
+
+    get walkSpeed() {
+        return this.planet.timeFactor * Game.citizenSpeed
+    }
 
     update(engine, delta) {
         super.update(engine, delta)
@@ -81,8 +85,8 @@ export class Citizen extends Actor {
             ctx.fillRect(px, py, this.progress * pw, ph)
         }
 
-        let debugPath = true
-        if (this.path && debugPath) {
+        // let debugPath = true
+        if (this.path && Game.debugPath) {
             let c = Color.White.lighten(0.5)
             c.a = 0.5
             eachCons(this.path, 2).forEach(([a,b]) => {
@@ -147,15 +151,14 @@ export class Citizen extends Actor {
         if (this.path.length > 0) {
             throw new Error("Already pathing!!")
         }
-        console.log("PATH TO", { building, pos: this.pos })
+        // console.log("PATH TO", { building, pos: this.pos })
         let path = //this.currentBuilding
             // ? this.planet.pathBetween(this.currentBuilding.pos.clone(), building)
-            this.planet.pathBetween(this.pos.clone(), building)
+            this.planet.pathBetween(this.pos.clone(), building) //pos) //building)
 
-        console.log("FOUND PATH", { path })
+        // console.log("FOUND PATH", { path })
         if (path.length > 0) {
             this.path = path
-            path.pop()
             path.shift()
             await Promise.all(
                 path.map(step => this.glideTo(step))
@@ -166,13 +169,11 @@ export class Citizen extends Actor {
         return true;
     }
 
-    work() {
-        // this.isWorking = true
-        // await this.
-        if (!this.planet.colony.findAllDevices().every((d: Device) => d.built)) {
-            this.constructionStrategy.attempt()
+    async work() {
+        if (this.constructionStrategy.canApply()) {
+            await this.constructionStrategy.attempt()
         } else {
-            this.productionStrategy.attempt()
+            await this.productionStrategy.attempt()
         }
     }
 

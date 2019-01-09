@@ -6,6 +6,7 @@ import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 // import { drawRect, drawPatternedRect } from "../../Util";
 import { BackgroundPattern } from "./BackgroundPatterns";
 import { drawPatternedRect, drawRect } from "../../Painting";
+import { measureDistance, eachCons } from "../../Util";
 
 export class CommonAreaView extends Building {
     floorHeight: number = 12
@@ -82,6 +83,19 @@ export class CommonAreaView extends Building {
         return [
             new Vector(Math.floor(x), Math.floor(y))
         ];
+    }
+
+    graph(sg) {
+        let g = super.graph(sg)
+        let slots: Slot[] = this.slots()
+        let find = (s: Vector) => g.findOrCreate(s, measureDistance)
+        // draw from left slot to each device place to right slot?
+        let leftSlot = find(slots[0].pos), rightSlot = find(slots[slots.length-1].pos)
+        let devices = this.devicePlaces().map(d => find(d.position))
+        g.edge(leftSlot, devices[0])
+        eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
+        g.edge(devices[devices.length-1], rightSlot)
+        return g
     }
   
     reshape(cursor) {

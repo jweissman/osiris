@@ -2,9 +2,11 @@ import { ConstructionStrategy } from "./ConstructionStrategy";
 import { Device } from "../actors/Device";
 
 export class ProxmityBasedConstruction extends ConstructionStrategy {
+
+
     async apply() {
-        if (this.isActive) { return }
-        this.isActive = true
+        // if (this.isActive) { return }
+        // this.isActive = true
 
         console.warn("APPLY PROXIMITY BASED CONSTRUCTION!!")
 
@@ -13,15 +15,16 @@ export class ProxmityBasedConstruction extends ConstructionStrategy {
         // await this.pause()
 
         // throw new Error("Method not implemented.");
-        const isUnbuilt = (d: Device) => !d.built && !d.inUse
-        let unbuiltDevice = this.planet.colony.findAllDevices().find(isUnbuilt)
+        // const isUnbuilt = (d: Device) => !d.built && !d.inUse && d.building.isActive
+        // let unbuiltDevice = this.planet.colony.findAllDevices().find(isUnbuilt)
 
         // find cost items
-        if (unbuiltDevice && unbuiltDevice.building) {
-            await this.constructDevice(unbuiltDevice)
+        if (this.unbuiltDevice && this.unbuiltDevice.building) { //} && unbuiltDevice.building) {
+            await this.constructDevice(this.unbuiltDevice)
         }
+        await this.pause()
 
-        this.isActive = false
+        // this.isActive = false
     }
 
     private async constructDevice(device: Device) {

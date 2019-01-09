@@ -98,8 +98,8 @@ export class Building extends Actor {
 
         }
 
-        let debug = false;
-        if (debug) {
+        // let debug = true;
+        if (Game.debugPath) {
             if (this.slots().length > 0) {
                 // draw slots
                 this.slots().forEach((slot: Slot) => {
@@ -168,7 +168,8 @@ export class Building extends Actor {
         if (emptyUnlessActive && !this.isActive) {
             return emptyMarket()
         } else {
-            let machineEconomies = this.devices.map(d => d.machine.economy)
+            let machineEconomies = this.devices.map(d => d.economy)
+            //machine.economy)
 
             let buildingEconomy = {
                 ...emptyMarket(),
