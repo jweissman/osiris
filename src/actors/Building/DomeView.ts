@@ -2,10 +2,30 @@ import { Color, Vector } from "excalibur";
 import { Building, DevicePlace } from "./Building";
 import { Orientation } from "../../values/Orientation";
 import { DeviceSize } from "../../values/DeviceSize";
+import { Graph } from "../../values/Graph";
+import { measureDistance, eachCons } from "../../Util";
 
 export class DomeView extends Building {
     hideBox = true
     showLabel = true
+
+    graph(sg) {
+        let g = super.graph(sg)
+        let find = (s: Vector) => g.findOrCreate(s, measureDistance)
+
+        let slots: Vector[] = this.slots().map(s => s.pos)
+        let leftSlot = find(slots[0]), rightSlot = find(slots[slots.length-1])
+        let devices = this.devicePlaces().map(d => find(d.position))
+        g.edge(leftSlot, devices[0])
+        eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
+        g.edge(devices[devices.length-1], rightSlot)
+
+        let node = this.nodes()[0]
+        devices.forEach(device => g.edge(device, find(node)))
+
+        return g
+
+    }
 
     slots() {
         let theSlots = [];

@@ -24,11 +24,16 @@ Our prayers are with you.
 
 ## Stories to Play
 
-- [ok] Clone Vat (produce a clone every so often, consume a lot of meals/data)
-- Reshape most buildings (i.e., permit user to set width, and so number of slots, at least on most subsurface buildings)
-- Pinnacle buildings (huge devices/slots)
-- [some] Tech Tree (remaining buildings; unpack building menu over time) 
-- Device Palette (click to place devices in buildings; 'images' for most devices?)
-- Condensed Hud (hide/show menus; construct/furnish 'modes' where menus are hidden; intangible/'providential' resources [power/atmos/hope -- pop cap/building cap/base level or wealth])
+- Tech Tree (remaining buildings/machines/functions) 
+- Pinnacle buildings (huge devices/slots -- mini sun/black hole; refinery -> mineral processing, refinery becomes space fn)
+- Clone Vat (make consume meals/data)
+- Reshape most subsurface buildings (i.e., permit user to set width, and so number of slots, at least on common area bldgs)
+- Nonstandard building shapes (triangular wedge to break up linearities, huge octagon for power plant?)
+- Day-night cycle (do pawns sleep?
+- Art cycle ('images' for most devices)
+- Condensed Hud (hide/show menus; construct/furnish 'modes' where menus are hidden)
 - Building backgrounds (wall and floor patterns)
-- Economy (apply cost constraints; model higher-order substances: strange matter [negative-mass omnium?], algorithms [highly condensed/processed/worked data? output of a 'dev console'?], bioplasm [ some advanced biotic material?? ])
+- improve citizen automation (give back resources when we can't fulfill something)
+- improve pathing -- better graph nodes? (improve handling of machines? these are really the 'nodes')
+- handle construction better? (better hints to user at what is expected? better state mgmt...? maybe separate construction 'scene'?)
+- music player

@@ -116,19 +116,6 @@ export class Citizen extends Actor {
 
     isCarryingUnique(resources: ResourceBlock[]): boolean {
         let isCarrying = containsUniq(this.carrying, resources)
-        //let carryingCopy = this.carrying.slice()
-        //if (this.carrying.length > 0) {
-        //    let missingItem = false
-        //    resources.forEach(resToFind => {
-        //        if (carryingCopy.find(res => res === resToFind)) {
-        //            deleteByValueOnce(carryingCopy, resToFind)
-        //        } else {
-        //            missingItem = true;
-        //        }
-        //    })
-        //    isCarrying = !missingItem
-        //}
-        // console.log("IS CARRYING", { resources, carrying: this.carrying, result: isCarrying })
         return isCarrying
     }
 
@@ -145,16 +132,18 @@ export class Citizen extends Actor {
     currentBuilding: Building = null
     async visit(device: Device) {
         if (this.currentBuilding != device.building) {
+            // let path = this.planet.pathBetween
+
             console.log("VISIT (find path)", { device })
-            let path = this.planet.pathBetween(this.pos.clone(), device.building) //pos.add(device.building.pos))
+            // const path = this.planet.pathBetween(this.pos.clone(), device.building) //pos.add(device.building.pos))
+            const path = this.planet.pathBetweenPoints(this.pos.clone(), device.pos.add(device.building.pos))
             // path.pop()
+            // path.shift()
             // path.shift()
             console.log("VISIT (path found!)", { path })
             await this.followPath(path)
             console.log("VISIT (path follow done, moving to target)")
         }
-        // await this.glideTo(device.pos)
-        // await this.pathTo(device.building)
         let target = device.pos.add(device.building.pos)
         await this.glideTo(target)
         this.currentBuilding = device.building

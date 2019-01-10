@@ -82,14 +82,14 @@ export class CommandCenter extends Machine {
     description = 'commander, we need your help'
     operation = store(
         [ResourceBlock.Mineral], //,ResourceBlock.Biomass],
-        16
+        24
     )
-    image = images.consoleGreen
+    image = images.megaconsole
     size = DeviceSize.Medium
     economy = {
         ...emptyMarket(),
-        Power: { supply: 5, demand: 0 },
-        Oxygen: { supply: 25, demand: 0 },
+        Power: { supply: 6, demand: 0 },
+        Oxygen: { supply: 20, demand: 0 },
         Water: { supply: 10, demand: 0 },
         Hope: { supply: 1, demand: 0 },
         Shelter: { supply: 2, demand: 0}
@@ -97,7 +97,7 @@ export class CommandCenter extends Machine {
 
     onPlacement(device: Device) {
         device.built = true
-        for (let i in range(16)) {
+        for (let i in range(20)) {
             device.produceResource(ResourceBlock.Mineral)
         }
         let { building } = device
@@ -371,6 +371,20 @@ export class AlgaeVat extends Machine {
         Power: { supply: 0, demand: 2 },
     }
 }
+
+export class LifeSciencesConsole extends Machine {
+    name = 'Life Sciences Console'
+    description = 'mind and body together'
+    operation = store([ResourceBlock.Biomass, ResourceBlock.Data], 5)
+    prereqs = [Houseplant, Botany]
+    color = Green
+    image = images.consoleGreen
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 0.2 },
+    }
+}
+
 // medium
 
 export class MetalStorage extends Machine {
@@ -457,8 +471,8 @@ export class Botany extends Machine {
 }
 
 
-export class OreRefinery extends Machine {
-    name = 'Refinery'
+export class MineralProcessor extends Machine {
+    name = 'Mineral Processor'
     description = 'wheat from the chaff'
     operation = recipe(
         [ResourceBlock.Ore, ResourceBlock.Ore, ResourceBlock.Ore],
@@ -486,21 +500,6 @@ export class ThinkingFountain extends Machine {
         Wonder: { supply: 1, demand: 0 }
     }
 }
-
-export class LogicPool extends Machine {
-    name = 'Logic Pool'
-    size = DeviceSize.Large
-    prereqs = [ MolecularEngine ]
-    color = Color.fromHex('daa520')
-    operation = store([ResourceBlock.Algorithm, ResourceBlock.Aurum], 18)
-    cost = [ResourceBlock.Aurum]
-    economy = {
-        ...emptyMarket(),
-        Wisdom: { supply: 2, demand: 0 },
-        Wonder: { supply: 1, demand: 0 }
-    }
-}
-
 export class SilverForest extends Machine {
     name = 'Silver Forest'
     size = DeviceSize.Medium
@@ -606,6 +605,21 @@ export class Preserve extends Machine {
     }
 }
 
+export class LogicPool extends Machine {
+    name = 'Logic Pool'
+    size = DeviceSize.Large
+    prereqs = [ MolecularEngine ]
+    color = Color.fromHex('daa520')
+    operation = store([ResourceBlock.Algorithm, ResourceBlock.Aurum], 18)
+    cost = [ResourceBlock.Aurum]
+    economy = {
+        ...emptyMarket(),
+        Wisdom: { supply: 2, demand: 0 },
+        Wonder: { supply: 1, demand: 0 }
+    }
+}
+
+
 
 /// huge devices
 
@@ -660,7 +674,7 @@ export const allMachines = [
     LogicCrystal,
     Botany,
 
-    OreRefinery,
+    MineralProcessor,
     PlasmaBank,
     DissolutionVat,
     MetalStorage,
@@ -672,6 +686,7 @@ export const allMachines = [
     SilverForest,
 
     OrientationConsole,
+    LifeSciencesConsole,
     // TimeCrystal,
 
 ]

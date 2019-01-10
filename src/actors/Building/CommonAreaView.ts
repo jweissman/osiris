@@ -90,11 +90,14 @@ export class CommonAreaView extends Building {
         let slots: Slot[] = this.slots()
         let find = (s: Vector) => g.findOrCreate(s, measureDistance)
         // draw from left slot to each device place to right slot?
-        let leftSlot = find(slots[0].pos), rightSlot = find(slots[slots.length-1].pos)
+        let leftSlot = find(slots[0].pos), rightSlot = find(slots[1].pos)
         let devices = this.devicePlaces().map(d => find(d.position))
         g.edge(leftSlot, devices[0])
         eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
         g.edge(devices[devices.length-1], rightSlot)
+
+        let node = this.nodes()[0]
+        devices.forEach(device => g.edge(device, find(node)))
         return g
     }
   

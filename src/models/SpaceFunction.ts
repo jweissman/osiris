@@ -1,4 +1,4 @@
-import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog, Botany, OrientationConsole, PersonnelRegistry } from './Machine';
+import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog, Botany, OrientationConsole, PersonnelRegistry, MineralProcessor, MiningDrill } from './Machine';
 import { Color } from 'excalibur';
 import { Structure, MediumSurfaceRoom } from './Structure';
 import { BackgroundPattern } from '../actors/Building/BackgroundPatterns';
@@ -170,6 +170,18 @@ export class LifeSciencesLab extends SpaceFunction {
      machines = [ Botany, Botany ]
 }
 
+export class Refinery extends SpaceFunction {
+     name = 'Refinery'
+     description = 'separation'
+     machines = [ MineralProcessor ]
+}
+
+export class Mine extends SpaceFunction {
+     name = 'Mine'
+     description = 'ore from the stone'
+     machines = [ MiningDrill ]
+}
+
 export const allSpaceFunctions = [
     Library,
     Barracks,
@@ -196,4 +208,7 @@ export const allSpaceFunctions = [
     LifeSciencesLab,
 
     CloneReception,
+    
+    Refinery,
+    Mine
 ]

@@ -41,7 +41,9 @@ export class MediumSurfaceRoomView extends Building {
         eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
         g.edge(devices[devices.length-1], rightSlot)
 
-        g.edge(devices[1], find(slots[1]))
+        let node = this.nodes()[0]
+        devices.forEach(device => g.edge(device, find(node)))
+        // g.edge(devices[1], find(slots[1]))
 
         return g
     }

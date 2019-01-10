@@ -5,6 +5,7 @@ import { Structure } from '../../models/Structure';
 import { NavigationTree } from './NavigationTree';
 import { Machine } from '../../models/Machine';
 import { Device } from '../Device';
+import { Game } from '../../Game';
 
 export class Colony extends Actor {
     navTree: NavigationTree;
@@ -19,7 +20,7 @@ export class Colony extends Actor {
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta);
 
-        let debugTree = false
+        let debugTree = Game.debugPath
         if (this.navTree && debugTree) {
             let edges = this.navTree.graph.edgeList();
             edges.forEach((edge) => {
@@ -73,7 +74,7 @@ export class Colony extends Actor {
             this.buildNavTree();
         }
         let srcNode = this.navTree.closestNode(origin);
-        let dest = destination.nodes()[0];
+        let dest = destination.nodes()[0] //.length > 1 ? destination.nodes()[1] : destination.nodes()[0];
         let destNode = this.navTree.closestNode(dest);
         let path = this.navTree.seekPath(srcNode, destNode);
         return path;

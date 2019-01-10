@@ -147,8 +147,7 @@ export class Planet extends Actor {
     }
 
     pathBetweenPoints(origin: Vector, destination: Vector): Vector[] {
-        return this.colony.pathBetweenPoints(origin, destination)
-
+       return this.colony.pathBetweenPoints(origin, destination)
     }
 
     get timeFactor() {
