@@ -95,7 +95,7 @@ export class Library extends SpaceFunction {
      background = BackgroundPattern.Books
 }
 
-class Study extends SpaceFunction {
+export class Study extends SpaceFunction {
      name = 'Study'
      description = 'plan it out'
      machines = [ StudyMachine, Bookshelf ]
@@ -131,7 +131,7 @@ export class SolarArray extends SpaceFunction {
      machines = [ SolarCell, SolarCell ]
 }
 
-class Workshop extends SpaceFunction {
+export class Workshop extends SpaceFunction {
      name = 'Workshop'
      description = 'take form'
      machines = [ Fabricator, Fabricator ]

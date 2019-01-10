@@ -89,10 +89,10 @@ export class CommandCenter extends Machine {
     economy = {
         ...emptyMarket(),
         Power: { supply: 5, demand: 0 },
-        Oxygen: { supply: 2, demand: 0 },
-        Water: { supply: 2, demand: 0 },
+        Oxygen: { supply: 25, demand: 0 },
+        Water: { supply: 10, demand: 0 },
         Hope: { supply: 1, demand: 0 },
-        Shelter: { supply: 1, demand: 0}
+        Shelter: { supply: 2, demand: 0}
     }
 
     onPlacement(device: Device) {

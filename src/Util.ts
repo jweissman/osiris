@@ -79,3 +79,20 @@ export const countOccurrences = (arr) => {
   return counts
 }
 
+
+export const containsUniq = (arr, testElems) => {
+  let doesContain = false
+  let arrCopy = arr.slice()
+  if (arr.length > 0) {
+    let missingItem = false
+    testElems.forEach(testElem => {
+      if (arrCopy.find(e => e === testElem)) {
+        deleteByValueOnce(arrCopy, testElem)
+      } else {
+        missingItem = true
+      }
+    })
+    doesContain = !missingItem
+  }
+  return doesContain
+}

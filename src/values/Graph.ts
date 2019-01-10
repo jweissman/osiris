@@ -103,7 +103,8 @@ export class Graph<T> {
         let halt = false;
         let visited: number[] = []
         visited.push(rootIndex)
-        while (visited.length < this.nodes.length) {
+        let tries = 0
+        while (visited.length < this.nodes.length && tries++ < this.nodes.length * 20) {
             for (let visitedNode of visited) {
                 let adj: number[] = this.adjacentIndices(visitedNode)
                 for (let adjacentNode of adj) {

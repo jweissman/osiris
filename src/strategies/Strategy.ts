@@ -44,7 +44,8 @@ export abstract class Strategy {
         await sleep(this.sleepInterval)
     }
 
-    protected async gatherBlock(res: ResourceBlock) {
+    protected async gatherBlock(res: ResourceBlock): Promise<boolean> {
+        console.log("GATHER BLOCK", { res })
         let gathered = false
         let generatesDesiredBlock = (d: Device) => (d.operation.type === 'generator') &&
             d.product.some(stored => res === stored)
@@ -57,22 +58,24 @@ export abstract class Strategy {
         let device: Device = gen || store
 
         if (device) {
+            console.log("Found device to gather, visting...")
             await this.visitDevice(device)
+            console.log("Attempt to interact with device...")
             if (await device.interact(this.pawn, retrieveResource(res))) {
+                console.log("Interacted successfully!")
                 gathered = true
             }
         } else {
-            let recipe = this.recipes.find(recipe => recipe.produces === res);
-            if (recipe) {
-                await this.workRecipe(recipe);
-                gathered = true
-            }
+            console.log("Didn't gather...")
+            // don't work sub-recipes??
+            // let recipe = this.recipes.find(recipe => recipe.produces === res);
+            // if (recipe) {
+                // gathered = await this.workRecipe(recipe);
+                // gathered = true
+            // }
         }
 
-        if (!gathered) {
-            await this.pause()
-            await this.gatherBlock(res)
-        }
+        return gathered
     }
 
     protected async visitDevice(device: Device) {
@@ -80,34 +83,47 @@ export abstract class Strategy {
     }
 
 
-    protected async workRecipe(recipe: Recipe) {
-        await this.gatherIngredients(recipe.consumes)
-
-        let knowsRecipe = (d: Device) => d.operation === recipe
-        let maker = this.planet.colony.closestDeviceByType(this.pawn.pos, [], knowsRecipe)
-        if (maker) {
-            await this.visitDevice(maker)
-            await this.performRecipeTask(maker, recipe)
-        } else {
-            await this.pause()
-            await this.workRecipe(recipe);
-        }
-    }
-
-    protected async gatherIngredients(blocks: ResourceBlock[]) { //recipe: Recipe) {
-        if (!this.pawn.isCarryingUnique(blocks)) { //recipe.consumes)) {
-            for (let ingredient of blocks) { //recipe.consumes) {
-                await this.gatherBlock(ingredient);
+    protected async workRecipe(recipe: Recipe): Promise<boolean> {
+        console.log("Working recipe", { product: recipe.produces })
+        if (await this.gatherIngredients(recipe.consumes)) {
+            let knowsRecipe = (d: Device) => d.operation === recipe
+            let maker = this.planet.colony.closestDeviceByType(this.pawn.pos, [], knowsRecipe)
+            if (maker) {
+                await this.visitDevice(maker)
+                if (await this.performRecipeTask(maker, recipe)) {
+                    return true
+                }
             }
         }
+        // await this.pause()
+        // await this.workRecipe(recipe);
+        return false
+    }
+
+    protected async gatherIngredients(blocks: ResourceBlock[]): Promise<boolean> {
+        if (!this.pawn.isCarryingUnique(blocks)) {
+            console.log("Gathering blocks...")
+            for (let ingredient of blocks) {
+                console.log("attempting to gather", { ingredient })
+                if (await this.gatherBlock(ingredient)) {
+                    console.log("gathered!", { ingredient })
+                } else {
+                    console.warn("didn't gather it!")
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     protected async performRecipeTask(maker: Device, recipe: Recipe) {
+        console.log("Try to perform recipe task...", { produces: recipe.produces })
         let worked = await maker.interact(this.pawn, { type: 'work', recipe })
         if (!worked) {
-            await this.pause()
-            console.warn("waiting for machine to become available...")
-            await this.performRecipeTask(maker, recipe)
+            // await this.pause()
+            console.warn("NOT waiting for machine to become available...")
+            // await this.performRecipeTask(maker, recipe)
         }
+        return worked
     }
 }

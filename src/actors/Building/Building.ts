@@ -173,7 +173,7 @@ export class Building extends Actor {
 
             let buildingEconomy = {
                 ...emptyMarket(),
-                Oxygen: { demand: 0.1, supply: 0 }, // structural demand
+                Oxygen: { demand: 1, supply: 0 }, // structural demand
                 // Water: { demand: 0.1, supply: 0 },
             }
 

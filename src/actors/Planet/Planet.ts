@@ -1,7 +1,7 @@
 import * as ex from 'excalibur';
 import { Actor, Color, Vector, Util, EdgeArea } from 'excalibur';
 import { Building } from '../Building';
-import { range } from '../../Util';
+import { range, flatSingle } from '../../Util';
 import { Mountains } from './PlanetBackground';
 import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
@@ -157,5 +157,10 @@ export class Planet extends Actor {
         return ops
             .map(op => op.type === 'accelerate' ? op.factor : 1)
             .reduce((acc, val) => val * acc, 1.0)
+    }
+
+    get storedResources(): ResourceBlock[] {
+        let devices = this.colony.findAllDevices()
+        return flatSingle(devices.map(d => d.product))
     }
 }

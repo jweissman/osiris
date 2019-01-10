@@ -3,7 +3,7 @@ import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
-import { eachCons, deleteByValueOnce, sleep } from "../Util";
+import { eachCons, deleteByValueOnce, sleep, containsUniq } from "../Util";
 import { Device } from "./Device";
 import { Scale } from "../values/Scale";
 import { ProductionStrategy } from "../strategies/ProductionStrategy";
@@ -13,6 +13,7 @@ import { ConstructionStrategy } from "../strategies/ConstructionStrategy";
 import { ProxmityBasedConstruction } from "../strategies/ProximityBasedConstruction";
 
 export class Citizen extends Actor {
+    isPlanning: boolean = false // 
 
     // walkSpeed: number = Game.citizenSpeed
     carrying: ResourceBlock[] = [] // null
@@ -34,7 +35,7 @@ export class Citizen extends Actor {
         this.constructionStrategy = new ProxmityBasedConstruction(this)
     }
 
-    get isWorking() { return this.isWorking }
+    // get isWorking() { return this.isWorking }
     get currentPlanet() { return this.planet }
 
     get walkSpeed() {
@@ -114,19 +115,19 @@ export class Citizen extends Actor {
     }
 
     isCarryingUnique(resources: ResourceBlock[]): boolean {
-        let isCarrying = false
-        let carryingCopy = this.carrying.slice()
-        if (this.carrying.length > 0) {
-            let missingItem = false
-            resources.forEach(resToFind => {
-                if (carryingCopy.find(res => res === resToFind)) {
-                    deleteByValueOnce(carryingCopy, resToFind)
-                } else {
-                    missingItem = true;
-                }
-            })
-            isCarrying = !missingItem
-        }
+        let isCarrying = containsUniq(this.carrying, resources)
+        //let carryingCopy = this.carrying.slice()
+        //if (this.carrying.length > 0) {
+        //    let missingItem = false
+        //    resources.forEach(resToFind => {
+        //        if (carryingCopy.find(res => res === resToFind)) {
+        //            deleteByValueOnce(carryingCopy, resToFind)
+        //        } else {
+        //            missingItem = true;
+        //        }
+        //    })
+        //    isCarrying = !missingItem
+        //}
         // console.log("IS CARRYING", { resources, carrying: this.carrying, result: isCarrying })
         return isCarrying
     }
@@ -141,18 +142,22 @@ export class Citizen extends Actor {
         return null
     }
 
+    currentBuilding: Building = null
     async visit(device: Device) {
-
-        let path = this.planet.pathBetween(this.pos.clone(), device.building)
-        path.pop()
-        path.shift()
-        if (path.length > 1) {
+        if (this.currentBuilding != device.building) {
+            console.log("VISIT (find path)", { device })
+            let path = this.planet.pathBetween(this.pos.clone(), device.building) //pos.add(device.building.pos))
+            // path.pop()
+            // path.shift()
+            console.log("VISIT (path found!)", { path })
             await this.followPath(path)
+            console.log("VISIT (path follow done, moving to target)")
         }
         // await this.glideTo(device.pos)
         // await this.pathTo(device.building)
         let target = device.pos.add(device.building.pos)
         await this.glideTo(target)
+        this.currentBuilding = device.building
     }
 
     glideTo(pos: Vector) {
@@ -174,19 +179,29 @@ export class Citizen extends Actor {
     }
 
     // currentBuilding: Building
-    async pathTo(building: Building) {
-        if (this.path.length > 0) { throw new Error("Already pathing!!") }
-        let path = this.planet.pathBetween(this.pos.clone(), building)
-        await this.followPath(path)
-        return true;
-    }
+    // async pathTo(building: Building) {
+    //     if (this.path.length > 0) { throw new Error("Already pathing!!") }
+    //     let path = this.planet.pathBetween(this.pos.clone(), building)
+    //     await this.followPath(path)
+    //     return true;
+    // }
 
     async work() {
+        if (this.isPlanning) {
+            // console.log("---> Don't re-enter work, already planning")
+            return // nope
+        }
+
+        this.isPlanning = true
         if (this.constructionStrategy.canApply()) {
+            console.log("Constructing...")
             await this.constructionStrategy.attempt()
         } else {
+            console.log("Producing...")
             await this.productionStrategy.attempt()
         }
+        this.isPlanning = false
+        console.log("Done planning...")
     }
 
 }

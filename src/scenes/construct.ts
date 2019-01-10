@@ -7,7 +7,7 @@ import { Building, structureViews, } from "../actors/Building";
 import { Hud } from "../actors/Hud/Hud";
 import { Device } from "../actors/Device";
 import { Machine } from "../models/Machine";
-import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive, ComputerCore, MissionControl, SolarArray, CloneReception } from "../models/SpaceFunction";
+import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive, ComputerCore, MissionControl, SolarArray, CloneReception, Workshop, Study } from "../models/SpaceFunction";
 import { flatSingle, zip } from "../Util";
 import { DevicePlace } from "../actors/Building/Building";
 import { DeviceSize } from "../values/DeviceSize";
@@ -37,7 +37,9 @@ export class Construct extends Scene {
         LivingQuarters,
         // CloneMatrix,
         // CloneReception,
-        // Kitchen,
+        Kitchen,
+        Workshop,
+        Study,
         // Library,
         // Archive,
         // ComputerCore,
