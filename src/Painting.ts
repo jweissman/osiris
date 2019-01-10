@@ -41,7 +41,6 @@ export function drawRect(
 ) {
   let { x, y, width, height } = rectangle;
 
-
   if (filled) {
     let main = color;
     ctx.fillStyle = main.toRGBA();

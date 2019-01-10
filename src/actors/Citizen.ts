@@ -8,9 +8,11 @@ import { Device } from "./Device";
 import { Scale } from "../values/Scale";
 import { ProductionStrategy } from "../strategies/ProductionStrategy";
 import { CapacityBasedProduction } from "../strategies/CapacityBasedProduction";
-import { drawStar } from "../Painting";
+import { drawStar, drawRect } from "../Painting";
 import { ConstructionStrategy } from "../strategies/ConstructionStrategy";
 import { ProxmityBasedConstruction } from "../strategies/ProximityBasedConstruction";
+import { SleepingStrategy } from "../strategies/SleepingStrategy";
+import { AnyBedSleepingStrategy } from "../strategies/AnyBedSleepingStrategy";
 
 export class Citizen extends Actor {
     isPlanning: boolean = false // 
@@ -24,8 +26,13 @@ export class Citizen extends Actor {
     workDuration: number
     progress: number
 
+    sleeping: boolean = false
+
+    energy: number = 100
+
     private productionStrategy: ProductionStrategy
     private constructionStrategy: ConstructionStrategy
+    private sleepingStrategy: SleepingStrategy
 
     constructor(private home: Vector, protected planet: Planet, private elite: boolean = false) {
         super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White)
@@ -33,6 +40,7 @@ export class Citizen extends Actor {
 
         this.productionStrategy = new CapacityBasedProduction(this)
         this.constructionStrategy = new ProxmityBasedConstruction(this)
+        this.sleepingStrategy = new AnyBedSleepingStrategy(this)
     }
 
     // get isWorking() { return this.isWorking }
@@ -60,7 +68,20 @@ export class Citizen extends Actor {
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
-        super.draw(ctx, delta)
+        ctx.save()
+        // ctx.globalAlpha = 1.0
+        ctx.translate(this.x, this.y - this.getHeight()/2)
+        if (this.sleeping) {
+            ctx.rotate(Math.PI / 2);
+            ctx.translate(0, -5)
+        }
+        drawRect(ctx,
+            { x: 0, y: 0, width: this.getWidth(), height: this.getHeight() },
+            0,
+            Color.White
+        )
+        // super.draw(ctx, delta)
+        ctx.restore()
 
         if (this.elite) {
             // draw a little star?
@@ -157,17 +178,29 @@ export class Citizen extends Actor {
     }
 
     async work() {
-        if (this.isPlanning) {
-            return
-        }
+        if (this.isPlanning || this.sleeping) { return }
 
         this.isPlanning = true
-        if (this.constructionStrategy.canApply()) {
-            await this.constructionStrategy.attempt()
-        } else {
-            await this.productionStrategy.attempt()
+        // just get rid of it??
+        if (this.carrying.length > 0) { this.carrying = [] }
+        let strats = [
+            this.sleepingStrategy,
+            this.constructionStrategy,
+            this.productionStrategy
+        ]
+        let choice = strats.find(strat => strat.canApply())
+        if (choice) {
+            await choice.attempt()
+            this.energy--
         }
         this.isPlanning = false
     }
 
+    async takeRest(duration: number) {
+        console.log("Citizen taking a well-deserved rest!!")
+        this.sleeping = true
+        await this.progressBar(duration)
+        this.energy = 100
+        this.sleeping = false
+    }
 }

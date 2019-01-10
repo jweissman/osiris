@@ -29,10 +29,10 @@ Our prayers are with you.
 - Clone Vat (make consume meals/data)
 - Reshape most subsurface buildings (i.e., permit user to set width, and so number of slots, at least on common area bldgs)
 - Nonstandard building shapes (triangular wedge to break up linearities, huge octagon for power plant?)
-- Day-night cycle (do pawns sleep?
+- Day-night cycle (do pawns sleep?)
 - Art cycle ('images' for most devices)
 - Condensed Hud (hide/show menus; construct/furnish 'modes' where menus are hidden)
 - Building backgrounds (wall and floor patterns)
-- improve citizen automation (give back resources when we can't fulfill something)
-- improve pathing -- better graph nodes? (improve handling of machines? these are really the 'nodes')
-- handle construction better? (better hints to user at what is expected? better state mgmt...? maybe separate construction 'scene'?)
+- improve citizen automation (give back resources when we can't fulfill something? or give them up?)
+- handle construction better (better hints to user at what is expected? better state mgmt...? maybe separate construction 'scene'?)
+- Enemies?

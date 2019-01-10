@@ -10,7 +10,10 @@ export abstract class Strategy {
     private sleepInterval: number = 250
     protected isActive: boolean = false;
     constructor(protected pawn: Citizen) { }
+
     protected abstract async apply();
+    abstract canApply(): boolean;
+
     protected get planet(): Planet { return this.pawn.currentPlanet; }
     protected get devices(): Device[] { return this.planet.colony.findPoweredDevices(); }
     protected get operations(): MechanicalOperation[] { return this.devices.map(d => d.operation); }
@@ -60,6 +63,19 @@ export abstract class Strategy {
         if (device) {
             console.log("Found device to gather, visting...")
             await this.visitDevice(device)
+
+            if (device.inUse) {
+                // at least wait a bit and try again?
+                let waitTimes = 0
+                while (device.inUse) {
+                    console.warn("waiting for device to be ready!")
+                    await sleep(3000) //this.pause()
+                    if (waitTimes++ > 10) {
+                        return false 
+                    }
+                }
+            }
+
             console.log("Attempt to interact with device...")
             if (await device.interact(this.pawn, retrieveResource(res))) {
                 console.log("Interacted successfully!")
@@ -116,13 +132,18 @@ export abstract class Strategy {
         return true
     }
 
-    protected async performRecipeTask(maker: Device, recipe: Recipe) {
+    protected async performRecipeTask(maker: Device, recipe: Recipe, timesToAttempt: number = 5) {
         console.log("Try to perform recipe task...", { produces: recipe.produces })
         let worked = await maker.interact(this.pawn, { type: 'work', recipe })
         if (!worked) {
             // await this.pause()
             console.warn("NOT waiting for machine to become available...")
-            // await this.performRecipeTask(maker, recipe)
+            for (let i = 0; i < timesToAttempt; i ++) {
+              if (await this.performRecipeTask(maker, recipe)) {
+                  worked = true
+                  break
+              }
+            }
         }
         return worked
     }

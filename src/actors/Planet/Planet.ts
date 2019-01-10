@@ -12,27 +12,34 @@ import { Machine, CloningVat } from '../../models/Machine';
 import { Device } from '../Device';
 import { AccelerateTime, MechanicalOperation } from '../../models/MechanicalOperation';
 import { World } from '../../models/World';
+import { drawRect } from '../../Painting';
 
 class Sky extends Actor {
     constructor(
-        x: number = 0,
-        y: number = 0,
-        width: number = 0,
-        height: number = 0,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
         color: Color
     ) {
         super(x,y,width,height,color)
     }
 
+    draw(ctx, delta) {
+        drawRect(
+            ctx,
+            {x: this.x, y: this.y, width: this.getWidth(), height: this.getHeight() },
+            0,
+            this.color,
+        )
+    }
 }
 
 export class Planet extends Actor {
     colony: Colony
     population: Population
-
     // baseColor: Color
-
-    sky: Sky
+    sky: Actor
 
     constructor(
         public world: World,
@@ -48,7 +55,7 @@ export class Planet extends Actor {
 
         // this.baseColor = world.color.clone()
 
-        this.sky = new Sky(0,-depth,w,depth, world.skyColor) //Color.Blue)
+        this.sky = new Actor(0,-depth,w,depth, world.skyColor) //Color.Blue)
         this.add(this.sky)
 
         let yBase = -depth/2
@@ -76,7 +83,12 @@ export class Planet extends Actor {
 
     }
 
+
+    private currentHour: number
+    get hour() { return this.currentHour }
     set hour(hour: number) {
+        this.currentHour = hour
+
         let c = this.world.skyColor.clone().darken(0.2).desaturate(0.1)
 
         let colorMap = {
