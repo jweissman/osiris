@@ -12,10 +12,10 @@ game.add('construct', construct);
 
 game.start().then(() => {
   game.goToScene('construct');
-  setTimeout(() => {
-    console.log("let's jam!");
-    let jam: Sound = Resources.CraterRock //play();
-    jam.play()
-  }, 1500)
+  // setTimeout(() => {
+  //   console.log("let's jam!");
+  //   let jam: Sound = Resources.CraterRock //play();
+  //   jam.play()
+  // }, 1500)
   // jam.oncomplete = () => jam.play()
 });

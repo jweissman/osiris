@@ -1,9 +1,8 @@
-import { UIActor, Color } from "excalibur";
-import { Structure, Corridor, SurfaceRoad, Ladder, SmallRoomThree, SmallRoomTwo, MediumRoom, MidDome, SmallDome, LargeRoom, allStructures } from "../../models/Structure";
+import { UIActor } from "excalibur";
+import { Structure, Corridor, SurfaceRoad, Ladder, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
-import { ResourceBlock, emptyMarket, sumMarkets, PureValue } from "../../models/Economy";
-import { ResourcesList } from "./ResourcesList";
-import { Desk, Bookshelf, Machine, CloningVat, WaterCondensingMachine, OxygenExtractor, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Cabin, Orchard, SolarCell, Megafabricator, Arbor, Fabricator, MiningDrill, Preserve, Workstation, Houseplant, allMachines } from "../../models/Machine";
+import { ResourceBlock, emptyMarket, PureValue } from "../../models/Economy";
+import { Machine, allMachines } from "../../models/Machine";
 import { flatSingle } from "../../Util";
 import { Colony } from "../Planet/Colony";
 import { StatusAnalysisView } from "./StatusAnalysisView";
@@ -13,8 +12,12 @@ import { Card } from "./Card";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { Palette } from "./Palette";
 import { Building } from "../Building";
+import { Resources } from "../../Resources";
+import { MusicPlayer } from "./MusicPlayer";
 
 export class Hud extends UIActor {
+    private musicPlayer: MusicPlayer
+
     private hidePalettes: boolean = true
     private structurePalette: Palette //<Structure> 
     private machinePalette: Palette //<Machine>
@@ -34,7 +37,7 @@ export class Hud extends UIActor {
 
 
     constructor(
-        private game: Game,
+        game: Game,
         protected onBuildingSelect = null,
         protected onMachineSelect = null,
         protected onFunctionSelect = null
@@ -51,6 +54,14 @@ export class Hud extends UIActor {
 
         this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
         this.add(this.card)
+
+        this.musicPlayer = new MusicPlayer(1360, 0, {
+            'Crater Rock': Resources.CraterRock,
+            'Assembler': Resources.Assembler,
+            'Indivision': Resources.Indivision,
+            'Understanding': Resources.Understanding,
+        })
+        // this.add(this.musicPlayer)
     }
 
     showPalettes() {
@@ -61,6 +72,7 @@ export class Hud extends UIActor {
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta)
+        this.musicPlayer.draw(ctx)
         if (!this.hidePalettes) {
             this.structurePalette.draw(ctx)
             this.machinePalette.draw(ctx)
