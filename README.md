@@ -36,4 +36,3 @@ Our prayers are with you.
 - improve citizen automation (give back resources when we can't fulfill something)
 - improve pathing -- better graph nodes? (improve handling of machines? these are really the 'nodes')
 - handle construction better? (better hints to user at what is expected? better state mgmt...? maybe separate construction 'scene'?)
-- music player

@@ -13,6 +13,7 @@ export class MusicPlayer {
     private _titleElem: HTMLSpanElement;
 
     currentTrack: string
+    paused: boolean = false
 
     constructor(private x: number, private y: number, private playlist: {
         [track: string]: Sound;
@@ -27,8 +28,12 @@ export class MusicPlayer {
     startMusic() {
         // this.currentTrack = Object.keys(this.playlist)[0];
         this._titleElem.textContent = `Playing: ${this.currentTrack}`;
-
         this.playlist[this.currentTrack].play()
+        .then(() => {
+            // if (!this.advancing) {
+                this.advancePlaylist()
+            // }
+        })
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -74,7 +79,7 @@ export class MusicPlayer {
         let pause = this.iconFactory({ type: 'pause' }, '&#10072; &#10072;') //, this.handleAction)
         this._wrapper.appendChild(this.inlineBlock(pause))
 
-        let next = this.iconFactory({ type: 'next' }, '&#9288;')
+        let next = this.iconFactory({ type: 'next' }, '&rarr;')
         this._wrapper.appendChild(this.inlineBlock(next))
 
     }
@@ -83,18 +88,28 @@ export class MusicPlayer {
         // console.warn("WOULD HANDLE MUSIC PLAYER ACTION", { action })
         if (action.type === 'pause') {
             this.song.pause() //.play()
+            this.paused = true
         } else if (action.type === 'play') {
             this.song.play()
+            this.paused = false
         } else if (action.type === 'next') {
-            this.song.stop()
-            let ndx = this.trackNames.indexOf(this.currentTrack)
-            ndx = (ndx + 1) % this.trackNames.length
-            console.log("NEW SONG INDEX", { ndx })
-            this.currentTrack = this.trackNames[ndx]
-            this.startMusic() // play() and set title...
-            // this.song.play()
-            // this.currentTrac
+            if (this.paused) { //}.isPlaying) {
+                this.song.play()
+                // this.song.stop()
+                // this.advancePlaylist()
+                this.paused = false
+            } //else {
+                this.song.stop()
+            // }
         }
+    }
+
+    advancePlaylist() {
+        let ndx = this.trackNames.indexOf(this.currentTrack)
+        ndx = (ndx + 1) % this.trackNames.length
+        console.log("NEW SONG INDEX", { ndx })
+        this.currentTrack = this.trackNames[ndx]
+        this.startMusic() // play() and set title...
     }
 
     get trackNames() { return Object.keys(this.playlist) }
@@ -113,13 +128,17 @@ export class MusicPlayer {
         iconContent: string,
         // handleClick: (action: MusicPlayerAction) => any
     ) {
-        let bg = Color.DarkGray.darken(0.5)
+        let bg = Color.Transparent //DarkGray.darken(0.5)
         let fg = Color.White
         let icon = document.createElement('button')
         icon.innerHTML = iconContent
         icon.style.display = 'block';
         icon.style.fontSize = '7pt';
         icon.style.fontFamily = 'Verdana';
+        icon.style.border = 'none'
+        // icon.style.width = '8px'
+        // icon.style.height = '8px'
+        icon.style.padding = '4px'
         icon.style.background = bg.toRGBA();
         icon.style.color = fg.toRGBA();
         icon.onclick = () => { this.handleAction(action) }

@@ -55,7 +55,7 @@ export class Hud extends UIActor {
         this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
         this.add(this.card)
 
-        this.musicPlayer = new MusicPlayer(1360, 0, {
+        this.musicPlayer = new MusicPlayer(1360, -2, {
             'Crater Rock': Resources.CraterRock,
             'Assembler': Resources.Assembler,
             'Indivision': Resources.Indivision,
