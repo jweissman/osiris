@@ -13,14 +13,12 @@ export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, c:
   ctx.stroke()
 }
 
-// let gridPattern;
-// let loadingPattern  = false
 export function drawPatternedRect(
   ctx: CanvasRenderingContext2D,
   rect: Rectangle,
   pattern: BackgroundPattern = BackgroundPattern.Grid
 ) {
-  const gridPattern = getBackgroundPattern(ctx, pattern) // BackgroundPattern.Grid)
+  const gridPattern = getBackgroundPattern(ctx, pattern)
   if (gridPattern) {
     let { x, y, width, height } = rect;
     ctx.fillStyle = gridPattern
@@ -43,20 +41,15 @@ export function drawRect(
 ) {
   let { x, y, width, height } = rectangle;
 
-  // if (edgeWidth > 0) {
-  //   let edge = Color.White;
-  //   ctx.fillStyle = edge.toRGBA();
-  //   ctx.fillRect(x, y, width, height)
-  // }
 
   if (filled) {
     let main = color;
     ctx.fillStyle = main.toRGBA();
     ctx.fillRect(
-      x, //+ edgeWidth,
-      y, //+ edgeWidth,
-      width, // - edgeWidth * 2,
-      height // - edgeWidth * 2
+      x,
+      y,
+      width,
+      height
     )
   }
 
@@ -64,9 +57,8 @@ export function drawRect(
     let edge = Color.White;
     ctx.strokeStyle = edge.toRGBA();
     ctx.lineWidth=edgeWidth
-    if (dashed) { ctx.setLineDash([5, 10]) } //ctx.lineDashOffset = 5 }
+    if (dashed) { ctx.setLineDash([5, 10]) }
     else { ctx.setLineDash([]) }
-    // ctx.strokeStyle = Stroke.So
     ctx.strokeRect(
       x, y, width, height
     )
@@ -74,7 +66,6 @@ export function drawRect(
 }
 
 export function drawStar(ctx, cx, cy, outerRadius=3.6, innerRadius=1.4, spikes=5, ) {
-  // console.warn("DRAW STAR")
     var rot = Math.PI / 2 * 3;
     var x = cx;
     var y = cy;

@@ -11,22 +11,45 @@ import { Population } from './Population';
 import { Machine, CloningVat } from '../../models/Machine';
 import { Device } from '../Device';
 import { AccelerateTime, MechanicalOperation } from '../../models/MechanicalOperation';
+import { World } from '../../models/World';
 
+class Sky extends Actor {
+    constructor(
+        x: number = 0,
+        y: number = 0,
+        width: number = 0,
+        height: number = 0,
+        color: Color
+    ) {
+        super(x,y,width,height,color)
+    }
+
+}
 
 export class Planet extends Actor {
     colony: Colony
     population: Population
 
+    // baseColor: Color
+
+    sky: Sky
+
     constructor(
+        public world: World,
         public hud: Hud,
-        public color: Color,
+        // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
         private w: number = 2000000,
         private depth: number = 10000000,
         ) {
-        super(0, depth/2, w, depth, color)
+        super(0, depth/2, w, depth, world.color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
+
+        // this.baseColor = world.color.clone()
+
+        this.sky = new Sky(0,-depth,w,depth, world.skyColor) //Color.Blue)
+        this.add(this.sky)
 
         let yBase = -depth/2
         let crustHeight = 20
@@ -50,6 +73,41 @@ export class Planet extends Actor {
 
         this.population = new Population(this)
         this.add(this.population)
+
+    }
+
+    set hour(hour: number) {
+        let c = this.world.skyColor.clone().darken(0.2).desaturate(0.1)
+
+        let colorMap = {
+            night: c.darken(0.7),
+            dawn: c.darken(0.2),
+            morning: c.lighten(0.1),
+            afternoon: c.lighten(0.3),
+            evening: c,
+        }
+
+        if (hour >= 5 && hour < 8) { // dawn
+            let inc = (hour - 6) / 5
+            this.sky.color = colorMap.dawn.lighten(inc)
+        } else if (hour >= 8 && hour < 12) { // morning
+            let inc = (hour - 8) / 24
+            this.sky.color = colorMap.morning.lighten(inc)
+        } else if (hour >= 12 && hour < 14) { // early afternoon
+            this.sky.color = colorMap.afternoon //.darken(inc)
+        } else if (hour >= 14 && hour < 18) {  // late afternoon
+            let inc = (hour - 14) / 16
+            this.sky.color = colorMap.afternoon.darken(inc)
+        } else if (hour >= 18 && hour < 23) { // evening
+            let inc = (hour - 18) / 10
+            this.sky.color = colorMap.evening.darken(inc)
+        } else if (hour >= 23) { // late night
+            this.sky.color = colorMap.night
+        } else if (hour < 5) { // early morning
+            this.sky.color = colorMap.night
+        } else {
+            console.warn("No sky color handler for current time:", { hour })
+        }
     }
 
     set currentlyViewing(buildingOrDevice: Building | Device) {

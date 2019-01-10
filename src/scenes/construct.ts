@@ -1,4 +1,4 @@
-import { Scene, Input, Vector } from "excalibur";
+import { Scene, Input, Vector, Timer } from "excalibur";
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
@@ -26,6 +26,7 @@ export class Construct extends Scene {
 
     placingFunction: SpaceFunction = null
 
+    time: number = 7*60
 
     static requiredStructuresAndFunctions: (typeof SpaceFunction | typeof Structure)[] = [
         MissionControl,
@@ -49,7 +50,7 @@ export class Construct extends Scene {
     update(engine, delta) {
         super.update(engine, delta)
 
-        this.hud.updateDetails(this.planet, false)
+        this.hud.updateDetails(this.planet, false, this.time)
     }
 
     public onInitialize(game: Game) {
@@ -61,8 +62,9 @@ export class Construct extends Scene {
         this.add(this.hud)
 
         this.planet = new Planet(
+            game.world,
             this.hud,
-            game.world.color,
+            // game.world.color,
             (b) => this.hud.showCard(b),
             (d) => this.hud.showCard(d)
         )
@@ -73,9 +75,19 @@ export class Construct extends Scene {
         this.add(this.player)
 
         this.prepareNextBuilding()
-        this.camera.zoom(0.001)
-        this.camera.zoom(1.5, 10000)
-        // this.camera.pos.y = this.planet.getTop()
+        this.camera.pos.y = this.planet.getTop() - 1000
+        this.camera.zoom(0.01)
+        this.camera.zoom(0.125, 10000)
+
+        this.addTimer(
+            new Timer(() => { this.stepTime() }, 50, true)
+        )
+    }
+
+    private stepTime() { 
+        this.time += 1
+        // this.time = this.time % (24 * 60)
+        this.planet.hour = (Math.floor(this.time / 60)) % 24
     }
 
     public onActivate() {

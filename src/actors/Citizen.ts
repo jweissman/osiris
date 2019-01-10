@@ -132,17 +132,8 @@ export class Citizen extends Actor {
     currentBuilding: Building = null
     async visit(device: Device) {
         if (this.currentBuilding != device.building) {
-            // let path = this.planet.pathBetween
-
-            console.log("VISIT (find path)", { device })
-            // const path = this.planet.pathBetween(this.pos.clone(), device.building) //pos.add(device.building.pos))
             const path = this.planet.pathBetweenPoints(this.pos.clone(), device.pos.add(device.building.pos))
-            // path.pop()
-            // path.shift()
-            // path.shift()
-            console.log("VISIT (path found!)", { path })
             await this.followPath(path)
-            console.log("VISIT (path follow done, moving to target)")
         }
         let target = device.pos.add(device.building.pos)
         await this.glideTo(target)
@@ -158,8 +149,6 @@ export class Citizen extends Actor {
     async followPath(path: Vector[]) {
         if (path.length > 0) {
             this.path = path
-            // path.pop()
-            // path.shift()
             await Promise.all(
                 path.map(step => this.glideTo(step))
             )
@@ -167,30 +156,18 @@ export class Citizen extends Actor {
         }
     }
 
-    // currentBuilding: Building
-    // async pathTo(building: Building) {
-    //     if (this.path.length > 0) { throw new Error("Already pathing!!") }
-    //     let path = this.planet.pathBetween(this.pos.clone(), building)
-    //     await this.followPath(path)
-    //     return true;
-    // }
-
     async work() {
         if (this.isPlanning) {
-            // console.log("---> Don't re-enter work, already planning")
-            return // nope
+            return
         }
 
         this.isPlanning = true
         if (this.constructionStrategy.canApply()) {
-            console.log("Constructing...")
             await this.constructionStrategy.attempt()
         } else {
-            console.log("Producing...")
             await this.productionStrategy.attempt()
         }
         this.isPlanning = false
-        console.log("Done planning...")
     }
 
 }

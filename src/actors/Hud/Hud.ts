@@ -1,4 +1,4 @@
-import { UIActor } from "excalibur";
+import { UIActor, Label, Color } from "excalibur";
 import { Structure, Corridor, SurfaceRoad, Ladder, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket, PureValue } from "../../models/Economy";
@@ -17,6 +17,7 @@ import { MusicPlayer } from "./MusicPlayer";
 
 export class Hud extends UIActor {
     private musicPlayer: MusicPlayer
+    private clock: Label
 
     private hidePalettes: boolean = true
     private structurePalette: Palette //<Structure> 
@@ -55,6 +56,10 @@ export class Hud extends UIActor {
         this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
         this.add(this.card)
 
+        this.clock = new Label('current time', 1340, 15, 'Verdana')
+        this.clock.color = Color.White // 'white'
+        this.add(this.clock)
+
         this.musicPlayer = new MusicPlayer(1360, -2, {
             'Crater Rock': Resources.CraterRock,
             'Assembler': Resources.Assembler,
@@ -62,6 +67,7 @@ export class Hud extends UIActor {
             'Understanding': Resources.Understanding,
         })
         // this.add(this.musicPlayer)
+
     }
 
     showPalettes() {
@@ -80,6 +86,10 @@ export class Hud extends UIActor {
         }
     }
 
+    update(game: Game, delta: number) {
+        super.update(game, delta)
+    }
+
     resourceGathered(resource: ResourceBlock) {
         this.status.incrementResource(resource)
     }
@@ -88,12 +98,19 @@ export class Hud extends UIActor {
         this.status.decrementResource(resource)
     }
 
-    updateDetails(planet: Planet, rebuildPalettes: boolean = true) {
+    updateDetails(planet: Planet, rebuildPalettes: boolean = true, time: number = 0) {
         if (rebuildPalettes) {
             this.updatePalettes(planet.colony)
         }
         this.updateEconomy(planet)
         this.updateMaxPop(planet.economy[PureValue.Shelter].demand, planet.maxPop)
+
+        let days = (Math.floor(time / (60 * 24))+1).toString()
+        let hh = Math.floor(time / 60) % 24
+        let hours = ((hh + 11) % 12 + 1).toString()
+        let minutes = (time % 60).toString()
+        let ampm = hh < 12 ? 'AM' : 'PM'
+        this.clock.text = `Day ${days}. ${hours}:${minutes.padStart(2, '0')} ${ampm}`
     }
 
     showCard(entity: Machine | Structure | SpaceFunction | Building | Device) {

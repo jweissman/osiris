@@ -3,9 +3,9 @@ import { Device } from "../actors/Device";
 
 export class ProxmityBasedConstruction extends ConstructionStrategy {
     async apply() {
-        console.log("Applying prox-based construction...")
+        // console.log("Applying prox-based construction...")
         if (this.unbuiltDevice && this.unbuiltDevice.building) {
-            console.log("Okay, let's build it!", { device: this.unbuiltDevice.machine })
+            // console.log("Okay, let's build it!", { device: this.unbuiltDevice.machine })
             await this.constructDevice(this.unbuiltDevice)
         }
         await this.pause()

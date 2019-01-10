@@ -87,27 +87,26 @@ export class MusicPlayer {
     handleAction(action: MusicPlayerAction) {
         // console.warn("WOULD HANDLE MUSIC PLAYER ACTION", { action })
         if (action.type === 'pause') {
-            this.song.pause() //.play()
+            this.song.pause()
             this.paused = true
+            this._titleElem.textContent = `Paused: ${this.currentTrack}`;
         } else if (action.type === 'play') {
             this.song.play()
             this.paused = false
+            this._titleElem.textContent = `Playing: ${this.currentTrack}`;
         } else if (action.type === 'next') {
-            if (this.paused) { //}.isPlaying) {
+            if (this.paused) {
                 this.song.play()
-                // this.song.stop()
-                // this.advancePlaylist()
                 this.paused = false
-            } //else {
-                this.song.stop()
-            // }
+            }
+            this.song.stop()
         }
     }
 
     advancePlaylist() {
         let ndx = this.trackNames.indexOf(this.currentTrack)
         ndx = (ndx + 1) % this.trackNames.length
-        console.log("NEW SONG INDEX", { ndx })
+        // console.log("NEW SONG INDEX", { ndx })
         this.currentTrack = this.trackNames[ndx]
         this.startMusic() // play() and set title...
     }
@@ -126,9 +125,8 @@ export class MusicPlayer {
     private iconFactory(
         action: MusicPlayerAction,
         iconContent: string,
-        // handleClick: (action: MusicPlayerAction) => any
     ) {
-        let bg = Color.Transparent //DarkGray.darken(0.5)
+        let bg = Color.Transparent
         let fg = Color.White
         let icon = document.createElement('button')
         icon.innerHTML = iconContent

@@ -88,7 +88,7 @@ export class Colony extends Actor {
         let dest = destination; //.nodes()[0];
         let destNode = this.navTree.closestNode(dest);
         let path = this.navTree.seekPath(srcNode, destNode);
-        console.log("PATH FOUND BTWN POINTS", { srcNode, destNode, path })
+        // console.log("PATH FOUND BTWN POINTS", { srcNode, destNode, path })
         return path;
     }
 

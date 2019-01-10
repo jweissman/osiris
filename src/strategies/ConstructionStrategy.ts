@@ -4,7 +4,7 @@ import { containsUniq } from "../Util";
 
 export abstract class ConstructionStrategy extends Strategy {
     canApply(): boolean {
-        console.log("Any unbuilt devices?", !!this.unbuiltDevice)
+        // console.log("Any unbuilt devices?", !!this.unbuiltDevice)
         return !!this.unbuiltDevice
     }
 

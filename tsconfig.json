@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [ "es2017", "dom", "es2017.object" ],
+    "lib": [ "es2017", "dom", "es2017.object", "es2017.string" ],
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "./dist/",

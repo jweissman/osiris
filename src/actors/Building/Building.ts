@@ -427,7 +427,7 @@ export class Building extends Actor {
             this.spaceFunction = sf
             this.nameLabel.text = sf.name
         } else {
-            console.warn("Could not identify function!")
+            // console.warn("Could not identify function!")
         }
     }
 
