@@ -11,7 +11,13 @@ import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Li
 import { flatSingle, zip } from "../Util";
 import { DevicePlace } from "../actors/Building/Building";
 import { DeviceSize } from "../values/DeviceSize";
+import { Orientation } from "../values/Orientation";
 
+// class GameController {
+//     constructor(private game: Game) {
+
+//     }
+// }
 
 export class Construct extends Scene {
     game: Game
@@ -64,7 +70,6 @@ export class Construct extends Scene {
         this.planet = new Planet(
             game.world,
             this.hud,
-            // game.world.color,
             (b) => this.hud.showCard(b),
             (d) => this.hud.showCard(d)
         )
@@ -85,12 +90,13 @@ export class Construct extends Scene {
     }
 
     private stepTime() { 
-        this.time += 1
-        // this.time = this.time % (24 * 60)
+        this.time += 1 //.25
         this.planet.hour = (Math.floor(this.time / 60)) % 24
     }
 
     public onActivate() {
+        // this.game.controller.activate()
+
         this.game.input.pointers.primary.on('move', (e: Input.PointerMoveEvent) => {
             if (this.dragging) {
                 this.camera.pos = this.camera.pos.add(
@@ -171,6 +177,21 @@ export class Construct extends Scene {
             }
         })
 
+        let { Up, Down, Left, Right } = Orientation;
+        let moveCam = (direction: Orientation) => {
+            let camMoveSpeed = 10 * (1/this.camera.getZoom())
+            let dv = new Vector(0,0)
+            switch(direction) {
+            case Left: dv.x = -camMoveSpeed; break
+            case Right: dv.x = camMoveSpeed; break
+            case Up: dv.y = -camMoveSpeed; break
+            case Down: dv.y = camMoveSpeed; break
+            }
+            // console.log("MOVING CAM", { direction, dv, camMoveSpeed })
+            this.camera.move(this.camera.pos.add(dv), 0) //pos.addEqual(dv)
+        }
+
+
         this.game.input.keyboard.on('press', (e: Input.KeyEvent) => {
             if (e.key === Input.Keys.H) {
                 if (this.buildings && this.buildings[0]) {
@@ -180,6 +201,25 @@ export class Construct extends Scene {
             } else if (e.key === Input.Keys.Esc) {
                 this.planet.colony.currentlyConstructing = null
                 this.placingFunction = null
+            } else if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
+                moveCam(Up)
+            } else if (e.key === Input.Keys.Left || e.key === Input.Keys.A) {
+                moveCam(Left)
+            } else if (e.key === Input.Keys.Down || e.key === Input.Keys.S) {
+                moveCam(Down)
+            } else if (e.key === Input.Keys.Right || e.key === Input.Keys.D) {
+                moveCam(Right)
+            }
+        })
+        this.game.input.keyboard.on('hold', (e: Input.KeyEvent) => {
+            if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
+                moveCam(Up)
+            } else if (e.key === Input.Keys.Left || e.key === Input.Keys.A) {
+                moveCam(Left)
+            } else if (e.key === Input.Keys.Down || e.key === Input.Keys.S) {
+                moveCam(Down)
+            } else if (e.key === Input.Keys.Right || e.key === Input.Keys.D) {
+                moveCam(Right)
             }
         })
     }
@@ -294,7 +334,7 @@ export class Construct extends Scene {
             }
         }
 
-        console.log("SPAWN FUNCTION", { fn, structure: theStructure })
+        // console.log("SPAWN FUNCTION", { fn, structure: theStructure })
         let building = this.assembleBuildingFromStructure(theStructure, pos)
         building.reshape(building.constrainCursor(building.pos))
         return building

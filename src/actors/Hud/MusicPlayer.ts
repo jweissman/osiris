@@ -19,20 +19,16 @@ export class MusicPlayer {
         [track: string]: Sound;
     }) {
         this.makePlayer();
-        // this.song.isLoaded
-        setTimeout(() => { this.startMusic() }, 2000)
+        setTimeout(() => { this.startMusic() }, 3000)
         this._titleElem.textContent = `Please wait, the jams are on their way...`;
         this.currentTrack = sample(Object.keys(this.playlist)); //[0];
     }
 
     startMusic() {
-        // this.currentTrack = Object.keys(this.playlist)[0];
         this._titleElem.textContent = `Playing: ${this.currentTrack}`;
         this.playlist[this.currentTrack].play()
         .then(() => {
-            // if (!this.advancing) {
                 this.advancePlaylist()
-            // }
         })
     }
 
@@ -54,29 +50,21 @@ export class MusicPlayer {
         document.body.appendChild(this._wrapper);
 
         this._element = document.createElement('div');
-        // this._element.style.position = 'absolute';
         this._element.style.display = 'inline-block';
         this._element.style.border = 'none';
         this._wrapper.appendChild(this._element)
 
-        // document.body.appendChild(this._element);
-        // let track = Object.keys(this.playlist)[0];
-        // if (track) {
-            // console.log("WOULD DISPLAY TRACK INFO", { track })
-            this._titleElem = document.createElement('span');
-            // this._titleElem.textContent = `Currently Playing: ${track}`;
-            this._titleElem.style.fontFamily = 'Verdana';
-            this._titleElem.style.fontSize = '7pt';
-            this._titleElem.style.padding = '24px'
-            this._titleElem.style.color = 'white';
-            this._wrapper.appendChild(this.inlineBlock(this._titleElem));
-        // }
+        this._titleElem = document.createElement('span');
+        this._titleElem.style.fontFamily = 'Verdana';
+        this._titleElem.style.fontSize = '7pt';
+        this._titleElem.style.padding = '24px'
+        this._titleElem.style.color = 'white';
+        this._wrapper.appendChild(this.inlineBlock(this._titleElem));
 
-        let play = this.iconFactory({ type: 'play' }, '&#9655;') //, this.handleAction)
-        // this._element.appendChild(play)
+        let play = this.iconFactory({ type: 'play' }, '&#9655;')
         this._wrapper.appendChild(this.inlineBlock(play));
 
-        let pause = this.iconFactory({ type: 'pause' }, '&#10072; &#10072;') //, this.handleAction)
+        let pause = this.iconFactory({ type: 'pause' }, '&#10072; &#10072;')
         this._wrapper.appendChild(this.inlineBlock(pause))
 
         let next = this.iconFactory({ type: 'next' }, '&rarr;')
@@ -85,7 +73,6 @@ export class MusicPlayer {
     }
 
     handleAction(action: MusicPlayerAction) {
-        // console.warn("WOULD HANDLE MUSIC PLAYER ACTION", { action })
         if (action.type === 'pause') {
             this.song.pause()
             this.paused = true
@@ -106,9 +93,8 @@ export class MusicPlayer {
     advancePlaylist() {
         let ndx = this.trackNames.indexOf(this.currentTrack)
         ndx = (ndx + 1) % this.trackNames.length
-        // console.log("NEW SONG INDEX", { ndx })
         this.currentTrack = this.trackNames[ndx]
-        this.startMusic() // play() and set title...
+        this.startMusic()
     }
 
     get trackNames() { return Object.keys(this.playlist) }
@@ -134,8 +120,6 @@ export class MusicPlayer {
         icon.style.fontSize = '7pt';
         icon.style.fontFamily = 'Verdana';
         icon.style.border = 'none'
-        // icon.style.width = '8px'
-        // icon.style.height = '8px'
         icon.style.padding = '4px'
         icon.style.background = bg.toRGBA();
         icon.style.color = fg.toRGBA();

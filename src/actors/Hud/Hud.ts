@@ -62,9 +62,12 @@ export class Hud extends UIActor {
 
         this.musicPlayer = new MusicPlayer(1360, -2, {
             'Crater Rock': Resources.CraterRock,
-            'Assembler': Resources.Assembler,
             'Indivision': Resources.Indivision,
+            'Future Tense': Resources.FutureTense,
+            // 'Isomer': Resources.Isomer,
             'Understanding': Resources.Understanding,
+            // 'Outbound': Resources.Outbound,
+            'Assembler': Resources.Assembler,
         })
         // this.add(this.musicPlayer)
 
@@ -107,8 +110,8 @@ export class Hud extends UIActor {
 
         let days = (Math.floor(time / (60 * 24))+1).toString()
         let hh = Math.floor(time / 60) % 24
-        let hours = ((hh + 11) % 12 + 1).toString()
-        let minutes = (time % 60).toString()
+        let hours = Math.floor((hh + 11) % 12 + 1).toString()
+        let minutes = Math.floor(time % 60).toString()
         let ampm = hh < 12 ? 'AM' : 'PM'
         this.clock.text = `Day ${days}. ${hours}:${minutes.padStart(2, '0')} ${ampm}`
     }

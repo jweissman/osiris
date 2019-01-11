@@ -89,10 +89,10 @@ export class CommandCenter extends Machine {
     economy = {
         ...emptyMarket(),
         Power: { supply: 6, demand: 0 },
-        Oxygen: { supply: 20, demand: 0 },
-        Water: { supply: 10, demand: 0 },
+        Oxygen: { supply: 8, demand: 0 },
+        Water: { supply: 6, demand: 0 },
         Hope: { supply: 1, demand: 0 },
-        Shelter: { supply: 2, demand: 0}
+        Shelter: { supply: 1, demand: 0}
     }
 
     onPlacement(device: Device) {
@@ -247,7 +247,7 @@ export class Bed extends Machine {
     color = Orange
     economy = {
         ...emptyMarket(),
-        Shelter: { supply: 2, demand: 0 },
+        Shelter: { supply: 1, demand: 0 },
     }
 }
 

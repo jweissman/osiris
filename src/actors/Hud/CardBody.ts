@@ -5,7 +5,7 @@ import { PureValue, Economy, ResourceBlock } from "../../models/Economy";
 import { SpaceFunction } from "../../models/SpaceFunction";
 import { Building } from "../Building";
 import { Device } from "../Device";
-import { countOccurrences } from "../../Util";
+import { countOccurrences, flatSingle } from "../../Util";
 
 export class CardBody extends Actor {
     description: Label
@@ -52,11 +52,14 @@ export class CardBody extends Actor {
 
             if (entity instanceof Machine || entity instanceof Device) {
                 this.values.text =  this.describeEconomy(entity.economy)
-                this.footer.text = entity instanceof Machine
+                // let footerNotes = []
+                let resourceDescription = entity instanceof Machine
                     ? `Cost: ${this.describeResources(entity.cost)}`
                     : (entity.built ? this.describeResources(entity.product) : 'under construction')
-
-                this.notes.text = ''
+                let forDome = entity instanceof Machine ? entity.forDome : entity.machine.forDome
+                let domeStatus = `For Dome: ${forDome ? 'Yes' : 'No'}`
+                this.footer.text = flatSingle([ resourceDescription, domeStatus ]).join(' | ') 
+                this.notes.text = '' //
                 let op = entity.operation
                 if (op) {
                     if (op.type === 'recipe') {
