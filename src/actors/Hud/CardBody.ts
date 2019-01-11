@@ -58,7 +58,9 @@ export class CardBody extends Actor {
                     : (entity.built ? this.describeResources(entity.product) : 'under construction')
                 let forDome = entity instanceof Machine ? entity.forDome : entity.machine.forDome
                 let domeStatus = `For Dome: ${forDome ? 'Yes' : 'No'}`
-                this.footer.text = flatSingle([ resourceDescription, domeStatus ]).join(' | ') 
+                this.footer.text = resourceDescription === ''
+                    ? domeStatus
+                    : [resourceDescription, domeStatus].join(' | ') 
                 this.notes.text = '' //
                 let op = entity.operation
                 if (op) {

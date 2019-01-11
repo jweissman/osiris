@@ -88,9 +88,9 @@ export class CommandCenter extends Machine {
     size = DeviceSize.Medium
     economy = {
         ...emptyMarket(),
-        Power: { supply: 6, demand: 0 },
-        Oxygen: { supply: 8, demand: 0 },
-        Water: { supply: 6, demand: 0 },
+        Power: { supply: 2, demand: 0 },
+        Oxygen: { supply: 10, demand: 0 },
+        Water: { supply: 1, demand: 0 },
         Hope: { supply: 1, demand: 0 },
         Shelter: { supply: 1, demand: 0}
     }
@@ -136,7 +136,7 @@ export class OxygenExtractor extends Machine {
     forDome = true
     economy = {
         ...emptyMarket(),
-        Oxygen: { supply: 3, demand: 0 },
+        Oxygen: { supply: 5, demand: 0 },
         Power: { supply: 0, demand: 1 },
     }
 }

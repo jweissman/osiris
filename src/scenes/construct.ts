@@ -1,23 +1,18 @@
-import { Scene, Input, Vector, Timer } from "excalibur";
-import { Game } from "../Game";
+import { Input, Scene, Timer, Vector } from "excalibur";
+import { Building, structureViews } from "../actors/Building";
+import { DevicePlace } from "../actors/Building/Building";
+import { Device } from "../actors/Device";
+import { Hud } from "../actors/Hud/Hud";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
-import { Structure, MainTunnel, Corridor, SurfaceRoad, SmallDome, SmallRoomThree, MediumRoomThree, LargeRoom, HugeRoom } from "../models/Structure";
-import { Building, structureViews, } from "../actors/Building";
-import { Hud } from "../actors/Hud/Hud";
-import { Device } from "../actors/Device";
+import { Game } from "../Game";
 import { Machine } from "../models/Machine";
-import { SpaceFunction, CloneMatrix, Kitchen, LivingQuarters, LifeSupportPod, Library, Archive, ComputerCore, MissionControl, SolarArray, CloneReception, Workshop, Study } from "../models/SpaceFunction";
+import { LivingQuarters, MissionControl, SolarArray, SpaceFunction } from "../models/SpaceFunction";
+import { Corridor, HugeRoom, LargeRoom, MainTunnel, MediumRoomThree, SmallDome, SmallRoomThree, Structure, SurfaceRoad } from "../models/Structure";
 import { flatSingle, zip } from "../Util";
-import { DevicePlace } from "../actors/Building/Building";
 import { DeviceSize } from "../values/DeviceSize";
 import { Orientation } from "../values/Orientation";
 
-// class GameController {
-//     constructor(private game: Game) {
-
-//     }
-// }
 
 export class Construct extends Scene {
     game: Game
