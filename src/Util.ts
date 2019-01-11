@@ -79,8 +79,7 @@ export const countOccurrences = (arr) => {
   return counts
 }
 
-
-export const containsUniq = (arr, testElems) => {
+export function containsUniq<T>(arr: T[], testElems: T[]) {
   let doesContain = false
   let arrCopy = arr.slice()
   if (arr.length > 0) {

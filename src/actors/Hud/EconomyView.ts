@@ -21,7 +21,7 @@ export class EconomyView extends Actor {
 
         let index = 0
         for (let value of allValues) {
-            let valueLabel: EconomicValue =  new EconomicValue(value, (index++ * 34), 0)
+            let valueLabel: EconomicValue =  new EconomicValue(value, (index++ * 32), 0)
             this.valueLabels[value] = valueLabel
             this.add(valueLabel)
         }

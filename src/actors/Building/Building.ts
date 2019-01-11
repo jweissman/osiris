@@ -5,9 +5,9 @@ import { Slot } from "../../values/Slot";
 import { Orientation, flip, compass } from "../../values/Orientation";
 import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
-import { closest, measureDistance, deleteByValue } from "../../Util";
+import { closest, measureDistance, deleteByValue, containsUniq } from "../../Util";
 import { Graph } from "../../values/Graph";
-import { ResourceBlock, emptyMarket, Economy, sumMarkets, equilibrium } from "../../models/Economy";
+import { ResourceBlock, emptyMarket, Economy, sumMarkets, equilibrium, allValues, availableCapacity } from "../../models/Economy";
 import { Device } from "../Device";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
@@ -188,10 +188,36 @@ export class Building extends Actor {
         if (!this.structure.infra) {
             if (this.active) {
                 if (this.devices.some(d => d.inUse)) { return }
+                let wasEquil = equilibrium(this.planet.economy)
                 this.active = false
-                if (!equilibrium(this.planet.economy)) {
-                    this.active = true
+                if (wasEquil) {
+                    if (!equilibrium(this.planet.economy)) {
+                        this.active = true
+                        // return
+                    }
+                    // this.active = true
+                } else {
+                    // we weren't at equilibrium previously
+                    // we should let this happen, if it wouldn't make any stat
+                    // go neg that wasn't before, or any negative stat worse
+                    // for now just permit it, if we don't have any supply that would go negative without us?
+                    console.log("can we toggle?")
+                    for (let value of allValues) {
+                        let localCap = availableCapacity(this.economy(false), value)
+                        let globalCap = availableCapacity(this.economy(false), value)
+                        console.log("value", { value, localCap, globalCap})
+                        // if (availableCapacity(this.economy(false), value) > 0) {
+                            // if (availableCapacity(this.planet.economy, value) < 0) {
+                        if (localCap > 0 && globalCap < 0) {
+                            // don't permit it
+                            this.active = true
+                            // return
+                        }
+                    }
                 }
+                // if (!(wasEquil && !equilibrium(this.planet.economy))) {
+                    // this.active = true
+                // }
             } else { // this.active is false now
                 let agg = [
                     this.planet.economy,
@@ -419,7 +445,11 @@ export class Building extends Actor {
                 if (!matchingDevice) { matched = false; }
                 unseenDevices = deleteByValue(unseenDevices, matchingDevice)
             })
-            return matched;
+            return matched
+            // return containsUniq(
+                // this.devices.map(d => d.machine),
+                // sf.machines.map((machine: typeof Machine) => new m())
+            // );
         })
         if (fn) {
             // console.log("Determined building function", { fn })

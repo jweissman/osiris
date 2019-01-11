@@ -16,12 +16,16 @@ export class AnyBedSleepingStrategy extends SleepingStrategy {
     protected async apply() {
         console.warn("Take a nap!!!!")
         // find a bed
-        let bed = shuffle(this.devices).find(d => d.machine instanceof Bed)
+        let bed = shuffle(this.devices).find(d => d.machine instanceof Bed && !d.inUse)
         if (bed) {
+            bed.inUse = true
             await this.visitDevice(bed)
         }
         console.log("ZZZZZ")
         await this.pawn.takeRest(1000 * 24)
+        if (bed) { 
+            bed.inUse = false
+        }
         return true
     }
 

@@ -22,16 +22,16 @@ export class StatusAnalysisView extends Actor {
         brand.fontStyle = FontStyle.Italic
         this.add(brand)
 
-        let version = new Label("v0.0.1", 48, ty + 2)
+        let version = new Label("v0.1", 48, ty + 2)
         version.fontSize = 7
         version.color = Color.Gray.darken(0.4)
         this.add(version)
 
 
-        this.resources = new ResourcesList(80, ty)
+        this.resources = new ResourcesList(70, ty)
         this.add(this.resources)
 
-        this.economy = new EconomyView(market, 400, ty)
+        this.economy = new EconomyView(market, 360, ty)
         this.add(this.economy)
 
         this.popLabel = new Label("", 1000, ty, 'Helvetica')

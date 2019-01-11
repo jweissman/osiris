@@ -25,6 +25,7 @@ export class Device extends Actor {
     imageLoaded: boolean = false
 
     built: boolean = false
+    reserved: boolean = false
 
     constructor(
         public machine: Machine,

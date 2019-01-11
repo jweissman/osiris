@@ -20,6 +20,7 @@ export const allValues: PureValue[] = [
     PureValue.Water,
     PureValue.Shelter,
     PureValue.Hope,
+    PureValue.Joy,
     PureValue.Wisdom,
     PureValue.Wealth,
     PureValue.Beauty,

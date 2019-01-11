@@ -88,8 +88,8 @@ export class CommandCenter extends Machine {
     size = DeviceSize.Medium
     economy = {
         ...emptyMarket(),
-        Power: { supply: 2, demand: 0 },
-        Oxygen: { supply: 10, demand: 0 },
+        Power: { supply: 6, demand: 0 },
+        Oxygen: { supply: 16, demand: 0 },
         Water: { supply: 1, demand: 0 },
         Hope: { supply: 1, demand: 0 },
         Shelter: { supply: 1, demand: 0}
@@ -136,7 +136,7 @@ export class OxygenExtractor extends Machine {
     forDome = true
     economy = {
         ...emptyMarket(),
-        Oxygen: { supply: 5, demand: 0 },
+        Oxygen: { supply: 6, demand: 0 },
         Power: { supply: 0, demand: 1 },
     }
 }
@@ -148,20 +148,20 @@ export class SolarCell extends Machine {
     forDome = true
     economy = {
         ...emptyMarket(),
-        Power: { supply: 5, demand: 0 },
+        Power: { supply: 10, demand: 0 },
     }
 }
 
 
 export class WaterCondensingMachine extends Machine {
-    name = 'H20 Condenser'
+    name = 'H2O Condenser'
     description = 'have a drink'
     prereqs = [ SolarCell ]
 
     forDome = true
     economy = {
         ...emptyMarket(),
-        Water: { supply: 4, demand: 0 },
+        Water: { supply: 6, demand: 0 },
         Power: { supply: 0, demand: 1 },
     }
 }
@@ -503,7 +503,7 @@ export class ThinkingFountain extends Machine {
 export class SilverForest extends Machine {
     name = 'Silver Forest'
     size = DeviceSize.Medium
-    prereqs = [ Megafabricator ]
+    prereqs = [ Megafabricator, Mainframe ]
     color = Color.fromHex('c0c0c0')
     operation = store([ResourceBlock.Argent], 12)
     cost = [ResourceBlock.Argent]
@@ -517,14 +517,56 @@ export class SilverForest extends Machine {
 
 export class TimeCrystal extends Machine {
     name = 'Time Crystal'
+    description = 'xlr8'
     size = DeviceSize.Medium
     color = Color.fromHex('e5e4e2')
     operation = accelerateTime()
     cost = [ResourceBlock.Omnium]
-    prereqs = []
-    // onPlacement(device: Device) {
-        // device.building.planet.updateSpeeds()
-    // }
+    prereqs = [ Megafabricator, SilverForest ]
+}
+
+export class HoloProjector extends Machine {
+    name = 'Holo Projector'
+    description = 'whatever your heart desires'
+    size = DeviceSize.Medium
+    color = Blue
+    operation = generate(ResourceBlock.Data, 3)
+    cost = [ResourceBlock.Algorithm, ResourceBlock.Mineral]
+    prereqs = [ Mainframe ]
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 2 },
+        Joy: { supply: 3, demand: 0 },
+    }
+}
+
+export class SacredGrove extends Machine {
+    name = 'Sacred Grove'
+    description = 'where the furies play'
+    size = DeviceSize.Medium
+    forDome = true
+    cost = [ ResourceBlock.Omnium ]
+    prereqs = [ AtomicCompiler ]
+    economy = {
+        ...emptyMarket(),
+        Oxygen: { supply: 4, demand: 0 },
+        Wonder: { supply: 1, demand: 0 },
+    }
+}
+
+export class AtomicCompiler extends Machine {
+    name = 'Atomic Compiler'
+    description = 'super position'
+    operation = recipe(
+        [ ResourceBlock.Aurum, ResourceBlock.Argent ],
+        ResourceBlock.Omnium
+    )
+    cost = [ ResourceBlock.Argent, ResourceBlock.Algorithm ]
+    prereqs = [ ThinkingFountain, SilverForest ]
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 3 },
+    }
 }
 
 
@@ -619,6 +661,12 @@ export class LogicPool extends Machine {
     }
 }
 
+export class Cathedral extends Machine {
+    name = 'Cathedral'
+    description = 'first ultrahumanist'
+    size = DeviceSize.Large
+    prereqs = [ SacredGrove ]
+}
 
 
 /// huge devices
@@ -687,6 +735,12 @@ export const allMachines = [
 
     OrientationConsole,
     LifeSciencesConsole,
-    // TimeCrystal,
+
+    TimeCrystal,
+    LogicPool,
+    HoloProjector,
+    Cathedral,
+    SacredGrove,
+    AtomicCompiler,
 
 ]

@@ -1,4 +1,4 @@
-import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog, Botany, OrientationConsole, PersonnelRegistry, MineralProcessor, MiningDrill } from './Machine';
+import { Machine, OxygenExtractor, WaterCondensingMachine, CloningVat, Bookshelf, Desk, Bed, Stove, AlgaeVat, ResearchServer, Fridge, SolarCell, Arbor, Cabin, Workstation, Fabricator, Houseplant, Orchard, Megafabricator, StudyMachine, Mainframe, CommandCenter, MissionLog, Botany, OrientationConsole, PersonnelRegistry, MineralProcessor, MiningDrill, HoloProjector, TimeCrystal } from './Machine';
 import { Color } from 'excalibur';
 import { Structure, MediumSurfaceRoom } from './Structure';
 import { BackgroundPattern } from '../actors/Building/BackgroundPatterns';
@@ -182,6 +182,20 @@ export class Mine extends SpaceFunction {
      machines = [ MiningDrill ]
 }
 
+export class HoloMatrix extends SpaceFunction {
+     name = 'Hologram Matrix'
+     description = 'dream it'
+     machines = [ HoloProjector, HoloProjector ]
+}
+
+export class TimeChamber extends SpaceFunction {
+     name = 'Time Chamber'
+     description = 'believe it'
+     machines = [ TimeCrystal, TimeCrystal ]
+}
+
+// export class DreamMatrix extends 
+
 export const allSpaceFunctions = [
     Library,
     Barracks,
@@ -210,5 +224,7 @@ export const allSpaceFunctions = [
     CloneReception,
     
     Refinery,
-    Mine
+    Mine,
+    HoloMatrix,
+    TimeChamber,
 ]

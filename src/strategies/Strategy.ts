@@ -51,16 +51,17 @@ export abstract class Strategy {
         console.log("GATHER BLOCK", { res })
         let gathered = false
         let generatesDesiredBlock = (d: Device) => (d.operation.type === 'generator') &&
-            d.product.some(stored => res === stored)
+            d.product.some(stored => res === stored) //&& !d.inUse
         let gen: Device = this.planet.colony.closestDeviceByType(this.pawn.pos, [], generatesDesiredBlock)
 
         let storesDesiredBlock = (d: Device) => (d.operation.type === 'store') &&
-              d.product.some(stored => res === stored)
+              d.product.some(stored => res === stored) //&& !d.inUse
         let store: Device = this.planet.colony.closestDeviceByType(this.pawn.pos, [], storesDesiredBlock)
 
         let device: Device = gen || store
 
         if (device) {
+            // device.inUse = true
             console.log("Found device to gather, visting...")
             await this.visitDevice(device)
 
@@ -69,7 +70,7 @@ export abstract class Strategy {
                 let waitTimes = 0
                 while (device.inUse) {
                     console.warn("waiting for device to be ready!")
-                    await sleep(3000) //this.pause()
+                    await sleep(5000) //this.pause()
                     if (waitTimes++ > 10) {
                         return false 
                     }
@@ -101,19 +102,24 @@ export abstract class Strategy {
 
     protected async workRecipe(recipe: Recipe): Promise<boolean> {
         console.log("Working recipe", { product: recipe.produces })
-        if (await this.gatherIngredients(recipe.consumes)) {
-            let knowsRecipe = (d: Device) => d.operation === recipe
-            let maker = this.planet.colony.closestDeviceByType(this.pawn.pos, [], knowsRecipe)
-            if (maker) {
+        let knowsRecipe = (d: Device) => d.operation === recipe && !d.reserved
+        let maker = this.planet.colony.closestDeviceByType(this.pawn.pos, [], knowsRecipe)
+        let made = false
+        if (maker) {
+            maker.reserved = true
+            // maker.inUse = true
+            if (await this.gatherIngredients(recipe.consumes)) {
                 await this.visitDevice(maker)
                 if (await this.performRecipeTask(maker, recipe)) {
-                    return true
+                    made = true
                 }
             }
+            maker.reserved = false
+            // maker.inUse = false
         }
         // await this.pause()
         // await this.workRecipe(recipe);
-        return false
+        return made
     }
 
     protected async gatherIngredients(blocks: ResourceBlock[]): Promise<boolean> {
@@ -121,12 +127,25 @@ export abstract class Strategy {
             console.log("Gathering blocks...")
             for (let ingredient of blocks) {
                 console.log("attempting to gather", { ingredient })
-                if (await this.gatherBlock(ingredient)) {
-                    console.log("gathered!", { ingredient })
-                } else {
-                    console.warn("didn't gather it!")
+                let tries = 0
+                let gathered = false
+                while (!gathered && tries < 20) {
+                    tries += 1
+                    if (await this.gatherBlock(ingredient)) {
+                        gathered = true
+                    } else {
+                        await this.pause()
+                    }
+                }
+
+                if (!gathered) {
+                    console.warn("couldn't gather one of the ingredients!!")
                     return false
                 }
+                //else {
+                //    console.warn("didn't gather it!")
+                //    return false
+                //}
             }
         }
         return true
@@ -137,12 +156,13 @@ export abstract class Strategy {
         let worked = await maker.interact(this.pawn, { type: 'work', recipe })
         if (!worked) {
             // await this.pause()
-            console.warn("NOT waiting for machine to become available...")
+            console.warn("waiting for machine to become available...")
             for (let i = 0; i < timesToAttempt; i ++) {
-              if (await this.performRecipeTask(maker, recipe)) {
-                  worked = true
-                  break
-              }
+                await this.pause()
+                if (await this.performRecipeTask(maker, recipe)) {
+                    worked = true
+                    break
+                }
             }
         }
         return worked

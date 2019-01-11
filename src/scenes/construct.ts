@@ -7,7 +7,7 @@ import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
 import { Game } from "../Game";
 import { Machine } from "../models/Machine";
-import { LivingQuarters, MissionControl, SolarArray, SpaceFunction } from "../models/SpaceFunction";
+import { LivingQuarters, MissionControl, SolarArray, SpaceFunction, CloneReception, Kitchen, Workshop, Archive, Refinery, Mine } from "../models/SpaceFunction";
 import { Corridor, HugeRoom, LargeRoom, MainTunnel, MediumRoomThree, SmallDome, SmallRoomThree, Structure, SurfaceRoad } from "../models/Structure";
 import { flatSingle, zip } from "../Util";
 import { DeviceSize } from "../values/DeviceSize";
@@ -38,12 +38,14 @@ export class Construct extends Scene {
         Corridor,
         LivingQuarters,
         // CloneMatrix,
-        // CloneReception,
-        // Kitchen,
-        // Workshop,
+        CloneReception,
+        Kitchen,
+        Workshop,
         // Study,
         // Library,
-        // Archive,
+        Archive,
+        Refinery,
+        Mine,
         // ComputerCore,
         
     ]
@@ -196,6 +198,7 @@ export class Construct extends Scene {
             } else if (e.key === Input.Keys.Esc) {
                 this.planet.colony.currentlyConstructing = null
                 this.placingFunction = null
+                this.hud.setMessage(this.defaultMessage); //'Welcome to the Colony, Commander.')
             } else if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
                 moveCam(Up)
             } else if (e.key === Input.Keys.Left || e.key === Input.Keys.A) {
