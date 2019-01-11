@@ -506,7 +506,7 @@ export class SilverForest extends Machine {
     prereqs = [ Megafabricator, Mainframe ]
     color = Color.fromHex('c0c0c0')
     operation = store([ResourceBlock.Argent], 12)
-    cost = [ResourceBlock.Argent]
+    cost = [ResourceBlock.Alloy, ResourceBlock.Algorithm]
     economy = {
         ...emptyMarket(),
         Beauty: { supply: 2, demand: 0 },
@@ -634,12 +634,12 @@ export class Mainframe extends Machine {
 }
 
 export class Preserve extends Machine {
-    name = 'Preserve'
+    name = 'Nature Preserve'
     size = DeviceSize.Large
     prereqs = [ Arbor ]
     color = Green
     forDome = true
-    // operation = generate()
+    operation = generate(ResourceBlock.Biomass, 12)
     economy = {
         ...emptyMarket(),
         Water: { supply: 0, demand: 4 },
@@ -652,8 +652,8 @@ export class LogicPool extends Machine {
     size = DeviceSize.Large
     prereqs = [ MolecularEngine ]
     color = Color.fromHex('daa520')
-    operation = store([ResourceBlock.Algorithm, ResourceBlock.Aurum], 18)
-    cost = [ResourceBlock.Aurum]
+    operation = store([ResourceBlock.Aurum], 12)
+    cost = [ResourceBlock.Algorithm, ResourceBlock.Bioplasma]
     economy = {
         ...emptyMarket(),
         Wisdom: { supply: 2, demand: 0 },

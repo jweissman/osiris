@@ -18,6 +18,7 @@ import { MusicPlayer } from "./MusicPlayer";
 export class Hud extends UIActor {
     private musicPlayer: MusicPlayer
     private clock: Label
+    private hint: Label
 
     private hidePalettes: boolean = true
     private structurePalette: Palette //<Structure> 
@@ -56,7 +57,7 @@ export class Hud extends UIActor {
         this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
         this.add(this.card)
 
-        this.clock = new Label('current time', 1340, 15, 'Verdana')
+        this.clock = new Label('current time', 1340, 14, 'Verdana')
         this.clock.color = Color.White // 'white'
         this.add(this.clock)
 
@@ -71,6 +72,8 @@ export class Hud extends UIActor {
         })
         // this.add(this.musicPlayer)
 
+        // this.hint = new Label('Guide: Construct Life Support (a Dome with H20 Condenser + O2 Extractor)', 400, 30, 'Verdana')
+        // this.add(this.hint)
     }
 
     showPalettes() {

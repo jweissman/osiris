@@ -48,7 +48,7 @@ export abstract class Strategy {
     }
 
     protected async gatherBlock(res: ResourceBlock): Promise<boolean> {
-        console.log("GATHER BLOCK", { res })
+        console.debug("GATHER BLOCK", { res })
         let gathered = false
         let generatesDesiredBlock = (d: Device) => (d.operation.type === 'generator') &&
             d.product.some(stored => res === stored) //&& !d.inUse
@@ -62,7 +62,7 @@ export abstract class Strategy {
 
         if (device) {
             // device.inUse = true
-            console.log("Found device to gather, visting...")
+            console.debug("Found device to gather, visting...")
             await this.visitDevice(device)
 
             if (device.inUse) {
@@ -77,13 +77,13 @@ export abstract class Strategy {
                 }
             }
 
-            console.log("Attempt to interact with device...")
+            console.debug("Attempt to interact with device...")
             if (await device.interact(this.pawn, retrieveResource(res))) {
-                console.log("Interacted successfully!")
+                console.debug("Interacted successfully!")
                 gathered = true
             }
         } else {
-            console.log("Didn't gather...")
+            console.warn("Didn't gather...")
             // don't work sub-recipes??
             // let recipe = this.recipes.find(recipe => recipe.produces === res);
             // if (recipe) {
@@ -101,7 +101,7 @@ export abstract class Strategy {
 
 
     protected async workRecipe(recipe: Recipe): Promise<boolean> {
-        console.log("Working recipe", { product: recipe.produces })
+        console.debug("Working recipe", { product: recipe.produces })
         let knowsRecipe = (d: Device) => d.operation === recipe && !d.reserved
         let maker = this.planet.colony.closestDeviceByType(this.pawn.pos, [], knowsRecipe)
         let made = false
@@ -124,9 +124,9 @@ export abstract class Strategy {
 
     protected async gatherIngredients(blocks: ResourceBlock[]): Promise<boolean> {
         if (!this.pawn.isCarryingUnique(blocks)) {
-            console.log("Gathering blocks...")
+            console.debug("Gathering blocks...")
             for (let ingredient of blocks) {
-                console.log("attempting to gather", { ingredient })
+                console.debug("attempting to gather", { ingredient })
                 let tries = 0
                 let gathered = false
                 while (!gathered && tries < 20) {
@@ -152,7 +152,7 @@ export abstract class Strategy {
     }
 
     protected async performRecipeTask(maker: Device, recipe: Recipe, timesToAttempt: number = 5) {
-        console.log("Try to perform recipe task...", { produces: recipe.produces })
+        console.debug("Try to perform recipe task...", { produces: recipe.produces })
         let worked = await maker.interact(this.pawn, { type: 'work', recipe })
         if (!worked) {
             // await this.pause()

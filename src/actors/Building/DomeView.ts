@@ -73,7 +73,7 @@ export class DomeView extends Building {
         super.draw(ctx, delta)
     }
 
-    colorBase() { return Color.White.darken(0.05); } 
+    colorBase() { return Color.White.clone().darken(0.05); } 
 
     devicePlaces() {
         let w = this.getWidth()/2

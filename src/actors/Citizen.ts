@@ -3,7 +3,7 @@ import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
-import { eachCons, deleteByValueOnce, sleep, containsUniq } from "../Util";
+import { eachCons, deleteByValueOnce, sleep, containsUniq, deleteByValue } from "../Util";
 import { Device } from "./Device";
 import { Scale } from "../values/Scale";
 import { ProductionStrategy } from "../strategies/ProductionStrategy";
@@ -13,6 +13,8 @@ import { ConstructionStrategy } from "../strategies/ConstructionStrategy";
 import { ProxmityBasedConstruction } from "../strategies/ProximityBasedConstruction";
 import { SleepingStrategy } from "../strategies/SleepingStrategy";
 import { AnyBedSleepingStrategy } from "../strategies/AnyBedSleepingStrategy";
+import { EatingStrategy } from "../strategies/EatingStrategy";
+import { WhenHungryEatingStrategy } from "../strategies/WhenHungryEatingStrategy";
 
 export class Citizen extends Actor {
     isPlanning: boolean = false // 
@@ -28,11 +30,14 @@ export class Citizen extends Actor {
 
     sleeping: boolean = false
 
-    energy: number = 100
 
     private productionStrategy: ProductionStrategy
     private constructionStrategy: ConstructionStrategy
     private sleepingStrategy: SleepingStrategy
+    private eatingStrategy: EatingStrategy
+
+    private hunger: number = 0.0;
+    private energy: number = 100
 
     constructor(private home: Vector, protected planet: Planet, private elite: boolean = false) {
         super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White)
@@ -41,13 +46,17 @@ export class Citizen extends Actor {
         this.productionStrategy = new CapacityBasedProduction(this)
         this.constructionStrategy = new ProxmityBasedConstruction(this)
         this.sleepingStrategy = new AnyBedSleepingStrategy(this)
+        this.eatingStrategy = new WhenHungryEatingStrategy(this)
     }
+
+    get isHungry() { return this.hunger > 0.6 }
+    get isTired()  { return this.energy < 95 }
 
     // get isWorking() { return this.isWorking }
     get currentPlanet() { return this.planet }
 
     get walkSpeed() {
-        return this.planet.timeFactor * Game.citizenSpeed
+        return this.planet.timeFactor * Game.citizenSpeed + (this.elite ? 250 : 0)
     }
 
     update(engine, delta) {
@@ -75,7 +84,9 @@ export class Citizen extends Actor {
             ctx.rotate(Math.PI / 2);
             ctx.translate(0, -5)
         }
-        drawRect(ctx,
+        // ctx.globalAlpha = 1.0 //?
+        drawRect(
+            ctx,
             { x: 0, y: 0, width: this.getWidth(), height: this.getHeight() },
             0,
             Color.White
@@ -176,6 +187,15 @@ export class Citizen extends Actor {
             this.path = []
         }
     }
+    
+    protected get strategies() {
+        return [
+            this.sleepingStrategy,
+            this.eatingStrategy,
+            this.constructionStrategy,
+            this.productionStrategy
+        ]
+    }
 
     async work() {
         if (this.isPlanning || this.sleeping) { return }
@@ -183,15 +203,11 @@ export class Citizen extends Actor {
         this.isPlanning = true
         // just get rid of it??
         if (this.carrying.length > 0) { this.carrying = [] }
-        let strats = [
-            this.sleepingStrategy,
-            this.constructionStrategy,
-            this.productionStrategy
-        ]
-        let choice = strats.find(strat => strat.canApply())
+        let choice = this.strategies.find(strat => strat.canApply())
         if (choice) {
             await choice.attempt()
-            this.energy--
+            this.energy -= 4
+            this.hunger += 0.1
         }
         this.isPlanning = false
     }
@@ -202,5 +218,13 @@ export class Citizen extends Actor {
         await this.progressBar(duration)
         this.energy = 100
         this.sleeping = false
+    }
+
+    async eat() {
+        console.log("Citizen eating a meal!")
+        // this.eating = true
+        await this.progressBar(4000)
+        deleteByValueOnce(this.carrying, ResourceBlock.Meal)
+        this.hunger = 0
     }
 }

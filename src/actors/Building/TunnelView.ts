@@ -20,7 +20,7 @@ export class TunnelView extends Building {
         rect.x = rect.x + this.getWidth() / n
         rect.width -= (2) * (this.getWidth() / n)
         drawRect(ctx, rect, 0, this.color.darken(0.2)) 
-        super.draw(ctx, delta)
+        // super.draw(ctx, delta)
     }
 
     nodes(): Vector[] {

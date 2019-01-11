@@ -198,26 +198,18 @@ export class Building extends Actor {
                     // this.active = true
                 } else {
                     // we weren't at equilibrium previously
-                    // we should let this happen, if it wouldn't make any stat
-                    // go neg that wasn't before, or any negative stat worse
-                    // for now just permit it, if we don't have any supply that would go negative without us?
+                    // permit it, if we don't have any supply that would go negative without us?
                     console.log("can we toggle?")
                     for (let value of allValues) {
                         let localCap = availableCapacity(this.economy(false), value)
                         let globalCap = availableCapacity(this.economy(false), value)
                         console.log("value", { value, localCap, globalCap})
-                        // if (availableCapacity(this.economy(false), value) > 0) {
-                            // if (availableCapacity(this.planet.economy, value) < 0) {
                         if (localCap > 0 && globalCap < 0) {
                             // don't permit it
                             this.active = true
-                            // return
                         }
                     }
                 }
-                // if (!(wasEquil && !equilibrium(this.planet.economy))) {
-                    // this.active = true
-                // }
             } else { // this.active is false now
                 let agg = [
                     this.planet.economy,

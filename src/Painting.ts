@@ -43,6 +43,7 @@ export function drawRect(
 
   if (filled) {
     let main = color;
+    // main.a = 1
     ctx.fillStyle = main.toRGBA();
     ctx.fillRect(
       x,
