@@ -4,11 +4,11 @@ import { shuffle } from "../Util";
 
 export class AnyBedSleepingStrategy extends SleepingStrategy {
     canApply(): boolean {
-        if (this.pawn.isTired) { //energy > 95) {
+        if (!this.pawn.isTired) {
             return false
         }
 
-        let bedtime = this.planet.hour > 21 || this.planet.hour < 4
+        let bedtime = this.planet.hour > 20 || this.planet.hour < 4
         return bedtime
     }
 

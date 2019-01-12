@@ -401,7 +401,7 @@ export class ResearchServer extends Machine {
     description = 'hold data'
     operation = store([ResourceBlock.Data, ResourceBlock.Algorithm], 10)
     image = images.server
-    prereqs = [Bookshelf]
+    prereqs = [Bookshelf, Workstation]
     size = DeviceSize.Medium
     color = Blue
     economy = {
@@ -489,8 +489,9 @@ export class MineralProcessor extends Machine {
 
 export class ThinkingFountain extends Machine {
     name = 'Thinking Fountain'
+    description = 'slowly growing'
     size = DeviceSize.Medium
-    prereqs = [ MolecularEngine ]
+    prereqs = [ Mainframe, Megafabricator, MolecularEngine ]
     color = Color.fromHex('daa520')
     operation = generate(ResourceBlock.Aurum, 8)
     cost = [ResourceBlock.Aurum]
@@ -500,8 +501,10 @@ export class ThinkingFountain extends Machine {
         Wonder: { supply: 1, demand: 0 }
     }
 }
+
 export class SilverForest extends Machine {
     name = 'Silver Forest'
+    description = 'immense serenity'
     size = DeviceSize.Medium
     prereqs = [ Megafabricator, Mainframe ]
     color = Color.fromHex('c0c0c0')

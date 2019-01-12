@@ -132,5 +132,5 @@ export class MediumSurfaceRoomView extends Building {
         super.draw(ctx, delta)
     }
 
-    colorBase() { return Color.White; }
+    colorBase() { return Color.White.clone(); }
 }

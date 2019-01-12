@@ -87,7 +87,7 @@ export class Corridor extends Structure {
     description: string = 'in the hallway'
     view: string = 'CorridorView'
     width: number = minor.fifth
-    height: number = minor.fifth
+    height: number = minor.seventh
     zoom = 0.5
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [

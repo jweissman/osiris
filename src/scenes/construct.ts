@@ -27,7 +27,7 @@ export class Construct extends Scene {
 
     placingFunction: SpaceFunction = null
 
-    time: number = 7*60
+    time: number = Game.startHour*60
 
     static requiredStructuresAndFunctions: (typeof SpaceFunction | typeof Structure)[] = [
         MissionControl,

@@ -3,8 +3,9 @@ import { Rectangle } from "./values/Rectangle";
 import { BackgroundPattern, getBackgroundPattern } from "./actors/Building/BackgroundPatterns";
 
 // tiny rendering lib
-export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, c: Color = Color.White, lineWidth: number = 1) {
-  c.a = 0.5
+export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, clr: Color = Color.White, lineWidth: number = 1) {
+  let c = clr.clone()
+  // c.a = 0.5
   ctx.beginPath()
   ctx.moveTo(a.x, a.y)
   ctx.lineTo(b.x, b.y)
@@ -42,7 +43,7 @@ export function drawRect(
   let { x, y, width, height } = rectangle;
 
   if (filled) {
-    let main = color;
+    let main = color.clone();
     // main.a = 1
     ctx.fillStyle = main.toRGBA();
     ctx.fillRect(
@@ -54,7 +55,7 @@ export function drawRect(
   }
 
   if (edgeWidth > 0) {
-    let edge = Color.White;
+    let edge = Color.White.clone();
     ctx.strokeStyle = edge.toRGBA();
     ctx.lineWidth=edgeWidth
     if (dashed) { ctx.setLineDash([5, 10]) }

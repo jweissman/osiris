@@ -89,7 +89,7 @@ export class Device extends Actor {
             if (!this.built) { ctx.globalAlpha = 1.0 }
 
             if (this.hover) {
-                let c = Color.White
+                let c = Color.White.clone()
                 c.a = 0.6
                 drawRect(
                     ctx,

@@ -9,7 +9,8 @@ import { drawPatternedRect, drawRect } from "../../Painting";
 import { measureDistance, eachCons } from "../../Util";
 
 export class CommonAreaView extends Building {
-    floorHeight: number = 12
+    get floorHeight() { return this.getHeight() / 6 }
+    // floorHeight: number = 10
     edgeWidth: number = 0.5 //.1
     showLabel = true
     hideBox = true
@@ -30,10 +31,20 @@ export class CommonAreaView extends Building {
             drawRect(ctx, this.aabb(), 0, c)
         }
 
+        let floorEdgeHeight = 12 // 6
+        let floorOff = -5
         drawRect(
             ctx,
-            { x: this.x, y: this.y + this.getHeight() - this.floorHeight,
-              width: this.getWidth(), height: this.floorHeight },
+            { x: this.x, y: this.y + this.getHeight() - this.floorHeight - floorEdgeHeight,
+              width: this.getWidth(), height: floorEdgeHeight - floorOff },
+              0,
+              floorColor.lighten(0.4)
+        )
+
+        drawRect(
+            ctx,
+            { x: this.x, y: this.y + this.getHeight() - this.floorHeight - floorOff,
+              width: this.getWidth(), height: this.floorHeight + floorOff },
               0.2,
               floorColor
         )

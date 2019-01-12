@@ -199,13 +199,13 @@ export class Building extends Actor {
                 } else {
                     // we weren't at equilibrium previously
                     // permit it, if we don't have any supply that would go negative without us?
-                    console.log("can we toggle?")
+                    // console.log("can we toggle?")
                     for (let value of allValues) {
                         let localCap = availableCapacity(this.economy(false), value)
-                        let globalCap = availableCapacity(this.economy(false), value)
-                        console.log("value", { value, localCap, globalCap})
+                        let globalCap = availableCapacity(this.planet.economy, value)
+                        // console.log("value", { value, localCap, globalCap})
                         if (localCap > 0 && globalCap < 0) {
-                            // don't permit it
+                            // don't permit it to be turned off
                             this.active = true
                         }
                     }

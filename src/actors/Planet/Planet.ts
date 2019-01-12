@@ -120,6 +120,8 @@ export class Planet extends Actor {
         } else {
             console.warn("No sky color handler for current time:", { hour })
         }
+
+        // this.sky.color.screen
     }
 
     set currentlyViewing(buildingOrDevice: Building | Device) {

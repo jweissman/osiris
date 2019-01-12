@@ -23,12 +23,12 @@ export class Citizen extends Actor {
     carrying: ResourceBlock[] = [] // null
     path: Vector[] = []
 
-    workInProgress: boolean = false
-    workStarted: number
-    workDuration: number
-    progress: number
+    private workInProgress: boolean = false
+    private workStarted: number
+    private workDuration: number
+    private progress: number
 
-    sleeping: boolean = false
+    private sleeping: boolean = false
 
 
     private productionStrategy: ProductionStrategy
@@ -40,7 +40,7 @@ export class Citizen extends Actor {
     private energy: number = 100
 
     constructor(private home: Vector, protected planet: Planet, private elite: boolean = false) {
-        super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White)
+        super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White.clone())
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
         this.productionStrategy = new CapacityBasedProduction(this)
@@ -50,13 +50,14 @@ export class Citizen extends Actor {
     }
 
     get isHungry() { return this.hunger > 0.6 }
-    get isTired()  { return this.energy < 95 }
+    get isTired()  { return this.energy < 85 }
 
     // get isWorking() { return this.isWorking }
     get currentPlanet() { return this.planet }
 
     get walkSpeed() {
-        return this.planet.timeFactor * Game.citizenSpeed + (this.elite ? 250 : 0)
+        let speedMultiplier = this.planet.timeFactor * (this.elite ? 1.6 : 1)
+        return Game.citizenSpeed * speedMultiplier
     }
 
     update(engine, delta) {
@@ -79,10 +80,10 @@ export class Citizen extends Actor {
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         ctx.save()
         // ctx.globalAlpha = 1.0
-        ctx.translate(this.x, this.y - this.getHeight()/2)
+        ctx.translate(this.x, this.y - this.getHeight()/2 - 5)
         if (this.sleeping) {
-            ctx.rotate(Math.PI / 2);
-            ctx.translate(0, -5)
+            ctx.rotate(-Math.PI / 2);
+            ctx.translate(-10, -10)
         }
         // ctx.globalAlpha = 1.0 //?
         drawRect(
@@ -91,20 +92,22 @@ export class Citizen extends Actor {
             0,
             Color.White
         )
-        // super.draw(ctx, delta)
-        ctx.restore()
 
         if (this.elite) {
             // draw a little star?
-            drawStar(ctx, this.pos.x + 6, this.pos.y - 9)
+            drawStar(ctx, 8, -5)
         }
 
+        // super.draw(ctx, delta)
         if (this.carrying) {
+            let dx = 5
+            if (this.vel.x < 0) { dx = -5 }
             this.carrying.forEach((carried, idx) => {
-                ctx.fillStyle = blockColor(carried).toRGBA()
-                ctx.fillRect(this.x + 4, this.y - 3 * idx, 5, 5)
+                ctx.fillStyle = blockColor(carried).clone().saturate(0.2).toRGBA()
+                ctx.fillRect(dx, 2 - 4 * idx, 5, 5)
             })
         }
+        ctx.restore()
 
         if (this.workInProgress) {
             ctx.lineWidth = 1
@@ -120,7 +123,7 @@ export class Citizen extends Actor {
 
         // let debugPath = true
         if (this.path && Game.debugPath) {
-            let c = Color.White.lighten(0.5)
+            let c = Color.White.clone().lighten(0.5)
             c.a = 0.5
             eachCons(this.path, 2).forEach(([a,b]) => {
                 ctx.beginPath()
@@ -206,8 +209,8 @@ export class Citizen extends Actor {
         let choice = this.strategies.find(strat => strat.canApply())
         if (choice) {
             await choice.attempt()
-            this.energy -= 4
-            this.hunger += 0.1
+            this.energy -= 5
+            this.hunger += 0.04
         }
         this.isPlanning = false
     }

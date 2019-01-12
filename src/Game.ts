@@ -3,8 +3,9 @@ import { World } from './models/World';
 import { Resources } from './Resources';
 
 export class Game extends Engine {
-  static citizenSpeed: number = 73
+  static citizenSpeed: number = 150
   static debugPath: boolean = false
+  static startHour: number = 8;
 
   constructor(public world: World) {
     super({
