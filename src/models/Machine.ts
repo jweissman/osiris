@@ -25,6 +25,8 @@ const megaconsole = require('../images/mega-console-plain.svg')
 
 const fabricator = require('../images/fabricator-plain.svg')
 
+const couch = require('../images/couch-plain.svg')
+
 const images = {
     bookshelf: bookshelfSvg,
     vat: vatSvg,
@@ -45,6 +47,8 @@ const images = {
     megaconsole,
 
     fabricator,
+
+    couch,
 }
 
 
@@ -197,6 +201,17 @@ export class Workstation extends StudyMachine {
     concretize() { return this }
 }
 
+export class Couch extends Machine {
+    name = 'Couch'
+    description = 'take it easy'
+    prereqs = []
+    image = images.couch
+    economy = {
+        ...emptyMarket(),
+        Joy: { supply: 0.1, demand: 0 },
+    }
+}
+
 
 
 export class Bookshelf extends Machine {
@@ -204,7 +219,7 @@ export class Bookshelf extends Machine {
     description = 'brainstorm'
     operation = generate(ResourceBlock.Idea)
     image = images.bookshelf
-    prereqs = [ OxygenExtractor, Desk ]
+    prereqs = [ ]
     color = Blue
 }
 
@@ -746,4 +761,5 @@ export const allMachines = [
     SacredGrove,
     AtomicCompiler,
 
+    Couch,
 ]

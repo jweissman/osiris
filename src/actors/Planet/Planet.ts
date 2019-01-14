@@ -38,6 +38,8 @@ import { drawRect } from '../../Painting';
 export class Planet extends Actor {
     mountains: Mountains
     mountainLayers: MountainLayers
+    backMountainLayers: MountainLayers
+
     colony: Colony
     population: Population
     // baseColor: Color
@@ -49,8 +51,8 @@ export class Planet extends Actor {
         // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
-        private w: number = 200000,
-        private depth: number = 1000000,
+        private w: number = 250000,
+        private depth: number = 50000,
         ) {
         super(0, depth/2, w, depth, world.color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
@@ -75,25 +77,25 @@ export class Planet extends Actor {
             )
         }
         let c = this.color.clone()
-        // c.a = 0.4
-        this.mountains=(new Mountains(-depth/2, this.getWidth(), c.lighten(0.15)))
+
+        this.backMountainLayers = new MountainLayers(
+                -depth / 2 - 200,
+                this.getWidth(),
+                world.skyColor
+            )
+        this.add(this.backMountainLayers)
+        this.mountains=new Mountains(-depth/2, this.getWidth(), world.skyColor) //.lighten(0.15)))
         this.add(this.mountains)
 
         this.mountainLayers = new MountainLayers(
                 -depth / 2,
                 this.getWidth(),
-                this.color.lighten(0.15)
+                this.color
             )
             this.mountainLayers.skyColor = world.skyColor
         this.add(this.mountainLayers)
-            // new MountainLayers(
-            //     -depth / 2,
-            //     this.getWidth(),
-            //     this.color.lighten(0.15
-            // )
-            // ))
 
-        this.colony = new Colony(0,-depth/2) //yBase)
+        this.colony = new Colony(0,-depth/2)
         this.add(this.colony)
 
         this.population = new Population(this)
@@ -119,10 +121,13 @@ export class Planet extends Actor {
 
         let mixC = mixColors(newC, oldC, inc)
 
-        this.sky.color = mixC //this.skyColorForHour(this.hour)
+        this.sky.color = mixC
 
-        this.mountainLayers.skyColor = this.sky.color //world.skyColor
-        this.mountains.color = this.sky.color.lighten(0.2) //world.skyColor
+        this.mountainLayers.skyColor = this.sky.color //.lighten(0.04) //.lighten(0.02)
+        this.mountains.color = this.sky.color.lighten(0.04)
+
+        this.backMountainLayers.color = this.sky.color.lighten(0.12) //.darken(0.08) //.lighten(0.04) //.lighten(0.02)
+        this.backMountainLayers.skyColor = this.sky.color.darken(0.12)
     }
 
     skyColorForHour(hour: number) {

@@ -5,7 +5,7 @@ import { Vector, Color } from "excalibur";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 // import { drawRect, drawPatternedRect } from "../../Util";
 import { BackgroundPattern } from "./BackgroundPatterns";
-import { drawPatternedRect, drawRect } from "../../Painting";
+import { drawPatternedRect, drawRect, drawPatternedPoly, drawPoly } from "../../Painting";
 import { measureDistance, eachCons } from "../../Util";
 
 export class CommonAreaView extends Building {
@@ -17,18 +17,23 @@ export class CommonAreaView extends Building {
 
     colorBase() { return this.color.darken(0.3); }
 
+    poly() { return this.aabbPoly() } //angledRoofPoly() }
+
     draw(ctx: CanvasRenderingContext2D, delta: number) {
 
-        // let wallColor = this.processedColor() //.darken(0.4)
-        let floorColor = this.planet.color.darken(0.6) //Color.Violet.darken(0.92)
+        let floorColor = this.planet.color.darken(0.6)
 
-        // drawRect(ctx, this.aabb(), 0.5, wallColor)
-        drawPatternedRect(ctx, this.aabb(), this.backgroundPattern)
+        drawPatternedPoly(
+            ctx,
+            this.poly(),
+            this.backgroundPattern
+        )
+
         if (!this.isActive) {
             // draw overlay rect that darkens
-            let c = Color.Black
+            let c = Color.Black.clone()
             c.a = 0.6
-            drawRect(ctx, this.aabb(), 0, c)
+            drawPoly(ctx, this.poly(), c)
         }
 
         let floorEdgeHeight = 12 // 6
@@ -45,7 +50,7 @@ export class CommonAreaView extends Building {
             ctx,
             { x: this.x, y: this.y + this.getHeight() - this.floorHeight - floorOff,
               width: this.getWidth(), height: this.floorHeight + floorOff },
-              0.2,
+              0,
               floorColor
         )
 

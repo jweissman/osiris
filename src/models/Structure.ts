@@ -173,6 +173,7 @@ class CommonArea extends Structure {
 export class SmallRoomTwo extends CommonArea {
     name = 'Sm. Room (2)'
     width = major.eighth
+    height = major.fifth
     prereqs = [ SmallDome ]
     machines = smallBelow
     // two small slots
@@ -183,6 +184,7 @@ export class SmallRoomThree extends CommonArea {
     prereqs = [SmallRoomTwo]
     view = 'SmallRoomThreeView'
     width = 2 * major.eighth
+    height = major.eighth
     machines = smallBelow
 }
 
@@ -191,7 +193,7 @@ export class MediumRoom extends CommonArea {
     prereqs = [ SmallRoomThree ]
     view = 'MediumRoomView'
     width = 2 * major.eighth
-    height = 2 * major.third
+    // height = 2 * major.third
     // two medium slots...
     
     machines = midBelow
@@ -202,7 +204,9 @@ export class MediumRoomThree extends CommonArea {
     prereqs = [ MediumRoom ]
     view = 'MediumRoomThreeView'
     width = 3 * major.eighth
-    height = 2 * major.third
+    // height = 2 * major.third
+    height = major.eighth
+    // machines = smallBelow
 
     machines = midBelow
 }
@@ -212,7 +216,8 @@ export class LargeRoom extends CommonArea {
     view = 'LargeRoomView'
     prereqs = [ MediumRoom ]
     width = 4 * major.eighth
-    height = 3 * major.fifth
+    // height = 3 * major.fifth
+    height = major.eighth
 
     // two big slots?
     machines = largeBelow
@@ -236,8 +241,8 @@ export class MediumSurfaceRoom extends Dome {
 
     view: string = 'MediumSurfaceRoomView';
 
-    width: number = 6 * major.eighth
-    height: number = 1 * major.sixth
+    width: number = 8 * major.eighth
+    height: number = 2 * major.third
 
     zoom = 0.1
 
@@ -257,8 +262,8 @@ export class MediumSurfaceRoom extends Dome {
 
 export class SmallDome extends Dome {
     name = 'Sm. Dome'
-    width = 2 * major.seventh
-    height = major.seventh
+    width = major.eighth
+    height = major.fourth
     machines = smallDome
 }
 
@@ -266,7 +271,7 @@ export class SmallDomeThree extends Dome {
     name = 'Sm. Dome (3)'
     view = 'SmallDomeThreeView'
     width = 3 * major.fifth
-    height = 2 * major.fifth
+    height = 2*major.fifth
     machines = smallDome
 }
 

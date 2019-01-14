@@ -1,11 +1,11 @@
 import { CommonAreaView } from ".";
-import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
-import { DevicePlace } from "./Building";
-import { Vector } from "excalibur";
+import { DeviceSize } from "../../values/DeviceSize";
 
 export class MediumRoomThreeView extends CommonAreaView {
     devicePlaceSize = DeviceSize.Medium
     devicePlaceCount = 3
+
+    poly() { return this.angledRoofPoly() }
 
     // devicePlaces() {
     //     let w = this.getWidth()/2

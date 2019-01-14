@@ -33,7 +33,7 @@ export class StatusAnalysisView extends Actor {
         this.add(version)
 
 
-        this.resources = new ResourcesList(140, ty)
+        this.resources = new ResourcesList(130, ty)
         this.add(this.resources)
 
         this.economy = new EconomyView(market, 280, ty)

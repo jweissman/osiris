@@ -100,10 +100,10 @@ export class Construct extends Scene {
                     this.dragOrigin.sub(e.pos)
                 )
 
-                this.camera.pos.x = Math.max(
-                    this.camera.pos.x,
-                    -this.planet.getWidth() ///4
-                )
+                // this.camera.pos.x = Math.max(
+                //     this.camera.pos.x,
+                //     -this.planet.getWidth() ///4
+                // )
             } else {
                 this.player.pos = e.pos
 

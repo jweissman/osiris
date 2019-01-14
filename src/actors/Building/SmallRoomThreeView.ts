@@ -5,6 +5,7 @@ import { DeviceSize } from "../../values/DeviceSize";
 
 export class SmallRoomThreeView extends CommonAreaView {
     devicePlaceCount = 3
+    poly() { return this.angledRoofPoly() }
     //devicePlaces() {
     //    let w = this.getWidth()/2
     //    let x = this.pos.x + w;

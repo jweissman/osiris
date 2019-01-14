@@ -2,6 +2,27 @@ import { Vector, Color } from "excalibur";
 import { Rectangle } from "./values/Rectangle";
 import { BackgroundPattern, getBackgroundPattern } from "./actors/Building/BackgroundPatterns";
 
+type PaintingPath = { x: number, y: number }[]
+
+export function pathFromRect(rect: Rectangle): PaintingPath {
+  let pos = { x: rect.x, y: rect.y }
+  let path = [
+            // bottom-left
+            { x: pos.x, y: pos.y + rect.height }, // this.getHeight() },
+
+            // upper-left
+            { x: pos.x, y: pos.y },
+
+            // upper-right
+            { x: pos.x + rect.width, y: pos.y },
+
+            // bottom-right
+            { x: pos.x + rect.width, y: pos.y + rect.height },
+        ];
+
+  return path
+}
+
 // tiny rendering lib
 export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, clr: Color = Color.White, lineWidth: number = 1) {
   let c = clr.clone()
@@ -21,14 +42,44 @@ export function drawPatternedRect(
 ) {
   const gridPattern = getBackgroundPattern(ctx, pattern)
   if (gridPattern) {
-    let { x, y, width, height } = rect;
-    ctx.fillStyle = gridPattern
-    ctx.fillRect(x,y,width,height)
+    drawPatternedPoly(ctx, pathFromRect(rect), pattern)
+    // let { x, y, width, height } = rect;
+    // ctx.fillStyle = gridPattern
+    // ctx.fillRect(x,y,width,height)
 
-    ctx.lineWidth = 2
-    ctx.setLineDash([])
-    ctx.strokeStyle = Color.White.toRGBA()
-    ctx.strokeRect(x,y,width,height)
+    //ctx.lineWidth = 0
+    //ctx.setLineDash([])
+    //ctx.strokeStyle = Color.White.toRGBA()
+    //ctx.strokeRect(x,y,width,height)
+  }
+}
+
+export function drawPatternedPoly(
+  ctx: CanvasRenderingContext2D,
+  path: {x:number, y:number}[],
+  // rect: Rectangle,
+  pattern: BackgroundPattern = BackgroundPattern.Grid
+) {
+  const gridPattern = getBackgroundPattern(ctx, pattern)
+  if (gridPattern) {
+    ctx.save()
+    ctx.translate(path[0].x, path[0].y)
+    // ctx.moveTo(0, 0)
+    ctx.beginPath()
+    ctx.moveTo(0,0) //path[0].x, path[0].y)
+    path.forEach(pt => ctx.lineTo(pt.x - path[0].x, pt.y-path[0].y))
+    ctx.lineTo(0,0) // path[0].x, path[0].y)
+    ctx.closePath()
+    // let { x, y, width, height } = rect;
+    ctx.fillStyle = gridPattern
+    ctx.fill()
+    ctx.restore()
+    // ctx.fillRect(x,y,width,height)
+
+    // ctx.lineWidth = 2
+    // ctx.setLineDash([])
+    // ctx.strokeStyle = Color.White.toRGBA()
+    // ctx.strokeRect(x,y,width,height)
   }
 }
 
@@ -64,6 +115,32 @@ export function drawRect(
       x, y, width, height
     )
   }
+}
+
+export function drawPoly(
+  ctx: CanvasRenderingContext2D,
+  path: {x:number, y:number}[],
+  color: Color
+  // rect: Rectangle,
+  // pattern: BackgroundPattern = BackgroundPattern.Grid
+) {
+  // const gridPattern = getBackgroundPattern(ctx, pattern)
+  // if (gridPattern) {
+    ctx.beginPath()
+    ctx.moveTo(path[0].x, path[0].y)
+    path.forEach(pt => ctx.lineTo(pt.x, pt.y))
+    ctx.lineTo(path[0].x, path[0].y)
+    ctx.closePath()
+    // let { x, y, width, height } = rect;
+    ctx.fillStyle = color.fillStyle()
+    ctx.fill()
+    // ctx.fillRect(x,y,width,height)
+
+    // ctx.lineWidth = 2
+    // ctx.setLineDash([])
+    // ctx.strokeStyle = Color.White.toRGBA()
+    // ctx.strokeRect(x,y,width,height)
+  // }
 }
 
 export function drawStar(ctx, cx, cy, outerRadius=3.6, innerRadius=1.4, spikes=5, ) {

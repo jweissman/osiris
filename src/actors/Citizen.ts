@@ -101,7 +101,7 @@ export class Citizen extends Actor {
         // super.draw(ctx, delta)
         if (this.carrying) {
             let dx = 5
-            if (this.vel.x < 0) { dx = -5 }
+            // if (this.vel.x < 0) { dx = -5 }
             this.carrying.forEach((carried, idx) => {
                 ctx.fillStyle = blockColor(carried).clone().saturate(0.2).toRGBA()
                 ctx.fillRect(dx, 2 - 4 * idx, 5, 5)

@@ -12,10 +12,10 @@ import { Device } from "../Device";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { World } from "../../models/World";
-import { Machine } from "../../models/Machine";
+import { Machine, allMachines, CommandCenter, MissionLog } from "../../models/Machine";
 import { BackgroundPattern } from "./BackgroundPatterns";
 import { EconomicValue } from "../Hud/EconomicValue";
-import { drawRect } from "../../Painting";
+import { drawRect, pathFromRect } from "../../Painting";
 
 export class DevicePlace {
     constructor(private pos: Vector, private size: DeviceSize) {}
@@ -83,6 +83,7 @@ export class Building extends Actor {
         if (this.structure.infra) { this.active = true }
     }
 
+    poly() { return this.aabbPoly() }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (!this.hideBox) {
@@ -91,8 +92,9 @@ export class Building extends Actor {
         // this.devices.forEach(device => device.draw(ctx, delta))
         super.draw(ctx, delta)
 
-        if (this.showLabel) {
-            this.nameLabel.pos = this.getCenter()
+        if (this.showLabel && this.spaceFunction) {
+            this.nameLabel.pos = this.pos //get getCenter().
+            this.nameLabel.pos.x = this.getCenter().x //ctx.measureText(this.structure.name).width / 2
             this.nameLabel.pos.x -= ctx.measureText(this.structure.name).width / 2
             this.nameLabel.draw(ctx, delta)
 
@@ -118,7 +120,7 @@ export class Building extends Actor {
         }
 
         let showDevicePlaces = true
-        if (showDevicePlaces && this.devicePlaces().length > 0) {
+        if (showDevicePlaces && this.devicePlaces().length > 0 && this.devices.length < this.devicePlaces().length) {
             this.devicePlaces().forEach(p => {
                 let place = p.position
                 let sz = p.visibleSize
@@ -295,6 +297,44 @@ export class Building extends Actor {
         }
     }
 
+    protected aabbPoly(): {x:number,y:number}[] {
+        return pathFromRect(this.aabb());
+        //return [
+        //    // bottom-left
+        //    { x: this.pos.x, y: this.pos.y + this.getHeight() },
+
+        //    // upper-left
+        //    { x: this.pos.x, y: this.pos.y },
+
+        //    // upper-right
+        //    { x: this.pos.x + this.getWidth(), y: this.pos.y },
+
+        //    // bottom-right
+        //    { x: this.pos.x + this.getWidth(), y: this.pos.y + this.getHeight() },
+        //];
+    }
+
+    protected angledRoofPoly(): {x: number, y: number}[] {
+        let angleStartY = 1 * (this.getHeight() / 3) - 3
+        let angleStartX = 20 // 1 * (this.getWidth() / 10)
+        return [
+            // bottom-left
+            { x: this.pos.x, y: this.pos.y + this.getHeight() },
+
+            // upper-left
+            { x: this.pos.x, y: this.pos.y + angleStartY },
+            { x: this.pos.x + angleStartX, y: this.pos.y },
+
+            // upper-right
+            { x: this.pos.x + this.getWidth() - angleStartX, y: this.pos.y },
+            { x: this.pos.x + this.getWidth(), y: this.pos.y + angleStartY },
+
+            // bottom-right
+            { x: this.pos.x + this.getWidth(), y: this.pos.y + this.getHeight() },
+        ]
+            
+    }
+
     protected overlaps(other: Building): boolean {
         let rect1 = this.aabb(), rect2 = other.aabb();
         let doesOverlap = (
@@ -428,20 +468,27 @@ export class Building extends Actor {
     }
 
     private updateFunction() {
+        let allTheMachines = [ ...allMachines, CommandCenter, MissionLog ]
+        let machines = this.devices.map(
+            d => allTheMachines.find((m: typeof Machine) => d.machine instanceof m) //this.devices.some(d => d.machine instanceof m))
+        ) //
+        // debugger
+        console.log("MY MACHINES", { machines })
         let fn = allSpaceFunctions.find(spaceFn => {
-            let matched = true;
-            let unseenDevices = this.devices.slice()
+            // let matched = true;
+            // let unseenDevices = this.devices.slice()
             let sf = new spaceFn()
-            sf.machines.forEach((machine: typeof Machine) => {
-                let matchingDevice = unseenDevices.find(d => d.machine instanceof machine)
-                if (!matchingDevice) { matched = false; }
-                unseenDevices = deleteByValue(unseenDevices, matchingDevice)
-            })
-            return matched
-            // return containsUniq(
-                // this.devices.map(d => d.machine),
-                // sf.machines.map((machine: typeof Machine) => new m())
-            // );
+            // //sf.machines.forEach((machine: typeof Machine) => {
+            // //    let matchingDevice = unseenDevices.find(d => d.machine instanceof machine)
+            // //    if (!matchingDevice) { matched = false; }
+            // //    unseenDevices = deleteByValue(unseenDevices, matchingDevice)
+            // //})
+            // return matched
+            return containsUniq(
+              machines,
+              sf.machines
+             // sf.machines.map((machine: typeof Machine) => new m())
+            );
         })
         if (fn) {
             // console.log("Determined building function", { fn })

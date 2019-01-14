@@ -4,8 +4,9 @@ import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Device } from "../Device";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
-import { drawPatternedRect, drawRect } from "../../Painting";
+import { drawPatternedRect, drawRect, drawPatternedPoly, drawPoly } from "../../Painting";
 import { measureDistance, eachCons } from "../../Util";
+import { BackgroundPattern } from "./BackgroundPatterns";
 // import { drawPatternedRect, drawRect } from "../../Util";
 
 export class MediumSurfaceRoomView extends Building {
@@ -110,24 +111,32 @@ export class MediumSurfaceRoomView extends Building {
         // ctx.fillRect(this.pos.x, this.pos.y, this.getWidth(), this.getHeight())
         // let rect = 
             // { x: this.pos.x, y: this.pos.y, width: this.getWidth(), height: this.getHeight() };
-        drawPatternedRect(
+        drawPatternedPoly(
             ctx,
-            this.aabb(),
+            this.angledRoofPoly(),
             this.backgroundPattern
         )
+
         if (!this.isActive) {
             // draw overlay rect that darkens
-            let c = Color.Black
+            let c = Color.Black.clone()
             c.a = 0.6
-            drawRect(ctx, this.aabb(), 0, c)
+            drawPoly(ctx, this.angledRoofPoly(), c)
         }
 
         // a little flag :)
         let flagpoleHeight = 18
         let flagX = this.pos.x + 3 * (this.getWidth() / 4)
         let flagY = this.pos.y - flagpoleHeight
-        ctx.fillRect(flagX, flagY, 2, flagpoleHeight)
-        ctx.fillRect(flagX, flagY, 10, 5)
+
+        ctx.fillStyle = Color.Black.fillStyle()
+        ctx.fillRect(flagX, flagY-1, 1, flagpoleHeight+1)
+        drawPatternedRect(
+            ctx,
+            { x: flagX, y: flagY, width: 10, height: 6 },
+            BackgroundPattern.USSF
+        )
+        // ctx.fillRect(flagX, flagY, 10, 5)
 
         super.draw(ctx, delta)
     }
