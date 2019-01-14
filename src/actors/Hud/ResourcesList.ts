@@ -1,6 +1,7 @@
 import { Color, Actor } from "excalibur";
 import { ResourceBlock } from "../../models/Economy";
 import { ResourceListEntry } from "./ResourceListEntry";
+import { eachCons, eachChunk } from "../../Util";
 export class ResourcesList extends Actor {
     entries: {
         [block in ResourceBlock]: ResourceListEntry;
@@ -20,26 +21,33 @@ export class ResourcesList extends Actor {
         };
 
     constructor(x: number, y: number) {
-        super(x, y, 0, 0, Color.DarkGray.darken(0.8));
-        let rx0 = 0, ry0 = -2.5;
+        super(x,y,0,0); // 200, 60, Color.Green.clone().darken(0.8));
+        let rx0 = 0, ry0 = -5;
         let resources = [
             ResourceBlock.Meal,
-            ResourceBlock.Data,
-            ResourceBlock.Mineral,
-
             ResourceBlock.Bioplasma,
-            ResourceBlock.Alloy,
+
+            ResourceBlock.Data,
             ResourceBlock.Algorithm,
+
+            ResourceBlock.Mineral,
+            ResourceBlock.Alloy,
 
             ResourceBlock.Argent,
             ResourceBlock.Aurum,
         ];
-        resources.forEach((resource, index) => {
-            let rx = rx0 + index * 18, ry = ry0 + index * 0;
-            let entry = new ResourceListEntry(rx, ry, resource, 0);
-            this.add(entry);
-            this.entries[resource] = entry;
+
+        eachChunk(resources, 2).forEach(([res1, res2], index) => {
+            let rx = rx0 + index * 36, ry = ry0 + index * 0;
+            this.addEntry(rx, ry, res1)
+            this.addEntry(rx, ry + 14, res2)
         });
+    }
+
+    private addEntry(x: number, y: number, res: ResourceBlock) {
+        let entry = new ResourceListEntry(x, y, res, 0);
+        this.add(entry);
+        this.entries[res] = entry;
     }
 
     increment(resource: ResourceBlock) {

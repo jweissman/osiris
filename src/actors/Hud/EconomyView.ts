@@ -1,6 +1,7 @@
-import { Actor } from "excalibur";
+import { Actor, Color } from "excalibur";
 import { Economy, PureValue, availableCapacity, allValues } from "../../models/Economy";
 import { EconomicValue } from "./EconomicValue";
+import { eachChunk } from "../../Util";
 
 export class EconomyView extends Actor {
     private valueLabels: { [key in PureValue]: EconomicValue } = {
@@ -17,16 +18,22 @@ export class EconomyView extends Actor {
     }
 
     constructor(market: Economy, x: number, y: number) {
-        super(x, y, 0, 0);
+        super(x, y, 0, 0) //Color.DarkGray.clone().darken(0.5));
 
         let index = 0
-        for (let value of allValues) {
-            let valueLabel: EconomicValue =  new EconomicValue(value, (index++ * 32), 0)
-            this.valueLabels[value] = valueLabel
-            this.add(valueLabel)
+        for (let [val1, val2] of eachChunk(allValues, 2)) {
+            this.addValue(index * 32, 0, val1)
+            this.addValue(index * 32, 7, val2)
+            index += 1
         }
 
         this.updateView(market);
+    }
+
+    private addValue(x: number, y: number, value: PureValue) {
+        let valueLabel: EconomicValue = new EconomicValue(value, x, y)
+        this.valueLabels[value] = valueLabel
+        this.add(valueLabel)
     }
 
     updateView(updatedEconomy: Economy): void {

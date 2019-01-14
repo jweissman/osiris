@@ -51,6 +51,9 @@ export class Palette {
 
         this._element = document.createElement('div');
         this._element.style.position = 'absolute';
+        this._element.style.display = 'flex';
+        this._element.style.flexWrap = 'wrap';
+        this._element.style.width = '200px';
         this._element.style.border = 'none'; //1px solid black'; //0.5px solid white';
         document.body.appendChild(this._element);
 
@@ -60,6 +63,7 @@ export class Palette {
             title.style.fontFamily = 'Verdana'
             title.style.fontSize = '7pt'
             title.style.fontWeight = '400'
+            title.style.width = '200px'
             title.style.color = Color.White.toRGBA()
             title.style.backgroundColor = Color.Violet.darken(0.92).toRGBA()
             title.style.padding = '4px'
@@ -98,11 +102,11 @@ export class Palette {
         paletteButton.textContent = label;
 
         paletteButton.style.display = 'block';
-        paletteButton.style.fontSize = '7pt';
+        paletteButton.style.fontSize = '6pt';
         paletteButton.style.fontFamily = 'Verdana';
         paletteButton.style.fontWeight = '500';
-        paletteButton.style.padding = '3px';
-        paletteButton.style.width = '124px';
+        paletteButton.style.padding = '2px';
+        paletteButton.style.width = '100px';
         paletteButton.style.textTransform = 'uppercase';
         paletteButton.style.border = 'none' //1px solid rgba(255,255,255,0.08)';
         paletteButton.style.background = bg.toRGBA();

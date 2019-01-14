@@ -12,17 +12,14 @@ import { Card } from "./Card";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { Palette } from "./Palette";
 import { Building } from "../Building";
-import { Resources } from "../../Resources";
-import { MusicPlayer } from "./MusicPlayer";
 
 export class Hud extends UIActor {
-    private musicPlayer: MusicPlayer
-    private clock: Label
-    private hint: Label
+    // private hint: Label
 
     private hidePalettes: boolean = true
-    private structurePalette: Palette //<Structure> 
-    private machinePalette: Palette //<Machine>
+
+    private structurePalette: Palette
+    private machinePalette: Palette
     private functionPalette: Palette
     private card: Card
 
@@ -36,8 +33,6 @@ export class Hud extends UIActor {
     static machinesForPalette = allMachines
     static functionsForPalette = allSpaceFunctions
 
-
-
     constructor(
         game: Game,
         protected onBuildingSelect = null,
@@ -46,34 +41,22 @@ export class Hud extends UIActor {
     ) {
         super(0, 0, game.canvasWidth, game.canvasHeight);
 
-        this.status = new StatusAnalysisView(emptyMarket());
+        this.status = new StatusAnalysisView(emptyMarket(), game.canvasWidth, 64);
         this.add(this.status)
 
         let displayInfo = (e) => this.showCard(e)
-        this.structurePalette = new Palette('Structure', 20, 35, Hud.structuresForPalette, onBuildingSelect, displayInfo)
-        this.machinePalette = new Palette('Machine', 20, 300, allMachines, onMachineSelect, displayInfo) // (e) => this.showCard(e))
-        this.functionPalette = new Palette('Function', 220, 35, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
+        this.machinePalette = new Palette('Machine', 20, 55, allMachines, onMachineSelect, displayInfo) // (e) => this.showCard(e))
+        this.structurePalette = new Palette('Structure', 20, 300, Hud.structuresForPalette, onBuildingSelect, displayInfo)
+        this.functionPalette = new Palette('Function', 20, 435, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
         this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
         this.add(this.card)
 
-        this.clock = new Label('current time', 1340, 14, 'Verdana')
-        this.clock.color = Color.White // 'white'
-        this.add(this.clock)
-
-        this.musicPlayer = new MusicPlayer(1360, -2, {
-            'Crater Rock': Resources.CraterRock,
-            'Indivision': Resources.Indivision,
-            'Future Tense': Resources.FutureTense,
-            // 'Isomer': Resources.Isomer,
-            'Understanding': Resources.Understanding,
-            // 'Outbound': Resources.Outbound,
-            'Assembler': Resources.Assembler,
-        })
         // this.add(this.musicPlayer)
 
         // this.hint = new Label('Guide: Construct Life Support (a Dome with H20 Condenser + O2 Extractor)', 400, 30, 'Verdana')
         // this.add(this.hint)
+
     }
 
     showPalettes() {
@@ -84,7 +67,6 @@ export class Hud extends UIActor {
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta)
-        this.musicPlayer.draw(ctx)
         if (!this.hidePalettes) {
             this.structurePalette.draw(ctx)
             this.machinePalette.draw(ctx)
@@ -111,12 +93,7 @@ export class Hud extends UIActor {
         this.updateEconomy(planet)
         this.updateMaxPop(planet.economy[PureValue.Shelter].demand, planet.maxPop)
 
-        let days = (Math.floor(time / (60 * 24))+1).toString()
-        let hh = Math.floor(time / 60) % 24
-        let hours = Math.floor((hh + 11) % 12 + 1).toString()
-        let minutes = Math.floor(time % 60).toString()
-        let ampm = hh < 12 ? 'AM' : 'PM'
-        this.clock.text = `Day ${days}. ${hours}:${minutes.padStart(2, '0')} ${ampm}`
+        this.status.setClock(time)
     }
 
     showCard(entity: Machine | Structure | SpaceFunction | Building | Device) {

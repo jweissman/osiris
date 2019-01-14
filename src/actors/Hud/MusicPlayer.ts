@@ -20,7 +20,7 @@ export class MusicPlayer {
     }) {
         this.makePlayer();
         setTimeout(() => { this.startMusic() }, 3000)
-        this._titleElem.textContent = `Please wait, the jams are on their way...`;
+        this._titleElem.textContent = `Getting ready...`;
         this.currentTrack = sample(Object.keys(this.playlist)); //[0];
     }
 
@@ -45,7 +45,7 @@ export class MusicPlayer {
         this._wrapper = document.createElement('div')
         this._wrapper.style.position = 'absolute'
         this._wrapper.style.width = '20%'
-        this._wrapper.style.textAlign = 'center'
+        this._wrapper.style.textAlign = 'left'
         this._wrapper.style.border = 'none';
         document.body.appendChild(this._wrapper);
 

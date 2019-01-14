@@ -57,6 +57,14 @@ function _ecRange (a, i, n) {
   return r
 }
 
+export function eachChunk(a, n) {
+  return a.reduce(function (result, value, index, array) {
+    if (index % n === 0)
+      result.push(array.slice(index, index + n));
+    return result;
+  }, []);
+}
+
 export const measureDistance = (a: Vector, b: Vector) => a.distance(b)
 
 
@@ -65,10 +73,10 @@ export function sleep(ms) {
 }
 
 export function shuffle(arr) {
-   return arr.sort(() => Math.random() > 0.5 ? 1 : -1) 
+  return arr.sort(() => Math.random() > 0.5 ? 1 : -1)
 }
 
-export const zip = (a, b) => a.map((e,i) => [e, b[i]])
+export const zip = (a, b) => a.map((e, i) => [e, b[i]])
 
 export const countOccurrences = (arr) => {
   let counts = {}
