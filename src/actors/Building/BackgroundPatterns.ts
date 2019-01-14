@@ -7,6 +7,7 @@ const checker = require('../../images/checker-bg.png')
 const beige = require('../../images/beige-bg.png')
 const window = require('../../images/window-bg.png')
 const ussf = require('../../images/ussf.png')
+const wood = require('../../images/wood-panel-bg.png')
 
 interface Background {
     image: HTMLImageElement
@@ -34,6 +35,7 @@ export enum BackgroundPattern {
     Beige = 'Beige',
     Window = 'Window',
     USSF = 'USSF',
+    Wood = 'Wood',
 }
 
 const backgroundPatterns: { [ key in BackgroundPattern ]: { background: Background, scale: number } } = {
@@ -45,7 +47,8 @@ const backgroundPatterns: { [ key in BackgroundPattern ]: { background: Backgrou
     Checker: loadBg(checker),
     Beige: loadBg(beige),
     Window: loadBg(window),
-    USSF: loadBg(ussf, 0.5)
+    USSF: loadBg(ussf, 0.5),
+    Wood: loadBg(wood),
 }
 
 export const getBackgroundPattern = (ctx: CanvasRenderingContext2D, p: BackgroundPattern) => {

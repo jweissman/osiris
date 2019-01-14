@@ -176,7 +176,6 @@ export class SmallRoomTwo extends CommonArea {
     height = major.fifth
     prereqs = [ SmallDome ]
     machines = smallBelow
-    // two small slots
 }
 
 export class SmallRoomThree extends CommonArea {
@@ -193,9 +192,6 @@ export class MediumRoom extends CommonArea {
     prereqs = [ SmallRoomThree ]
     view = 'MediumRoomView'
     width = 2 * major.eighth
-    // height = 2 * major.third
-    // two medium slots...
-    
     machines = midBelow
 }
 
@@ -204,9 +200,7 @@ export class MediumRoomThree extends CommonArea {
     prereqs = [ MediumRoom ]
     view = 'MediumRoomThreeView'
     width = 3 * major.eighth
-    // height = 2 * major.third
     height = major.eighth
-    // machines = smallBelow
 
     machines = midBelow
 }
@@ -216,10 +210,7 @@ export class LargeRoom extends CommonArea {
     view = 'LargeRoomView'
     prereqs = [ MediumRoom ]
     width = 4 * major.eighth
-    // height = 3 * major.fifth
-    height = major.eighth
-
-    // two big slots?
+    height = 2*major.eighth
     machines = largeBelow
 }
 

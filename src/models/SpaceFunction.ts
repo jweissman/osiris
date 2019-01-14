@@ -99,6 +99,7 @@ export class Study extends SpaceFunction {
      name = 'Study'
      description = 'plan it out'
      machines = [ StudyMachine, Bookshelf ]
+     background = BackgroundPattern.Wood
 }
 
 class ComputerLab extends SpaceFunction {

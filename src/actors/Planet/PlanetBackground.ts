@@ -4,7 +4,7 @@ import { drawRect } from '../../Painting';
 
 class PlanetBackground extends Actor {
     constructor(y: number, width: number, color: Color) {
-        super(0, y, width, 1500, color); // y + size, size, layerSize, color.darken(0.2))
+        super(0, y, width, 1500, color)
     }
 }
 
@@ -16,9 +16,9 @@ export class MountainLayers extends PlanetBackground {
     }[] = []
 
     skyColor: Color = Color.Blue.clone()
-    layerHeight: number = 180
+    layerHeight: number = 30
     layerCount = 2
-    peakCount = 3000
+    peakCount = 1000
 
     get peakWidth() {
         return Math.floor(this.getWidth() / this.peakCount)
@@ -28,22 +28,20 @@ export class MountainLayers extends PlanetBackground {
         let min = -this.layerHeight
         for (let layerIndex of range(this.layerCount)) {
             this.layers.unshift({
-                baseY: -this.layerHeight - (96 * layerIndex), //(layerIndex+1)) // * 7*(-this.layerHeight/8)),
+                baseY: -this.layerHeight - (16 * layerIndex),
                 deltas: this.genPeaks(layerIndex)
             })
         }
     }
 
-    draw(ctx, delta) { //, worldColor = Color.Green, skyColor = Color.Blue) {
-        // super.draw(ctx, delta)
+    draw(ctx, delta) {
         let wc = this.color.clone().lighten(0.1)
         let sc = this.skyColor.clone().lighten(0.1)
 
         let ndx = 1
-        let ls = this.layers.slice() //:.reverse()
+        let ls = this.layers.slice()
         for (let layer of ls) {
             let c = mixColors(wc, sc, (ndx / (this.layers.length+1)))
-            // c.a = 0.8
             this.drawLayer(ctx, layer, c.lighten(0.1))
             ndx += 1
         }
@@ -51,37 +49,31 @@ export class MountainLayers extends PlanetBackground {
 
     private drawLayer(ctx, layer, color) {
         let ox = -this.getWidth()/2, oy = this.pos.y + layer.baseY 
-        // console.log("layer base y", { y: layer.baseY })
         let c = color.clone()
-        // c.a = 1
 
         ctx.beginPath()
-        ctx.moveTo(ox, oy) //-this.layerHeight)
-        // ctx.lineTo(ox, oy) // + this.layerHeight)
+        ctx.moveTo(ox, oy)
         let ndx = 0
         for (let delta of layer.deltas) {
             ctx.lineTo(ox + (ndx * this.peakWidth), oy + delta)
             ndx += 1
         }
-        ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy) // + this.layerHeight) //-this.layerHeight)
-        ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy + this.layerHeight) //-this.layerHeight)
+        ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy)
+        ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy + this.layerHeight)
         ctx.lineTo(ox, oy+this.layerHeight)
-        // ctx.lineTo(ox, oy)
         ctx.closePath()
         ctx.fillStyle = c.toRGBA()
         ctx.fill()
     }
 
     private genPeaks(n) {
-        // let dMin = 200
         let dMax = 2*(this.layerHeight/3)
         let deltas = []
         let randomDelta = () => (Math.random() * (dMax)) - (dMax/2)
         let last = 0
-        let maxDiff = 5 + (n*2) // dMax/10
+        let maxDiff = 5 + (n*2)
         for (let times in range(this.peakCount)) {
-            // deltas.push()
-            let curr = randomDelta() //Math.max(0,randomDelta())// this.layerHeight/2 + randomDelta() //Math.max(this.layerHeight/2, randomDelta())
+            let curr = randomDelta()
             let pick = Math.max(
                    last - maxDiff,
                    Math.min(curr, last + maxDiff),
@@ -101,11 +93,8 @@ export class Mountains extends PlanetBackground {
         height: number;
     }[] = [];
     onInitialize() {
-        let peakCount = 12; // Math.floor(this.getWidth() / 2000)
+        let peakCount = 18;
         let peakHeight = 3600;
-        // let mtnWidth = 180
-        // figure out mountain peaks?
-        // let yBase = this.pos.y //-1000 //this.pos.y //this.getHeight()
         let xOff = this.getWidth() / 2;
         let peakDistance = this.getWidth() / peakCount;
         for (let times of range(2)) {

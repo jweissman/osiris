@@ -12,7 +12,7 @@ import { Device } from "../Device";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { World } from "../../models/World";
-import { Machine, allMachines, CommandCenter, MissionLog } from "../../models/Machine";
+import { Machine, allMachines, CommandCenter, MissionLog, StudyMachine } from "../../models/Machine";
 import { BackgroundPattern } from "./BackgroundPatterns";
 import { EconomicValue } from "../Hud/EconomicValue";
 import { drawRect, pathFromRect } from "../../Painting";
@@ -468,26 +468,18 @@ export class Building extends Actor {
     }
 
     private updateFunction() {
-        let allTheMachines = [ ...allMachines, CommandCenter, MissionLog ]
+        let allTheMachines = [ StudyMachine, ...allMachines, CommandCenter, MissionLog ]
         let machines = this.devices.map(
             d => allTheMachines.find((m: typeof Machine) => d.machine instanceof m) //this.devices.some(d => d.machine instanceof m))
         ) //
         // debugger
         console.log("MY MACHINES", { machines })
         let fn = allSpaceFunctions.find(spaceFn => {
-            // let matched = true;
-            // let unseenDevices = this.devices.slice()
             let sf = new spaceFn()
-            // //sf.machines.forEach((machine: typeof Machine) => {
-            // //    let matchingDevice = unseenDevices.find(d => d.machine instanceof machine)
-            // //    if (!matchingDevice) { matched = false; }
-            // //    unseenDevices = deleteByValue(unseenDevices, matchingDevice)
-            // //})
-            // return matched
+
             return containsUniq(
               machines,
               sf.machines
-             // sf.machines.map((machine: typeof Machine) => new m())
             );
         })
         if (fn) {

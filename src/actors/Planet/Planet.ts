@@ -51,7 +51,7 @@ export class Planet extends Actor {
         // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
-        private w: number = 250000,
+        private w: number = 500000,
         private depth: number = 50000,
         ) {
         super(0, depth/2, w, depth, world.color)
@@ -79,7 +79,7 @@ export class Planet extends Actor {
         let c = this.color.clone()
 
         this.backMountainLayers = new MountainLayers(
-                -depth / 2 - 200,
+                -depth / 2 - 30,
                 this.getWidth(),
                 world.skyColor
             )
@@ -123,11 +123,11 @@ export class Planet extends Actor {
 
         this.sky.color = mixC
 
-        this.mountainLayers.skyColor = this.sky.color //.lighten(0.04) //.lighten(0.02)
+        this.mountainLayers.skyColor = this.sky.color.darken(0.12) //.lighten(0.04) //.lighten(0.02)
         this.mountains.color = this.sky.color.lighten(0.04)
 
-        this.backMountainLayers.color = this.sky.color.lighten(0.12) //.darken(0.08) //.lighten(0.04) //.lighten(0.02)
-        this.backMountainLayers.skyColor = this.sky.color.darken(0.12)
+        this.backMountainLayers.color = this.sky.color.darken(0.12) //.darken(0.08) //.lighten(0.04) //.lighten(0.02)
+        this.backMountainLayers.skyColor = this.sky.color //.lighten(0.02)
     }
 
     skyColorForHour(hour: number) {
