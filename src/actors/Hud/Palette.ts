@@ -1,6 +1,14 @@
 import { Color } from "excalibur";
 import { EntityKind } from "../../values/Entity";
 
+class PaletteGroup {
+
+    built: EntityKind[] = [];
+    comprehended: EntityKind[] = [];
+    constructor(private name: string, private all: EntityKind[], private comprehend = true) {
+    }
+}
+
 export class Palette {
     private _element: HTMLDivElement;
     built: EntityKind[] = [];
@@ -43,6 +51,7 @@ export class Palette {
         this.makePalette();
     }
 
+    dragging: boolean = false
     private makePalette() {
         if (this._element) {
             this._element.parentElement.removeChild(this._element);
@@ -55,10 +64,37 @@ export class Palette {
         this._element.style.flexWrap = 'wrap';
         this._element.style.width = '200px';
         this._element.style.border = 'none'; //1px solid black'; //0.5px solid white';
+
+        this._element.addEventListener('mousedown', (e) => { //.onmousedown = (e) => {
+            // alert('click palette')
+            this.dragging = true
+            console.log("START DRAG")
+        })
+        document.addEventListener('onmousemove', (e: MouseEvent) => {
+            if (this.dragging) {
+                this.x = e.clientX
+                this.y = e.clientY
+            }
+        })
+
+        document.addEventListener('onmouseup', (e) => {
+            if (this.dragging) { this.dragging = false }
+        })
+        // title.onmousemove = (e) => {
+        //     if (this.dragging) {
+        //         this.x = e.clientX
+        //         this.y = e.clientY
+        //     }
+        // }
+        // this._element.onmouseup = (e) => {
+        //     this.dragging = false
+        //     console.log("DRAG END") 
+        // }
+
         document.body.appendChild(this._element);
 
         if (this.name) {
-            let title = document.createElement('h2')
+            let title = document.createElement('div')
             title.textContent = this.name
             title.style.fontFamily = 'Verdana'
             title.style.fontSize = '7pt'
@@ -68,6 +104,7 @@ export class Palette {
             title.style.backgroundColor = Color.Violet.darken(0.92).toRGBA()
             title.style.padding = '4px'
             title.style.margin = '0px'
+            
             this._element.appendChild(
                 title
             )

@@ -33,28 +33,28 @@ export class StatusAnalysisView extends Actor {
         this.add(version)
 
 
-        this.resources = new ResourcesList(160, ty)
+        this.resources = new ResourcesList(140, ty)
         this.add(this.resources)
 
-        this.economy = new EconomyView(market, 320, ty)
+        this.economy = new EconomyView(market, 280, ty)
         this.add(this.economy)
 
-        this.clock = new Label('current time', 650, ty, 'Verdana')
+        this.clock = new Label('current time', 600, ty, 'Verdana')
         this.clock.color = Color.White // 'white'
         this.add(this.clock)
 
-        this.popLabel = new Label("", 650, ty + 14, 'Verdana')
+        this.popLabel = new Label("", 600, ty + 14, 'Verdana')
         this.popLabel.fontSize = 10
         this.popLabel.color = Color.White
         this.add(this.popLabel)
 
-        this.messageLabel = new Label('hi', 780, ty, 'Verdana')
+        this.messageLabel = new Label('hi', 750, ty, 'Verdana')
         this.messageLabel.fontSize = 10
         this.messageLabel.color = Color.White
         this.messageLabel.fontStyle = FontStyle.Italic
         this.add(this.messageLabel)
 
-        this.musicPlayer = new MusicPlayer(756, 12, {
+        this.musicPlayer = new MusicPlayer(726, 12, {
             'Crater Rock': Resources.CraterRock,
             'Indivision': Resources.Indivision,
             'Future Tense': Resources.FutureTense,

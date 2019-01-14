@@ -1,7 +1,7 @@
 import * as ex from 'excalibur';
 import { Actor, Color, Vector, Util, EdgeArea } from 'excalibur';
 import { Building } from '../Building';
-import { range, flatSingle } from '../../Util';
+import { range, flatSingle, mixColors } from '../../Util';
 import { Mountains, MountainLayers } from './PlanetBackground';
 import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
@@ -14,26 +14,26 @@ import { AccelerateTime, MechanicalOperation } from '../../models/MechanicalOper
 import { World } from '../../models/World';
 import { drawRect } from '../../Painting';
 
-class Sky extends Actor {
-    constructor(
-        x: number,
-        y: number,
-        width: number,
-        height: number,
-        color: Color
-    ) {
-        super(x,y,width,height,color)
-    }
+// class Sky extends Actor {
+//     constructor(
+//         x: number,
+//         y: number,
+//         width: number,
+//         height: number,
+//         color: Color
+//     ) {
+//         super(x,y,width,height,color)
+//     }
 
-    draw(ctx, delta) {
-        drawRect(
-            ctx,
-            {x: this.x, y: this.y, width: this.getWidth(), height: this.getHeight() },
-            0,
-            this.color,
-        )
-    }
-}
+//     draw(ctx, delta) {
+//         drawRect(
+//             ctx,
+//             {x: this.x, y: this.y, width: this.getWidth(), height: this.getHeight() },
+//             0,
+//             this.color,
+//         )
+//     }
+// }
 
 export class Planet extends Actor {
     mountains: Mountains
@@ -49,8 +49,8 @@ export class Planet extends Actor {
         // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
-        private w: number = 2000000,
-        private depth: number = 10000000,
+        private w: number = 200000,
+        private depth: number = 1000000,
         ) {
         super(0, depth/2, w, depth, world.color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
@@ -104,9 +104,28 @@ export class Planet extends Actor {
 
     private currentHour: number
     get hour() { return this.currentHour }
-    set hour(hour: number) {
-        this.currentHour = hour
 
+    setTime(time: number) {
+        this.hour = (Math.floor(time / 60)) % 24
+
+        let nextHour = this.hour + 1
+
+        let minute = Math.floor(time % 60)
+        let inc = (minute / 60)
+        // console.log({ hour: this.hour, nextHour: nextHour, minute, inc })
+
+        let oldC = this.skyColorForHour(this.hour),
+            newC = this.skyColorForHour(nextHour)
+
+        let mixC = mixColors(newC, oldC, inc)
+
+        this.sky.color = mixC //this.skyColorForHour(this.hour)
+
+        this.mountainLayers.skyColor = this.sky.color //world.skyColor
+        this.mountains.color = this.sky.color.lighten(0.2) //world.skyColor
+    }
+
+    skyColorForHour(hour: number) {
         let c = this.world.skyColor.clone().darken(0.2).desaturate(0.1)
 
         let colorMap = {
@@ -117,31 +136,31 @@ export class Planet extends Actor {
             evening: c,
         }
 
+        let result: Color = null
         if (hour >= 5 && hour < 8) { // dawn
             let inc = (hour - 6) / 5
-            this.sky.color = colorMap.dawn.lighten(inc)
+            result = colorMap.dawn.lighten(inc)
         } else if (hour >= 8 && hour < 12) { // morning
             let inc = (hour - 8) / 24
-            this.sky.color = colorMap.morning.lighten(inc)
+            result = colorMap.morning.lighten(inc)
         } else if (hour >= 12 && hour < 14) { // early afternoon
-            this.sky.color = colorMap.afternoon //.darken(inc)
+            result = colorMap.afternoon //.darken(inc)
         } else if (hour >= 14 && hour < 18) {  // late afternoon
             let inc = (hour - 14) / 16
-            this.sky.color = colorMap.afternoon.darken(inc)
+            result = colorMap.afternoon.darken(inc)
         } else if (hour >= 18 && hour < 23) { // evening
             let inc = (hour - 18) / 10
-            this.sky.color = colorMap.evening.darken(inc)
+            result = colorMap.evening.darken(inc)
         } else if (hour >= 23) { // late night
-            this.sky.color = colorMap.night
+            result = colorMap.night
         } else if (hour < 5) { // early morning
-            this.sky.color = colorMap.night
-        } else {
-            console.warn("No sky color handler for current time:", { hour })
+            result = colorMap.night
         }
+        return result
+    }
 
-        this.mountainLayers.skyColor = this.sky.color //world.skyColor
-        this.mountains.color = this.sky.color.lighten(0.2) //world.skyColor
-        // this.sky.color.screen
+    set hour(hour: number) {
+        this.currentHour = hour
     }
 
     set currentlyViewing(buildingOrDevice: Building | Device) {

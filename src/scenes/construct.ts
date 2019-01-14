@@ -88,7 +88,7 @@ export class Construct extends Scene {
 
     private stepTime() { 
         this.time += 1 //.25
-        this.planet.hour = (Math.floor(this.time / 60)) % 24
+        this.planet.setTime(this.time) 
     }
 
     public onActivate() {
@@ -98,6 +98,11 @@ export class Construct extends Scene {
             if (this.dragging) {
                 this.camera.pos = this.camera.pos.add(
                     this.dragOrigin.sub(e.pos)
+                )
+
+                this.camera.pos.x = Math.max(
+                    this.camera.pos.x,
+                    -this.planet.getWidth() ///4
                 )
             } else {
                 this.player.pos = e.pos

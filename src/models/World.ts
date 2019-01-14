@@ -14,18 +14,4 @@ export class World {
         lighten(0.15).
         desaturate(0.65)
 
-  
-    static bestowName(): any {
-        let nameList = [
-            'Aragorn',
-            'Anodyne',
-            'Carolyn',
-            'Exeter',
-            'Colwreath',
-            'India',
-            'Comma',
-            'Terabithia'
-        ]
-        return sample(nameList)
-    }
 }
