@@ -1,9 +1,97 @@
 import { Actor, Color } from 'excalibur';
-import { range } from '../../Util';
+import { range, mixColors } from '../../Util';
+import { drawRect } from '../../Painting';
 
 class PlanetBackground extends Actor {
     constructor(y: number, width: number, color: Color) {
-        super(0, y, width, 500, color); // y + size, size, layerSize, color.darken(0.2))
+        super(0, y, width, 1500, color); // y + size, size, layerSize, color.darken(0.2))
+    }
+}
+
+export class MountainLayers extends PlanetBackground {
+    layers: {
+        baseY: number,
+        // color: Color,
+        deltas: number[]
+    }[] = []
+
+    skyColor: Color = Color.Blue.clone()
+    layerHeight: number = 50
+    layerCount = 3
+    peakCount = 6000
+
+    get peakWidth() {
+        return Math.floor(this.getWidth() / this.peakCount)
+    }
+
+    onInitialize() {
+        let min = -this.layerHeight
+        for (let layerIndex of range(this.layerCount)) {
+            this.layers.unshift({
+                baseY: -this.layerHeight - (15 * layerIndex), //(layerIndex+1)) // * 7*(-this.layerHeight/8)),
+                deltas: this.genPeaks()
+            })
+        }
+    }
+
+    draw(ctx, delta) { //, worldColor = Color.Green, skyColor = Color.Blue) {
+        // super.draw(ctx, delta)
+        let wc = this.color.clone()
+        let sc = this.skyColor.clone()
+
+        let ndx = 1
+        let ls = this.layers.slice() //:.reverse()
+        for (let layer of ls) {
+            let c = mixColors(wc, sc, (ndx / this.layers.length))
+            // c.a = 0.8
+            this.drawLayer(ctx, layer, c.lighten(0.1))
+            ndx += 1
+        }
+    }
+
+    private drawLayer(ctx, layer, color) {
+        let ox = -this.getWidth()/2, oy = this.pos.y + layer.baseY 
+        // console.log("layer base y", { y: layer.baseY })
+        let c = color.clone()
+        // c.a = 1
+
+        ctx.beginPath()
+        ctx.moveTo(ox, oy) //-this.layerHeight)
+        // ctx.lineTo(ox, oy) // + this.layerHeight)
+        let ndx = 0
+        for (let delta of layer.deltas) {
+            ctx.lineTo(ox + (ndx * this.peakWidth), oy + delta)
+            ndx += 1
+        }
+        ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy) // + this.layerHeight) //-this.layerHeight)
+        ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy + this.layerHeight) //-this.layerHeight)
+        ctx.lineTo(ox, oy+this.layerHeight)
+        // ctx.lineTo(ox, oy)
+        ctx.closePath()
+        ctx.fillStyle = c.toRGBA()
+        ctx.fill()
+    }
+
+    private genPeaks() {
+        // let dMin = 200
+        let dMax = 2*(this.layerHeight/3)
+        let deltas = []
+        let randomDelta = () => (Math.random() * (dMax)) // - (dMax/2)
+        let last = 0
+        let maxDiff = dMax/4
+        for (let times in range(this.peakCount)) {
+            // deltas.push()
+            let curr = Math.max(0,randomDelta())// this.layerHeight/2 + randomDelta() //Math.max(this.layerHeight/2, randomDelta())
+            let pick = Math.max(
+                   last - maxDiff,
+                   Math.min(curr, last + maxDiff),
+               )
+            deltas.push(
+               pick
+            )
+            last = pick
+        }
+        return deltas
     }
 }
 
@@ -14,7 +102,7 @@ export class Mountains extends PlanetBackground {
     }[] = [];
     onInitialize() {
         let peakCount = 20; // Math.floor(this.getWidth() / 2000)
-        let peakHeight = 3000;
+        let peakHeight = 5000;
         // let mtnWidth = 180
         // figure out mountain peaks?
         // let yBase = this.pos.y //-1000 //this.pos.y //this.getHeight()
@@ -37,7 +125,7 @@ export class Mountains extends PlanetBackground {
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         let baseColor = this.color.desaturate(0.25); //.toRGB
         // baseColor.a = 0.6
-        let brightColor = this.color.saturate(0.2).lighten(0.5)
+        let brightColor = this.color.saturate(0.2).lighten(0.2)
         // super.draw(ctx, delta)
         ctx.fillStyle = baseColor.toRGBA() // this.color.desaturate(0.45).lighten(0.15).toRGBA();
         //let peakHeight = 250

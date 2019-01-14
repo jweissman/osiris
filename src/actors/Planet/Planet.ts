@@ -2,7 +2,7 @@ import * as ex from 'excalibur';
 import { Actor, Color, Vector, Util, EdgeArea } from 'excalibur';
 import { Building } from '../Building';
 import { range, flatSingle } from '../../Util';
-import { Mountains } from './PlanetBackground';
+import { Mountains, MountainLayers } from './PlanetBackground';
 import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
 import { ResourceBlock, Economy, sumMarkets, emptyMarket, availableCapacity, PureValue } from '../../models/Economy';
@@ -36,6 +36,8 @@ class Sky extends Actor {
 }
 
 export class Planet extends Actor {
+    mountains: Mountains
+    mountainLayers: MountainLayers
     colony: Colony
     population: Population
     // baseColor: Color
@@ -60,7 +62,7 @@ export class Planet extends Actor {
 
         let yBase = -depth/2
         let crustHeight = 20
-        this.createLayer(yBase, crustHeight, this.color.lighten(0.25))
+        this.createLayer(yBase, crustHeight, this.color.lighten(0.45))
 
 
         let layerCount = 10
@@ -72,8 +74,24 @@ export class Planet extends Actor {
                 this.color.darken(0.05 + 0.01 * i)
             )
         }
+        let c = this.color.clone()
+        // c.a = 0.4
+        this.mountains=(new Mountains(-depth/2, this.getWidth(), c.lighten(0.15)))
+        this.add(this.mountains)
 
-        this.add(new Mountains(-depth/2, this.getWidth(), this.color.lighten(0.15)))
+        this.mountainLayers = new MountainLayers(
+                -depth / 2,
+                this.getWidth(),
+                this.color.lighten(0.15)
+            )
+            this.mountainLayers.skyColor = world.skyColor
+        this.add(this.mountainLayers)
+            // new MountainLayers(
+            //     -depth / 2,
+            //     this.getWidth(),
+            //     this.color.lighten(0.15
+            // )
+            // ))
 
         this.colony = new Colony(0,-depth/2) //yBase)
         this.add(this.colony)
@@ -121,6 +139,8 @@ export class Planet extends Actor {
             console.warn("No sky color handler for current time:", { hour })
         }
 
+        this.mountainLayers.skyColor = this.sky.color //world.skyColor
+        this.mountains.color = this.sky.color.lighten(0.2) //world.skyColor
         // this.sky.color.screen
     }
 

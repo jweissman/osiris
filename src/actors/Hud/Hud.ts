@@ -49,13 +49,9 @@ export class Hud extends UIActor {
         this.structurePalette = new Palette('Structure', 20, 300, Hud.structuresForPalette, onBuildingSelect, displayInfo)
         this.functionPalette = new Palette('Function', 20, 435, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
-        this.card = new Card(null, 20, 800) // game.canvasHeight - 200)
+        this.card = new Card(null, 20, game.canvasHeight - 200)
         this.add(this.card)
 
-        // this.add(this.musicPlayer)
-
-        // this.hint = new Label('Guide: Construct Life Support (a Dome with H20 Condenser + O2 Extractor)', 400, 30, 'Verdana')
-        // this.add(this.hint)
 
     }
 

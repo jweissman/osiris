@@ -103,3 +103,14 @@ export function containsUniq<T>(arr: T[], testElems: T[]) {
   }
   return doesContain
 }
+
+
+export function mixColors(a: Color, b: Color, factor: number = 0.5): Color {
+  let aFactor = factor, bFactor = (1-factor)
+  return new Color(
+    (a.r * aFactor) + (b.r * bFactor),
+    (a.g * aFactor) + (b.g * bFactor),
+    (a.b * aFactor) + (b.b * bFactor),
+    1
+  )
+}
