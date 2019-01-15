@@ -49,7 +49,7 @@ export class Hud extends UIActor {
         this.structurePalette = new Palette('Structure', 20, 300, Hud.structuresForPalette, onBuildingSelect, displayInfo)
         this.functionPalette = new Palette('Function', 20, 435, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
-        this.card = new Card(null, 20, game.canvasHeight - 200)
+        this.card = new Card(null, 20, game.canvas.height - 200)
         this.add(this.card)
 
 

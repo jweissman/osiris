@@ -2,7 +2,7 @@ import { ResourceBlock, Economy, emptyMarket } from "./Economy";
 import { Color, FontStyle, Resource } from "excalibur";
 import { DeviceSize } from "../values/DeviceSize";
 import { MechanicalOperation, mechanicalOperations } from "./MechanicalOperation";
-import { shuffle, range } from "../Util";
+import { shuffle, range, sample } from "../Util";
 import { Device } from "../actors/Device";
 
 const bookshelfSvg = require('../images/bookshelf-plain.svg');
@@ -26,6 +26,11 @@ const megaconsole = require('../images/mega-console-plain.svg')
 const fabricator = require('../images/fabricator-plain.svg')
 
 const couch = require('../images/couch-plain.svg')
+const solar = require('../images/solar-collector-plain.svg')
+const miner = require('../images/miner-plain.svg')
+
+const statue = require('../images/statue-plain.svg')
+const codex = require('../images/codex-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -49,6 +54,11 @@ const images = {
     fabricator,
 
     couch,
+    solar,
+    miner,
+    statue,
+
+    codex,
 }
 
 
@@ -148,6 +158,7 @@ export class OxygenExtractor extends Machine {
 export class SolarCell extends Machine {
     name = 'Solar Cell'
     description = 'feel the warmth'
+    image = images.solar
 
     forDome = true
     economy = {
@@ -165,12 +176,23 @@ export class WaterCondensingMachine extends Machine {
     forDome = true
     economy = {
         ...emptyMarket(),
-        Water: { supply: 6, demand: 0 },
+        Water: { supply: 5, demand: 0 },
         Power: { supply: 0, demand: 1 },
     }
 }
 
 /// small subsurface
+
+export class Statue extends Machine {
+    name = 'Statue'
+    description = 'for honor'
+    economy = {
+        ...emptyMarket(),
+        Hope: { supply: 0.1, demand: 0 },
+        Beauty: { supply: 0.1, demand: 0 },
+    }
+    image = images.statue
+}
 
 export class StudyMachine extends Machine {
     operation = recipe(
@@ -178,7 +200,7 @@ export class StudyMachine extends Machine {
         ResourceBlock.Data
     )
     color = Blue
-    concretize(): Machine { return new (shuffle([Workstation, Desk])[0])() }
+    concretize(): Machine { return new (sample([Workstation, Desk]))() }
 }
 
 export class Desk extends StudyMachine {
@@ -187,6 +209,16 @@ export class Desk extends StudyMachine {
     image = images.bench
     prereqs = [ OxygenExtractor ]
     concretize() { return this }
+}
+
+export class Codex extends Machine {
+    name = 'Codex'
+    description = 'read it closely'
+    image = images.codex
+    prereqs = [ Bookshelf ]
+    operation = store([ResourceBlock.Data], 3)
+    color = Blue
+    // concretize() { return this }
 }
 
 export class Workstation extends StudyMachine {
@@ -596,6 +628,7 @@ export class MiningDrill extends Machine {
     operation = generate(ResourceBlock.Ore)
     size = DeviceSize.Large
     prereqs = [ Fabricator ]
+    image = images.miner
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 5 },
@@ -762,4 +795,6 @@ export const allMachines = [
     AtomicCompiler,
 
     Couch,
+    Statue,
+    Codex,
 ]

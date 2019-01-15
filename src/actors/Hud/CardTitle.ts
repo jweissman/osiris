@@ -16,7 +16,7 @@ export class CardTitle extends Actor {
         this.name.color = Color.Black
         this.add(this.name)
 
-        this.type = new Label('..', 232, 16)
+        this.type = new Label('..', 220, 18)
         this.type.fontSize = 10
         this.type.color = Color.Gray
         this.type.fontStyle = FontStyle.Italic
@@ -30,7 +30,7 @@ export class CardTitle extends Actor {
     announce(entity: Machine | Structure | SpaceFunction | Building | Device): any {
         this.name.text = entity.name
         this.color = entity.color.desaturate(0.5).darken(0.2)
-        if (entity instanceof Machine) { this.type.text = `${DeviceSize[entity.size]} Machine` }
+        if (entity instanceof Machine) { this.type.text = `${DeviceSize[entity.size]} Machine Type` }
         if (entity instanceof Structure) { this.type.text = 'Structure' }
         if (entity instanceof SpaceFunction) { this.type.text = 'Function' }
         if (entity instanceof Building) { this.type.text = 'Building' }

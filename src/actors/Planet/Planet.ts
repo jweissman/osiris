@@ -1,5 +1,5 @@
 import * as ex from 'excalibur';
-import { Actor, Color, Vector, Util, EdgeArea } from 'excalibur';
+import { Actor, Color, Vector } from 'excalibur';
 import { Building } from '../Building';
 import { range, flatSingle, mixColors } from '../../Util';
 import { Mountains, MountainLayers } from './PlanetBackground';
@@ -8,32 +8,10 @@ import { Hud } from '../Hud/Hud';
 import { ResourceBlock, Economy, sumMarkets, emptyMarket, availableCapacity, PureValue } from '../../models/Economy';
 import { Colony } from './Colony';
 import { Population } from './Population';
-import { Machine, CloningVat } from '../../models/Machine';
+import { Machine } from '../../models/Machine';
 import { Device } from '../Device';
-import { AccelerateTime, MechanicalOperation } from '../../models/MechanicalOperation';
+import { MechanicalOperation } from '../../models/MechanicalOperation';
 import { World } from '../../models/World';
-import { drawRect } from '../../Painting';
-
-// class Sky extends Actor {
-//     constructor(
-//         x: number,
-//         y: number,
-//         width: number,
-//         height: number,
-//         color: Color
-//     ) {
-//         super(x,y,width,height,color)
-//     }
-
-//     draw(ctx, delta) {
-//         drawRect(
-//             ctx,
-//             {x: this.x, y: this.y, width: this.getWidth(), height: this.getHeight() },
-//             0,
-//             this.color,
-//         )
-//     }
-// }
 
 export class Planet extends Actor {
     mountains: Mountains
@@ -57,9 +35,7 @@ export class Planet extends Actor {
         super(0, depth/2, w, depth, world.color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
-        // this.baseColor = world.color.clone()
-
-        this.sky = new Actor(0,-depth,w,depth, world.skyColor) //Color.Blue)
+        this.sky = new Actor(0,-depth,w,depth, world.skyColor)
         this.add(this.sky)
 
         let yBase = -depth/2
@@ -137,7 +113,7 @@ export class Planet extends Actor {
             night: c.darken(0.7),
             dawn: c.darken(0.2),
             morning: c.lighten(0.1),
-            afternoon: c.lighten(0.3),
+            afternoon: c.lighten(0.2).desaturate(0.1),
             evening: c,
         }
 

@@ -39,8 +39,10 @@ export class Card extends Actor {
         this.cardBody.show(entity)
 
         this.entity = entity
-        if (this.entity instanceof Machine) {
+        if (this.entity instanceof Machine) { //} || this.entity instanceof Device) {
             this.image.src = this.entity.image
+        } else if (this.entity instanceof Device) {
+            this.image.src = this.entity.machine.image
         }
     }
 

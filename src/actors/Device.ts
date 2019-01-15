@@ -17,7 +17,7 @@ export class Device extends Actor {
     // could also use for storage?
     product: ResourceBlock[] = []
     nameLabel: Label
-    image: any
+    image: HTMLImageElement
     building: Building
     inUse: boolean = false
     hover: boolean = false

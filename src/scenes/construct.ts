@@ -87,7 +87,7 @@ export class Construct extends Scene {
     }
 
     private stepTime() { 
-        this.time += 1 //.25
+        this.time += 0.125 //.25
         this.planet.setTime(this.time) 
     }
 
