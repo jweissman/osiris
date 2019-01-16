@@ -467,10 +467,10 @@ export class Building extends Actor {
         return this.devices //.filter(d => d.built)
     }
 
-    private updateFunction() {
+    public updateFunction() {
         let allTheMachines = [ StudyMachine, ...allMachines, CommandCenter, MissionLog ]
         let machines = this.devices.map(
-            d => allTheMachines.find((m: typeof Machine) => d.machine instanceof m) //this.devices.some(d => d.machine instanceof m))
+            d => allTheMachines.find((m: typeof Machine) => d.machine instanceof m) // && d.built) //this.devices.some(d => d.machine instanceof m))
         ) //
         // debugger
         console.log("MY MACHINES", { machines })

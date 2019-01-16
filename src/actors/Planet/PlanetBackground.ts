@@ -16,9 +16,9 @@ export class MountainLayers extends PlanetBackground {
     }[] = []
 
     skyColor: Color = Color.Blue.clone()
-    layerHeight: number = 30
-    layerCount = 2
-    peakCount = 1000
+    layerHeight: number = 48
+    layerCount = 3
+    peakCount = 200
 
     get peakWidth() {
         return Math.floor(this.getWidth() / this.peakCount)
@@ -28,15 +28,15 @@ export class MountainLayers extends PlanetBackground {
         let min = -this.layerHeight
         for (let layerIndex of range(this.layerCount)) {
             this.layers.unshift({
-                baseY: -this.layerHeight - (16 * layerIndex),
+                baseY: -this.layerHeight - (20 * layerIndex),
                 deltas: this.genPeaks(layerIndex)
             })
         }
     }
 
     draw(ctx, delta) {
-        let wc = this.color.clone().lighten(0.1)
-        let sc = this.skyColor.clone().lighten(0.1)
+        let wc = this.color.clone() //.lighten(0.1)
+        let sc = this.skyColor.clone() //.lighten(0.1)
 
         let ndx = 1
         let ls = this.layers.slice()
@@ -62,6 +62,7 @@ export class MountainLayers extends PlanetBackground {
         ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy + this.layerHeight)
         ctx.lineTo(ox, oy+this.layerHeight)
         ctx.closePath()
+        c.a = 1
         ctx.fillStyle = c.toRGBA()
         ctx.fill()
     }
@@ -71,7 +72,7 @@ export class MountainLayers extends PlanetBackground {
         let deltas = []
         let randomDelta = () => (Math.random() * (dMax)) - (dMax/2)
         let last = 0
-        let maxDiff = 5 + (n*2)
+        let maxDiff = 10 + (n*2)
         for (let times in range(this.peakCount)) {
             let curr = randomDelta()
             let pick = Math.max(
@@ -93,7 +94,7 @@ export class Mountains extends PlanetBackground {
         height: number;
     }[] = [];
     onInitialize() {
-        let peakCount = 18;
+        let peakCount = 10;
         let peakHeight = 3600;
         let xOff = this.getWidth() / 2;
         let peakDistance = this.getWidth() / peakCount;

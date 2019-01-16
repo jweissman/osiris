@@ -29,7 +29,7 @@ export class Planet extends Actor {
         // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
-        private w: number = 500000,
+        private w: number = 250000,
         private depth: number = 50000,
         ) {
         super(0, depth/2, w, depth, world.color)
@@ -55,7 +55,7 @@ export class Planet extends Actor {
         let c = this.color.clone()
 
         this.backMountainLayers = new MountainLayers(
-                -depth / 2 - 30,
+                -depth / 2 - 50,
                 this.getWidth(),
                 world.skyColor
             )
@@ -66,7 +66,7 @@ export class Planet extends Actor {
         this.mountainLayers = new MountainLayers(
                 -depth / 2,
                 this.getWidth(),
-                this.color
+                this.color.lighten(0.1)
             )
             this.mountainLayers.skyColor = world.skyColor
         this.add(this.mountainLayers)
@@ -99,11 +99,17 @@ export class Planet extends Actor {
 
         this.sky.color = mixC
 
-        this.mountainLayers.skyColor = this.sky.color.darken(0.12) //.lighten(0.04) //.lighten(0.02)
-        this.mountains.color = this.sky.color.lighten(0.04)
+        this.mountainLayers.skyColor = this.sky.color.lighten(0.06)
+        //   mixColors(
+        //       this.sky.color.lighten(0.16),
+        //       this.color.lighten(0.24),
+        //       0.8
+        //   )
+               //.lighten(0.04) //.lighten(0.02)
+        this.mountains.color = this.sky.color.lighten(0.06)
 
-        this.backMountainLayers.color = this.sky.color.darken(0.12) //.darken(0.08) //.lighten(0.04) //.lighten(0.02)
-        this.backMountainLayers.skyColor = this.sky.color //.lighten(0.02)
+        this.backMountainLayers.color = this.sky.color.lighten(0.12) //.saturate(0.12) //.darken(0.08) //.lighten(0.04) //.lighten(0.02)
+        this.backMountainLayers.skyColor = this.sky.color.lighten(0.24) //.desaturate(0.24)
     }
 
     skyColorForHour(hour: number) {

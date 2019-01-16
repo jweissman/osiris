@@ -129,6 +129,8 @@ export class Device extends Actor {
                 citizen.drop(res)
             }
             this.built = true
+            // this.building.updateFunction()
+            // this.building.planet.upd
         }
     }
 

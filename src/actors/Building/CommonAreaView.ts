@@ -11,7 +11,7 @@ import { measureDistance, eachCons } from "../../Util";
 export class CommonAreaView extends Building {
     get floorHeight() { return this.getHeight() / 6 }
     // floorHeight: number = 10
-    edgeWidth: number = 0.5 //.1
+    edgeWidth: number = 0 //.5 //.1
     showLabel = true
     hideBox = true
 
@@ -26,7 +26,8 @@ export class CommonAreaView extends Building {
         drawPatternedPoly(
             ctx,
             this.poly(),
-            this.backgroundPattern
+            this.backgroundPattern,
+            this.mainColor()
         )
 
         if (!this.isActive) {

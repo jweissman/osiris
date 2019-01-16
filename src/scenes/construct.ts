@@ -53,7 +53,7 @@ export class Construct extends Scene {
     update(engine, delta) {
         super.update(engine, delta)
 
-        this.hud.updateDetails(this.planet, false, this.time)
+        this.hud.updateDetails(this.planet, true, this.time)
     }
 
     public onInitialize(game: Game) {
@@ -149,7 +149,7 @@ export class Construct extends Scene {
                             this.hud.setMessage(this.defaultMessage)
                             this.planet.colony.currentlyConstructing = null
                             this.prepareNextBuilding(e.pos)
-                            this.hud.updateDetails(this.planet)
+                            // this.hud.updateDetails(this.planet)
                         }
                     } else {
                         let deviceUnderConstruction = currentlyBuilding
@@ -158,7 +158,7 @@ export class Construct extends Scene {
                             bldg.addDevice(deviceUnderConstruction)
                             this.planet.colony.currentlyConstructing = null
                             this.hud.setMessage(this.defaultMessage)
-                            this.hud.updateDetails(this.planet)
+                            // this.hud.updateDetails(this.planet)
                         }
                     }
                 }

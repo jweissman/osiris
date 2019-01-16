@@ -135,7 +135,8 @@ export class MediumSurfaceRoomView extends Building {
         drawPatternedPoly(
             ctx,
             this.angledRoofPoly(),
-            this.backgroundPattern
+            this.backgroundPattern,
+            this.mainColor()
         )
 
         if (!this.isActive) {

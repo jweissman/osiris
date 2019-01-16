@@ -34,7 +34,6 @@ export class MissionControl extends SpaceFunction {
      background = BackgroundPattern.Window
 }
 
-
 export class LivingQuarters extends SpaceFunction {
      name = 'Living Quarters'
      description = 'good night'
@@ -240,4 +239,7 @@ export const allSpaceFunctions = [
     Mine,
     HoloMatrix,
     TimeChamber,
+
+    LivingRoom,
+    Statuary,
 ]

@@ -116,6 +116,8 @@ export class CommandCenter extends Machine {
         }
         let { building } = device
         building.populate(device.pos.add(building.pos), true)
+
+        // building.updateFunction()
     }
 }
 

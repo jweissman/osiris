@@ -58,7 +58,8 @@ export function drawPatternedPoly(
   ctx: CanvasRenderingContext2D,
   path: {x:number, y:number}[],
   // rect: Rectangle,
-  pattern: BackgroundPattern = BackgroundPattern.Grid
+  pattern: BackgroundPattern = BackgroundPattern.Grid,
+  edgeColor: Color = Color.Black
 ) {
   const gridPattern = getBackgroundPattern(ctx, pattern)
   if (gridPattern) {
@@ -73,6 +74,10 @@ export function drawPatternedPoly(
     // let { x, y, width, height } = rect;
     ctx.fillStyle = gridPattern
     ctx.fill()
+
+
+    ctx.strokeStyle = edgeColor.fillStyle()
+    ctx.stroke()
     ctx.restore()
     // ctx.fillRect(x,y,width,height)
 

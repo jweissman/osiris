@@ -13,6 +13,48 @@ import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { Palette } from "./Palette";
 import { Building } from "../Building";
 
+class Tabs { //extends UIActor {
+    //private structurePalette: Palette
+    //private machinePalette: Palette
+    //private functionPalette: Palette
+    // private active: number = null
+
+    _rootElement: HTMLDivElement
+    private tabs: {name: string, element: HTMLDivElement}[] = []
+
+    constructor(private x: number, private y: number, private title: string) { //}, x: number, y: number) {
+        // super(0,0,300,300)
+        this._rootElement = this.makeRootElement()
+    }
+
+    addTab(name: string, element: HTMLDivElement) {
+        this.tabs.push({ name, element })
+    }
+
+    draw(ctx: CanvasRenderingContext2D) {
+        if (this._rootElement) {
+            let left = ctx.canvas.offsetLeft;
+            let top = ctx.canvas.offsetTop;
+            this._rootElement.style.left = `${left + this.x}px`;
+            this._rootElement.style.top = `${top + this.y}px`;
+        }
+    }
+
+    private makeRootElement() {
+        let root = document.createElement('div')
+        root.style.position = 'absolute'
+        root.style.width = '240px'
+        root.style.padding = '10px'
+
+        let title = document.createElement('h2')
+        title.style.fontSize = '14pt'
+        root.appendChild(title)
+
+        return root
+    }
+    
+}
+
 export class Hud extends UIActor {
     // private hint: Label
 
@@ -113,20 +155,25 @@ export class Hud extends UIActor {
     private updateBuildingPalette(colony: Colony) {
         let builtStructures =
             Hud.structuresForPalette.filter((structure) => colony.buildings.some(b => b.structure instanceof structure))
-
-        this.structurePalette.updateBuilt(builtStructures)
+        if (!builtStructures.every(s => this.structurePalette.built.includes(s))) {
+            this.structurePalette.updateBuilt(builtStructures)
+        }
     }
 
     private updateMachinePalette(colony: Colony) {
         let devices = colony.findAllDevices()
-        let builtMachines = Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine))
-        this.machinePalette.updateBuilt(builtMachines)
+        let builtMachines = Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine && d.built))
+        if (!builtMachines.every(machine => this.machinePalette.built.includes(machine))) {
+            this.machinePalette.updateBuilt(builtMachines)
+        }
     }
 
     private updateFunctionPalette(colony: Colony) {
         let builtReifiedFunctions = flatSingle(colony.buildings.map(b => b.spaceFunction))
         let builtFunctions = Hud.functionsForPalette.filter((fn) => builtReifiedFunctions.some(rf => rf instanceof fn))
-        this.functionPalette.updateBuilt(builtFunctions)
+        if (!builtFunctions.every(fn => this.functionPalette.built.includes(fn))) {
+            this.functionPalette.updateBuilt(builtFunctions)
+        }
     }
 
 }
