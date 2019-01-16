@@ -215,7 +215,7 @@ export class Citizen extends Actor {
         this.isPlanning = false
     }
 
-    async takeRest(duration: number) {
+    async takeRest(duration: number = 8 * 60 * Game.minuteTickMillis) {
         console.log("Citizen taking a well-deserved rest!!")
         this.sleeping = true
         await this.progressBar(duration)
@@ -226,7 +226,8 @@ export class Citizen extends Actor {
     async eat() {
         console.log("Citizen eating a meal!")
         // this.eating = true
-        await this.progressBar(4000)
+        let thirtyMinuteTimer = 30 * Game.minuteTickMillis
+        await this.progressBar(thirtyMinuteTimer)
         deleteByValueOnce(this.carrying, ResourceBlock.Meal)
         this.hunger = 0
     }

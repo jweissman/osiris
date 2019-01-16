@@ -135,17 +135,21 @@ export class TunnelView extends Building {
 
     constrainCursor(cursor: Vector): Vector {
         if (this.pickingOrigin) {
-            this.alignToSlot(cursor)
+            // this.alignToSlot(cursor)
         } else {
-            cursor.y = Math.max(this.planet.getTop() + 100, cursor.y)
+            // cursor.y = Math.max(this.planet.getTop() + 100, cursor.y)
         }
         return cursor;
     }
 
     reshape(cursor: Vector) {
-        this.pos.y = this.planet.getTop() + 2
-        if (!this.pickingOrigin) {
-          this.setHeight(cursor.y - this.planet.getTop())
+        // this.pos.y = this.planet.getTop() + 2
+        if (this.pickingOrigin) {
+            this.alignToSlot(cursor)
+        } else {
+          this.setHeight(
+             (100 * Math.floor(Math.abs(cursor.y - this.planet.getTop()) / 100)) - 5
+          )
         }
     }
 

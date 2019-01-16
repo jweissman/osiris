@@ -1,4 +1,4 @@
-import { Actor, Vector, CollisionType, Color, Label, Traits } from "excalibur";
+import { Actor, Vector, CollisionType, Color, Label, Traits, FontStyle } from "excalibur";
 import { Planet } from "../Planet/Planet";
 import { Structure, } from "../../models/Structure";
 import { Slot } from "../../values/Slot";
@@ -78,6 +78,8 @@ export class Building extends Actor {
         this.collisionType = CollisionType.PreventCollision
 
         this.nameLabel = new Label(this.structure.name, 0, 0, 'Helvetica')
+        this.nameLabel.fontSize = 14
+        this.nameLabel.fontStyle = FontStyle.Italic
         this.nameLabel.color = Color.White
 
         if (this.structure.infra) { this.active = true }
@@ -93,9 +95,9 @@ export class Building extends Actor {
         super.draw(ctx, delta)
 
         if (this.showLabel && this.spaceFunction) {
-            this.nameLabel.pos = this.pos //get getCenter().
-            this.nameLabel.pos.x = this.getCenter().x //ctx.measureText(this.structure.name).width / 2
-            this.nameLabel.pos.x -= ctx.measureText(this.structure.name).width / 2
+            this.nameLabel.pos = this.pos.add(new Vector(32, 24)) //get getCenter().
+            // this.nameLabel.pos.x = this.getCenter().x //ctx.measureText(this.structure.name).width / 2
+            // this.nameLabel.pos.x -= ctx.measureText(this.structure.name).width / 2
             this.nameLabel.draw(ctx, delta)
 
         }

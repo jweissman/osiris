@@ -21,7 +21,6 @@ export class CommonAreaView extends Building {
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
 
-        let floorColor = this.planet.color.darken(0.6)
 
         drawPatternedPoly(
             ctx,
@@ -38,6 +37,7 @@ export class CommonAreaView extends Building {
         }
 
         let floorEdgeHeight = 12 // 6
+        let floorColor = this.planet.color.darken(0.6)
         let floorOff = -5
         drawRect(
             ctx,

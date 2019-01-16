@@ -11,15 +11,17 @@ import { BackgroundPattern } from "./BackgroundPatterns";
 
 export class MediumSurfaceRoomView extends Building {
     hideBox = true
+    showLabel = true
     // hideLabe
 
     devicePlaceSize = DeviceSize.Medium
     devicePlaceCount = 3
+    get floorHeight() { return this.getHeight() / 6 }
 
     devicePlaces() {
         let w = this.getWidth()/2
         let x = this.pos.x + w;
-        let y = this.pos.y + this.getHeight() //- this.floorHeight // - 10 
+        let y = this.pos.y + this.getHeight() - this.floorHeight // - 10 
         y -= getVisibleDeviceSize(this.devicePlaceSize) / 3.5 ///2
 
         let ds = [
@@ -59,7 +61,7 @@ export class MediumSurfaceRoomView extends Building {
 
     slots() {
         let theSlots: Slot[] = []
-        let slotY = this.getHeight();
+        let slotY = this.getHeight() - this.floorHeight;
 
         if (this.isGroundFloor) {
             theSlots.push(
@@ -73,7 +75,7 @@ export class MediumSurfaceRoomView extends Building {
         theSlots.push(
             this.buildSlot(
                 this.pos.x + this.getWidth() / 2,
-                this.pos.y + this.getHeight(),
+                this.pos.y + this.getHeight() + 1, // + (2*this.floorHeight),
                 Orientation.Down
             )
         )
@@ -81,7 +83,7 @@ export class MediumSurfaceRoomView extends Building {
         theSlots.push(
             this.buildSlot(
                 this.pos.x + this.getWidth() / 2,
-                this.pos.y, // + this.getHeight(),
+                this.pos.y - 1, // + this.getHeight(),
                 Orientation.Up
             )
         )
@@ -117,12 +119,13 @@ export class MediumSurfaceRoomView extends Building {
     reshape(cursor: Vector) {
         if (this.planet.colony.buildings.length === 0) {
             this.pos = cursor
-            this.pos.y -= this.getHeight() - 2 // hm
+            this.pos.y -= this.getHeight() - 2 - this.floorHeight // hm
         } else {
             this.alignToSlot(cursor)
 
         }
     }
+
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         let color = this.mainColor()
@@ -139,12 +142,33 @@ export class MediumSurfaceRoomView extends Building {
             this.mainColor()
         )
 
+
         if (!this.isActive) {
             // draw overlay rect that darkens
             let c = Color.Black.clone()
             c.a = 0.6
             drawPoly(ctx, this.angledRoofPoly(), c)
         }
+
+        // floor
+        let floorColor = this.planet.color.darken(0.6)
+        let floorEdgeHeight = 12 // 6
+        let floorOff = -5
+        drawRect(
+            ctx,
+            { x: this.x, y: this.y + this.getHeight() - this.floorHeight - floorEdgeHeight,
+              width: this.getWidth(), height: floorEdgeHeight - floorOff },
+              0,
+              floorColor.lighten(0.4)
+        )
+
+        drawRect(
+            ctx,
+            { x: this.x, y: this.y + this.getHeight() - this.floorHeight - floorOff,
+              width: this.getWidth(), height: this.floorHeight + floorOff },
+              0,
+              floorColor
+        )
 
         // a little flag :)
         let flagpoleHeight = 18

@@ -8,10 +8,15 @@ export class World {
   static colors = [Color.Orange, Color.Red, Color.Blue, Color.Green] //, Color.Violet] //, Color.White]
 
   color: Color = sample(World.colors).
+      clone().
       darken(0.1).
       desaturate(0.8);
-  skyColor: Color = sample([ Color.Cyan, Color.Vermillion, Color.Violet, Color.Chartreuse, Color.Orange, Color.Rose ] ).
+  skyColor: Color = sample(
+    //   [ Color.Blue ]
+      [Color.Cyan, Color.Vermillion, Color.Violet, Color.Chartreuse, Color.Orange, Color.Rose]
+  ).
+        clone().
         lighten(0.15).
-        desaturate(0.65)
+        desaturate(0.8) //65)
 
 }

@@ -16,9 +16,9 @@ export class MountainLayers extends PlanetBackground {
     }[] = []
 
     skyColor: Color = Color.Blue.clone()
-    layerHeight: number = 48
-    layerCount = 3
-    peakCount = 200
+    layerHeight: number = 200
+    layerCount = 1
+    peakCount = 400
 
     get peakWidth() {
         return Math.floor(this.getWidth() / this.peakCount)
@@ -28,7 +28,7 @@ export class MountainLayers extends PlanetBackground {
         let min = -this.layerHeight
         for (let layerIndex of range(this.layerCount)) {
             this.layers.unshift({
-                baseY: -this.layerHeight - (20 * layerIndex),
+                baseY: -this.layerHeight - (10 * layerIndex),
                 deltas: this.genPeaks(layerIndex)
             })
         }
@@ -41,8 +41,8 @@ export class MountainLayers extends PlanetBackground {
         let ndx = 1
         let ls = this.layers.slice()
         for (let layer of ls) {
-            let c = mixColors(wc, sc, (ndx / (this.layers.length+1)))
-            this.drawLayer(ctx, layer, c.lighten(0.1))
+            let c = mixColors(wc, sc, (ndx / (this.layers.length)))
+            this.drawLayer(ctx, layer, c) //.lighten(0.1))
             ndx += 1
         }
     }
@@ -72,7 +72,7 @@ export class MountainLayers extends PlanetBackground {
         let deltas = []
         let randomDelta = () => (Math.random() * (dMax)) - (dMax/2)
         let last = 0
-        let maxDiff = 10 + (n*2)
+        let maxDiff = 5 + (n*2)
         for (let times in range(this.peakCount)) {
             let curr = randomDelta()
             let pick = Math.max(
@@ -94,34 +94,27 @@ export class Mountains extends PlanetBackground {
         height: number;
     }[] = [];
     onInitialize() {
-        let peakCount = 10;
-        let peakHeight = 3600;
-        let xOff = this.getWidth() / 2;
-        let peakDistance = this.getWidth() / peakCount;
+        let peakCount = 3
+        let peakHeight = 4800
+        let xOff = this.getWidth() / 2
+        let peakDistance = this.getWidth() / peakCount
         for (let times of range(2)) {
-            let heightRange = 100;
-            let drift = 3 * (peakDistance / 2);
-            for (let i of range(peakCount)) { //} / 2)) {
+            let heightRange = 100
+            let drift = 3 * (peakDistance / 2)
+            for (let i of range(peakCount)) {
                 this.peaks.push({
                     x: -xOff + i * peakDistance + ((Math.random() * drift) - (drift / 2)),
-                    height: Math.max(10, (Math.random() * peakHeight) + ((Math.random() * heightRange) - (heightRange / 2))) //(Util.randomIntInRange(-160,160))
-                    // y = yBase - peakHeight
-                });
+                    height: Math.max(10, 200 + (Math.random() * peakHeight) + ((Math.random() * heightRange) - (heightRange / 2))) //(Util.randomIntInRange(-160,160))
+                })
             }
         }
-        // console.log({ peaks: this.peaks });
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
-        let baseColor = this.color.desaturate(0.35); //.toRGB
-        // baseColor.a = 0.6
-        let brightColor = baseColor.lighten(0.1) // this.color.saturate(0.2).lighten(0.1)
-        // super.draw(ctx, delta)
-        ctx.fillStyle = baseColor.toRGBA() // this.color.desaturate(0.45).lighten(0.15).toRGBA();
-        //let peakHeight = 250
-        // let mtnWidth = 180
-        let yBase = this.pos.y-3; //-1000 //this.pos.y //this.getHeight()
-        // let xOff = this.getWidth() / 2
+        let baseColor = this.color.desaturate(0.35)
+        let brightColor = baseColor.lighten(0.1)
+        ctx.fillStyle = baseColor.toRGBA()
+        let yBase = this.pos.y-3
         this.peaks.forEach(peak => {
             let y0 = yBase - peak.height;
             let mtnWidth = peak.height * 3.4;
@@ -130,14 +123,14 @@ export class Mountains extends PlanetBackground {
             ctx.lineTo(peak.x - mtnWidth, yBase);
             ctx.lineTo(peak.x + mtnWidth, yBase);
 
-            ctx.fillStyle = baseColor.toRGBA() // this.color.desaturate(0.45).lighten(0.15).toRGBA();
+            ctx.fillStyle = baseColor.toRGBA()
             ctx.fill();
 
             ctx.beginPath();
             ctx.moveTo(peak.x, y0);
             ctx.lineTo(peak.x + 3*(mtnWidth/4), yBase);
             ctx.lineTo(peak.x + mtnWidth, yBase);
-            ctx.fillStyle = brightColor.toRGBA() // this.color.desaturate(0.45).lighten(0.15).toRGBA();
+            ctx.fillStyle = brightColor.toRGBA()
             ctx.fill();
 
         });

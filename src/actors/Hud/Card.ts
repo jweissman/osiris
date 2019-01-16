@@ -10,7 +10,7 @@ import { Device } from "../Device";
 export class Card extends Actor {
     title: CardTitle
     cardBody: CardBody
-    image: any
+    image: HTMLImageElement
 
     constructor(private entity: Machine | Structure | SpaceFunction | Building | Device, x: number, y: number) {
         super(x + 160, y + 90, 320, 180, Color.White);
@@ -26,10 +26,12 @@ export class Card extends Actor {
     draw(ctx: CanvasRenderingContext2D, delta) {
         super.draw(ctx, delta)
         if (this.entity) {
-            if (this.entity instanceof Machine) {
-                let ix = this.pos.x + 48, iy = this.pos.y - 16
-                let isz = 92
-                ctx.drawImage(this.image, ix, iy, isz, isz)
+            if (this.entity instanceof Machine || this.entity instanceof Device) {
+                // if (this.image.src !== null) {
+                    let ix = this.pos.x + 48, iy = this.pos.y - 16
+                    let isz = 92
+                    ctx.drawImage(this.image, ix, iy, isz, isz)
+                // }
             }
         }
     }
@@ -39,11 +41,14 @@ export class Card extends Actor {
         this.cardBody.show(entity)
 
         this.entity = entity
+        let src = null
         if (this.entity instanceof Machine) { //} || this.entity instanceof Device) {
-            this.image.src = this.entity.image
+            src = this.entity.image
         } else if (this.entity instanceof Device) {
-            this.image.src = this.entity.machine.image
+            src = this.entity.machine.image
         }
+        // console.log("img src", { src })
+        this.image.src = src
     }
 
 }

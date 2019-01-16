@@ -2,7 +2,6 @@ import * as ex from 'excalibur';
 import { Actor, Color, Vector } from 'excalibur';
 import { Building } from '../Building';
 import { range, flatSingle, mixColors } from '../../Util';
-import { Mountains, MountainLayers } from './PlanetBackground';
 import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
 import { ResourceBlock, Economy, sumMarkets, emptyMarket, availableCapacity, PureValue } from '../../models/Economy';
@@ -12,16 +11,15 @@ import { Machine } from '../../models/Machine';
 import { Device } from '../Device';
 import { MechanicalOperation } from '../../models/MechanicalOperation';
 import { World } from '../../models/World';
+import { Colorize } from 'excalibur/dist/Drawing/SpriteEffects';
+import { SkyLayers } from './SkyLayers';
 
 export class Planet extends Actor {
-    mountains: Mountains
-    mountainLayers: MountainLayers
-    backMountainLayers: MountainLayers
-
     colony: Colony
     population: Population
     // baseColor: Color
     sky: Actor
+    skyLayers: SkyLayers
 
     constructor(
         public world: World,
@@ -29,49 +27,41 @@ export class Planet extends Actor {
         // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
-        private w: number = 250000,
+        private w: number = 150000,
         private depth: number = 50000,
-        ) {
-        super(0, depth/2, w, depth, world.color)
+    ) {
+        super(0, depth / 2, w, depth, world.color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
-        this.sky = new Actor(0,-depth,w,depth, world.skyColor)
+        this.sky = new Actor(0, -depth, w, depth, world.skyColor)
         this.add(this.sky)
 
-        let yBase = -depth/2
-        let crustHeight = 20
+        let yBase = -depth / 2
+        let crustHeight = 24
         this.createLayer(yBase, crustHeight, this.color.lighten(0.45))
 
 
         let layerCount = 10
-        let layerHeight = depth / layerCount 
+        let layerHeight = depth / layerCount
         for (let i of range(layerCount)) {
             this.createLayer(
-                yBase + crustHeight + (layerHeight/2) + (layerHeight * (i+1)),
+                yBase + crustHeight + (layerHeight / 2) + (layerHeight * (i + 1)),
                 layerHeight,
                 this.color.darken(0.05 + 0.01 * i)
             )
         }
         let c = this.color.clone()
 
-        this.backMountainLayers = new MountainLayers(
-                -depth / 2 - 50,
-                this.getWidth(),
-                world.skyColor
-            )
-        this.add(this.backMountainLayers)
-        this.mountains=new Mountains(-depth/2, this.getWidth(), world.skyColor) //.lighten(0.15)))
-        this.add(this.mountains)
+        this.skyLayers =new SkyLayers(
+            -depth/2,
+            this.getWidth(),
+            this.color.lighten(0.2),
+            world.skyColor,
+            2
+        )
+        this.add(this.skyLayers)
 
-        this.mountainLayers = new MountainLayers(
-                -depth / 2,
-                this.getWidth(),
-                this.color.lighten(0.1)
-            )
-            this.mountainLayers.skyColor = world.skyColor
-        this.add(this.mountainLayers)
-
-        this.colony = new Colony(0,-depth/2)
+        this.colony = new Colony(0, -depth / 2)
         this.add(this.colony)
 
         this.population = new Population(this)
@@ -97,19 +87,27 @@ export class Planet extends Actor {
 
         let mixC = mixColors(newC, oldC, inc)
 
-        this.sky.color = mixC
+        this.assignColors(mixC)
+    }
 
-        this.mountainLayers.skyColor = this.sky.color.lighten(0.06)
-        //   mixColors(
-        //       this.sky.color.lighten(0.16),
-        //       this.color.lighten(0.24),
-        //       0.8
-        //   )
-               //.lighten(0.04) //.lighten(0.02)
-        this.mountains.color = this.sky.color.lighten(0.06)
+    private assignColors(skyColor: Color) {
+        this.sky.color = skyColor
 
-        this.backMountainLayers.color = this.sky.color.lighten(0.12) //.saturate(0.12) //.darken(0.08) //.lighten(0.04) //.lighten(0.02)
-        this.backMountainLayers.skyColor = this.sky.color.lighten(0.24) //.desaturate(0.24)
+        let inc = 0.04
+
+        let c = mixColors(
+            this.sky.color.lighten(3 * inc), //.lighten(3*inc).saturate(5*inc),
+            this.color.lighten(3 * inc), //.lighten(2*inc)
+            0.7
+        )
+
+        this.skyLayers.setHi(c)
+
+        // this.skyLayer.mountainLayers.color = this.color.lighten(inc) //0.1)
+        // this.skyLayer.mountainLayers.skyColor = c.lighten(inc)
+        // this.skyLayer.mountains.color = c.lighten(inc)
+        // this.skyLayer.backMountainLayers.color = c.lighten(inc)
+        // this.skyLayer.backMountainLayers.skyColor = c.lighten(inc * 3).desaturate(inc)
     }
 
     skyColorForHour(hour: number) {
@@ -226,13 +224,13 @@ export class Planet extends Actor {
         let economies = devices.map((d: Device) => d.machine.economy)
         let theEconomyWithoutPeople = economies.reduce(sumMarkets, emptyMarket())
 
-        let values = [ PureValue.Shelter, PureValue.Water, PureValue.Oxygen ]
+        let values = [PureValue.Shelter, PureValue.Water, PureValue.Oxygen]
         return Math.max(0, Math.min(
             ...values.map(val => availableCapacity(theEconomyWithoutPeople, val))
         ))
     }
 
-    closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = ()=>true): Building {
+    closestBuildingByType(cursor: Vector, structureTypes: (typeof Structure)[], predicate: (Building) => boolean = () => true): Building {
         return this.colony.closestBuildingByType(cursor, structureTypes, predicate)
     }
 
@@ -245,7 +243,7 @@ export class Planet extends Actor {
     }
 
     pathBetweenPoints(origin: Vector, destination: Vector): Vector[] {
-       return this.colony.pathBetweenPoints(origin, destination)
+        return this.colony.pathBetweenPoints(origin, destination)
     }
 
     get timeFactor() {

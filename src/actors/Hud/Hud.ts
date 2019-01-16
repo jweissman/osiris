@@ -125,6 +125,7 @@ export class Hud extends UIActor {
     }
 
     updateDetails(planet: Planet, rebuildPalettes: boolean = true, time: number = 0) {
+        if (!planet) { return }
         if (rebuildPalettes) {
             this.updatePalettes(planet.colony)
         }

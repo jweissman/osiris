@@ -82,12 +82,13 @@ export class Construct extends Scene {
         this.camera.zoom(0.125, 10000)
 
         this.addTimer(
-            new Timer(() => { this.stepTime() }, 50, true)
+            new Timer(() => { this.stepTime() }, this.timeStepIntervalMillis, true)
         )
     }
 
+    timeStepIntervalMillis: number = 50
     private stepTime() { 
-        this.time += 0.125 //.25
+        this.time += this.timeStepIntervalMillis / Game.minuteTickMillis  /// this.timeStepIntervalMillis //  0.125 //.25
         this.planet.setTime(this.time) 
     }
 

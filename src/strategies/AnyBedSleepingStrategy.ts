@@ -8,7 +8,7 @@ export class AnyBedSleepingStrategy extends SleepingStrategy {
             return false
         }
 
-        let bedtime = this.planet.hour > 20 || this.planet.hour < 4
+        let bedtime = this.planet.hour > 21 || this.planet.hour < 4
         return bedtime
     }
 
@@ -19,7 +19,7 @@ export class AnyBedSleepingStrategy extends SleepingStrategy {
             bed.inUse = true
             await this.visitDevice(bed)
         }
-        await this.pawn.takeRest(1000 * 24)
+        await this.pawn.takeRest() //1000 * 24)
         if (bed) { 
             bed.inUse = false
         }

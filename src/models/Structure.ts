@@ -235,7 +235,7 @@ export class MediumSurfaceRoom extends Dome {
     view: string = 'MediumSurfaceRoomView';
 
     width: number = 4 * major.eighth
-    height: number = major.fifth
+    height: number = major.seventh
 
     zoom = 0.1
 
@@ -250,13 +250,13 @@ export class MediumSurfaceRoom extends Dome {
 
     machines = midBelow
 
-    hide = false // need another one which cares about connecting to roads...
+    // hide = false // need another one which cares about connecting to roads...
 }
 
 export class SmallDome extends Dome {
     name = 'Sm. Dome'
     width = major.eighth
-    height = major.fourth
+    height = major.fifth
     machines = smallDome
 }
 

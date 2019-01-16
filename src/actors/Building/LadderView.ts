@@ -14,6 +14,7 @@ export class LadderView extends TunnelView {
        return cursor;
     }
 
+    minHeight: number = 50
     reshape(cursor: Vector) {
         if (this.pickingOrigin) { 
             let theSlot = this.alignToSlot(cursor)
@@ -28,11 +29,11 @@ export class LadderView extends TunnelView {
             if (this.facing === Orientation.Up) {
                 let maxHeight = this.originSlot.pos.y - this.planet.getTop() - 25
 
-                let h = Math.min(maxHeight, Math.max(100, this.originSlot.pos.y - cursor.y))
+                let h = Math.min(maxHeight, Math.max(this.minHeight, this.originSlot.pos.y - cursor.y))
                 this.setHeight((h/50)*50)
                 this.pos.y = this.originSlot.pos.y - this.getHeight()
             } else {
-                let h = Math.max(100, cursor.y - this.originSlot.pos.y)
+                let h = Math.max(this.minHeight, cursor.y - this.originSlot.pos.y)
                 this.setHeight((h/50)*50) // - cursor.y))
             }
         }
