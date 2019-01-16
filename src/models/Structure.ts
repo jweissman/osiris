@@ -54,7 +54,7 @@ export class MainTunnel extends Structure {
     name: string = 'Main Tunnel';
     description: string = 'Elevating';
     view: string = 'TunnelView';
-    width: number = major.second
+    width: number = major.fifth
     height: number = major.eighth
     zoom = 0.25
     connections: { [key in Orientation]: (typeof Structure)[] } = {
@@ -92,11 +92,13 @@ export class Corridor extends Structure {
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [
             MainTunnel,
-            CommonArea
+            CommonArea,
+            Ladder,
         ],
         [Orientation.Right]: [
             MainTunnel,
-            CommonArea
+            CommonArea,
+            Ladder,
         ],
         [Orientation.Up]: [ ],
         [Orientation.Down]: [ ],
@@ -109,7 +111,7 @@ export class Ladder extends Structure {
     name = 'Ladder'
     description = 'connect vertically'
     view = 'LadderView'
-    width = minor.third
+    width = minor.sixth
     height = 20 + major.third
     zoom = 0.5
     connections: { [key in Orientation]: (typeof Structure)[] } = {
@@ -232,8 +234,8 @@ export class MediumSurfaceRoom extends Dome {
 
     view: string = 'MediumSurfaceRoomView';
 
-    width: number = 8 * major.eighth
-    height: number = 2 * major.third
+    width: number = 4 * major.eighth
+    height: number = major.fifth
 
     zoom = 0.1
 
@@ -242,13 +244,13 @@ export class MediumSurfaceRoom extends Dome {
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ SurfaceRoad ],
         [Orientation.Right]: [ SurfaceRoad ],
-        [Orientation.Up]: [ MainTunnel ],
-        [Orientation.Down]: [ MainTunnel ],
+        [Orientation.Up]: [ MainTunnel, MediumSurfaceRoom ],
+        [Orientation.Down]: [ MainTunnel, MediumSurfaceRoom ],
     }
 
     machines = midBelow
 
-    hide = true // need another one which cares about connecting to roads
+    hide = false // need another one which cares about connecting to roads...
 }
 
 export class SmallDome extends Dome {

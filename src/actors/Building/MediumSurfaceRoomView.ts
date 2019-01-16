@@ -11,6 +11,7 @@ import { BackgroundPattern } from "./BackgroundPatterns";
 
 export class MediumSurfaceRoomView extends Building {
     hideBox = true
+    // hideLabe
 
     devicePlaceSize = DeviceSize.Medium
     devicePlaceCount = 3
@@ -36,11 +37,17 @@ export class MediumSurfaceRoomView extends Building {
         let find = (s: Vector) => g.findOrCreate(s, measureDistance)
         let slots: Vector[] = this.slots().map(s => s.pos)
         // draw from left slot to each device place to right slot?
-        let leftSlot = find(slots[0]), rightSlot = find(slots[slots.length-1])
         let devices = this.devicePlaces().map(d => find(d.position))
-        g.edge(leftSlot, devices[0])
         eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
-        g.edge(devices[devices.length-1], rightSlot)
+
+        if (this.isGroundFloor) {
+            let leftSlot = find(slots[0]), rightSlot = find(slots[slots.length - 1])
+            g.edge(leftSlot, devices[0])
+            g.edge(devices[devices.length - 1], rightSlot)
+        } else {
+            let topSlot = find(slots[1])
+            g.edge(devices[1], topSlot)
+        }
 
         let node = this.nodes()[0]
         devices.forEach(device => g.edge(device, find(node)))
@@ -48,28 +55,20 @@ export class MediumSurfaceRoomView extends Building {
 
         return g
     }
-  
-    // afterConstruct() {
-    //     let { machines } = this.structure;
-    //     if (machines && machines.length > 0) {
-    //         let machine = new machines[0]();
-    //         this.devicePlaces().forEach(place => {
-    //             let theDevice = new Device(machine, place.position)
-    //             this.addDevice(theDevice)
-    //         })
-    //     }
 
-    // }
 
     slots() {
         let theSlots: Slot[] = []
         let slotY = this.getHeight();
-        theSlots.push(
-            this.buildSlot(
-                this.pos.x, this.pos.y + slotY,
-                Orientation.Left
+
+        if (this.isGroundFloor) {
+            theSlots.push(
+                this.buildSlot(
+                    this.pos.x, this.pos.y + slotY,
+                    Orientation.Left
+                )
             )
-        )
+        }
 
         theSlots.push(
             this.buildSlot(
@@ -79,28 +78,50 @@ export class MediumSurfaceRoomView extends Building {
             )
         )
 
-
-
         theSlots.push(
             this.buildSlot(
-                this.pos.x + this.getWidth(),
-                this.pos.y + slotY,
-                Orientation.Right
+                this.pos.x + this.getWidth() / 2,
+                this.pos.y, // + this.getHeight(),
+                Orientation.Up
             )
         )
+
+
+        if (this.isGroundFloor) {
+            theSlots.push(
+                this.buildSlot(
+                    this.pos.x + this.getWidth(),
+                    this.pos.y + slotY,
+                    Orientation.Right
+                )
+            )
+        }
 
 
         return theSlots;
     }
 
+    get isGroundFloor() {
+        return !this.parentSlot || !(this.parentSlot.parent instanceof MediumSurfaceRoomView)
+    }
+
     constrainCursor(cursor: Vector): Vector {
-        cursor.y = this.planet.getTop();
+        if (this.planet.colony.buildings.length === 0) {
+            cursor.y = this.planet.getTop();
+        } // else {
+            // this.alignToSlot(cursor)
+        // }
         return cursor;
     }
 
     reshape(cursor: Vector) {
-        this.pos = cursor
-        this.pos.y -= this.getHeight() - 2
+        if (this.planet.colony.buildings.length === 0) {
+            this.pos = cursor
+            this.pos.y -= this.getHeight() - 2 // hm
+        } else {
+            this.alignToSlot(cursor)
+
+        }
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
