@@ -5,7 +5,7 @@ import { Slot } from "../../values/Slot";
 import { Orientation, flip, compass } from "../../values/Orientation";
 import { Game } from "../../Game";
 import { Rectangle } from "../../values/Rectangle";
-import { closest, measureDistance, deleteByValue, containsUniq } from "../../Util";
+import { closest, measureDistance, deleteByValue, containsUniq, flatSingle } from "../../Util";
 import { Graph } from "../../values/Graph";
 import { ResourceBlock, emptyMarket, Economy, sumMarkets, equilibrium, allValues, availableCapacity } from "../../models/Economy";
 import { Device } from "../Device";
@@ -301,19 +301,7 @@ export class Building extends Actor {
 
     protected aabbPoly(): {x:number,y:number}[] {
         return pathFromRect(this.aabb());
-        //return [
-        //    // bottom-left
-        //    { x: this.pos.x, y: this.pos.y + this.getHeight() },
 
-        //    // upper-left
-        //    { x: this.pos.x, y: this.pos.y },
-
-        //    // upper-right
-        //    { x: this.pos.x + this.getWidth(), y: this.pos.y },
-
-        //    // bottom-right
-        //    { x: this.pos.x + this.getWidth(), y: this.pos.y + this.getHeight() },
-        //];
     }
 
     protected angledRoofPoly(): {x: number, y: number}[] {
@@ -466,16 +454,14 @@ export class Building extends Actor {
     }
 
     public getDevices() {
-        return this.devices //.filter(d => d.built)
+        return [ ...this.devices, ...flatSingle(this.devices.map(d => d.tinyDevices)) ]
     }
 
     public updateFunction() {
         let allTheMachines = [ StudyMachine, ...allMachines, CommandCenter, MissionLog ]
         let machines = this.devices.map(
-            d => allTheMachines.find((m: typeof Machine) => d.machine instanceof m) // && d.built) //this.devices.some(d => d.machine instanceof m))
-        ) //
-        // debugger
-        console.log("MY MACHINES", { machines })
+            d => allTheMachines.find((m: typeof Machine) => d.machine instanceof m)
+        )
         let fn = allSpaceFunctions.find(spaceFn => {
             let sf = new spaceFn()
 

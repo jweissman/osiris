@@ -33,21 +33,9 @@ export class Construct extends Scene {
         MissionControl,
         SurfaceRoad,
         SolarArray,
-        // LifeSupportPod,
         MainTunnel,
         Corridor,
         LivingQuarters,
-        // CloneMatrix,
-        // CloneReception,
-        // Kitchen,
-        // Workshop,
-        // // Study,
-        // // Library,
-        // Archive,
-        // Refinery,
-        // Mine,
-        // ComputerCore,
-        
     ]
 
     update(engine, delta) {
@@ -78,8 +66,8 @@ export class Construct extends Scene {
 
         this.prepareNextBuilding()
         this.camera.pos.y = this.planet.getTop() - 1000
-        this.camera.zoom(0.01)
-        this.camera.zoom(0.125, 10000)
+        this.camera.zoom(0.05)
+        this.camera.zoom(0.5, 10000)
 
         this.addTimer(
             new Timer(() => { this.stepTime() }, this.timeStepIntervalMillis, true)
@@ -93,18 +81,12 @@ export class Construct extends Scene {
     }
 
     public onActivate() {
-        // this.game.controller.activate()
-
         this.game.input.pointers.primary.on('move', (e: Input.PointerMoveEvent) => {
             if (this.dragging) {
                 this.camera.pos = this.camera.pos.add(
                     this.dragOrigin.sub(e.pos)
                 )
 
-                // this.camera.pos.x = Math.max(
-                //     this.camera.pos.x,
-                //     -this.planet.getWidth() ///4
-                // )
             } else {
                 this.player.pos = e.pos
 
@@ -155,8 +137,13 @@ export class Construct extends Scene {
                     } else {
                         let deviceUnderConstruction = currentlyBuilding
                         if (deviceUnderConstruction.snap(this.planet)) {
-                            let bldg = deviceUnderConstruction.building
-                            bldg.addDevice(deviceUnderConstruction)
+                            if (deviceUnderConstruction.size === DeviceSize.Tiny) {
+                                let parent = deviceUnderConstruction.parentDevice
+                                parent.addTinyDevice(deviceUnderConstruction)
+                            } else {
+                                let bldg = deviceUnderConstruction.building
+                                bldg.addDevice(deviceUnderConstruction)
+                            }
                             this.planet.colony.currentlyConstructing = null
                             this.hud.setMessage(this.defaultMessage)
                             // this.hud.updateDetails(this.planet)

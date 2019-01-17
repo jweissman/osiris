@@ -27,8 +27,8 @@ export class Planet extends Actor {
         // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
-        private w: number = 150000,
-        private depth: number = 50000,
+        private w: number = 100000,
+        private depth: number = 40000,
     ) {
         super(0, depth / 2, w, depth, world.color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
@@ -55,7 +55,7 @@ export class Planet extends Actor {
         this.skyLayers =new SkyLayers(
             -depth/2,
             this.getWidth(),
-            this.color.lighten(0.2),
+            this.color.lighten(0.04),
             world.skyColor,
             2
         )
@@ -96,8 +96,8 @@ export class Planet extends Actor {
         let inc = 0.04
 
         let c = mixColors(
-            this.sky.color.lighten(3 * inc), //.lighten(3*inc).saturate(5*inc),
-            this.color.lighten(3 * inc), //.lighten(2*inc)
+            this.sky.color.lighten(5 * inc), //.lighten(3*inc).saturate(5*inc),
+            this.color.darken(5 * inc), //.lighten(2*inc)
             0.7
         )
 

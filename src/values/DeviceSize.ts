@@ -2,16 +2,18 @@ import { Scale } from "./Scale";
 let { major, minor } = Scale
 
 export enum DeviceSize {
+    Tiny,
     Small,
     Medium,
     Large,
-    Huge
+    Huge,
 }
 
 
 export function getVisibleDeviceSize(size: DeviceSize): number {
     let sz = 10;
     switch (size) {
+        case DeviceSize.Tiny: sz = minor.third; break;
         case DeviceSize.Small: sz = major.third; break;
         case DeviceSize.Medium: sz = major.fourth; break;
         case DeviceSize.Large: sz = major.eighth + major.second; break;

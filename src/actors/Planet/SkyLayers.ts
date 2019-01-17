@@ -8,7 +8,7 @@ export class SkyLayers extends Actor {
         for (let i of range(layerCount)) {
             let c0 = mixColors(lo, hi, (i / (layerCount + 1)));
             let c1 = mixColors(lo, hi, ((i + 1) / (layerCount + 1)));
-            let layer = new SkyLayer(-100 * (layerCount - i - 1), this.getWidth(), c1, c0);
+            let layer = new SkyLayer(-200 * (layerCount - i - 1), this.getWidth(), c1, c0);
             this.layers.push(layer);
             this.add(layer);
         }

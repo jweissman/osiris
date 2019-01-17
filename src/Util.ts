@@ -23,7 +23,7 @@ export const sample = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
 export const range = (n) => Array(n).fill(0).map((_val,idx) => idx)
 
-export function closest<T>(cursor: Vector, arr: Array<T>, getVector: (T) => Vector, predicate?: (T) => boolean) {
+export function closest<T>(cursor: Vector, arr: Array<T>, getVector: (elem: T) => Vector, predicate?: (elem: T) => boolean) {
    let matching: Array<T> = arr;
    if (predicate) { arr = arr.filter(predicate) }
    if (matching) {

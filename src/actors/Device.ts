@@ -5,9 +5,9 @@ import { ResourceBlock, blockColor, emptyMarket } from "../models/Economy";
 import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
-import { getVisibleDeviceSize } from "../values/DeviceSize";
+import { getVisibleDeviceSize, DeviceSize } from "../values/DeviceSize";
 import { Recipe, ResourceStorage, MechanicalOperation, ResourceGenerator } from "../models/MechanicalOperation";
-import { range, deleteByValueOnce } from "../Util";
+import { range, deleteByValueOnce, closest } from "../Util";
 import { drawRect } from "../Painting";
 import { InteractionRequest } from "../values/InteractionRequest";
 
@@ -40,7 +40,7 @@ export class Device extends Actor {
         )
 
         this.nameLabel = new Label(this.machine.name, 0, 0, 'Helvetica')
-        this.nameLabel.fontSize = 6
+        this.nameLabel.fontSize = this.machine.size === DeviceSize.Tiny ? 2 : 6
         this.nameLabel.color = Color.White
 
         this.image = new Image();
@@ -48,19 +48,15 @@ export class Device extends Actor {
         this.image.src = machine.image
 
         this.on('pointerenter', () => {
-            // console.log("HOVER ON", { device: this })
+            console.log("HOVER OVER", { machine: this.machine })
             this.hover = true
             if (this.building) {
-                // setInterval(() => {
                 this.building.planet.currentlyViewing = this
-                // }, 75)
             }
         })
 
-        this.on('pointerdown', () => {
-            // console.log("CLICKED DEVICE", { device: this })
-            // this.toggleActive();
-        })
+        // this.on('pointerdown', () => {
+        // })
 
         this.on('pointerleave', () => {
             this.hover = false
@@ -115,7 +111,15 @@ export class Device extends Actor {
             ctx.fillStyle = blockColor(produced).toRGBA()
             ctx.fillRect(bx + blockSize * index, by - blockSize + yOff, blockSize-1, blockSize-1)
         })
+
+        this.tinyDevices.forEach(d => d.draw(ctx, delta))
     }
+
+    // update(game, delta) {
+    //     super.update(game, delta)
+    //     this.tinyDevices.forEach(d => d.update(game, delta))
+
+    // }
 
     get name() { return this.machine.name }
     get description() { return this.machine.description }
@@ -250,29 +254,90 @@ export class Device extends Actor {
     }
 
     snap(planet: Planet, pos: Vector = this.pos) {
+        if (this.size === DeviceSize.Tiny) {
+            return this.snapTiny(planet, pos)
+        } else {
+            let bldg = planet.colony.closestBuildingByType(pos,
+                allStructures,
+                (bldg: Building) => {
+                    let hasSpace = bldg.hasPlaceForDevice()
+                    return hasSpace && bldg.structure.machines.some(Machine => this.machine instanceof Machine)
+
+                }
+            )
+
+            let snapped = false
+            if (bldg) {
+                let spot = bldg.nextDevicePlace().position
+                let d = spot.distance(pos)
+                snapped = d < 150
+            }
+
+            if (snapped) {
+                this.building = bldg;
+                this.pos = this.building.nextDevicePlace().position
+            } else {
+                this.pos = pos
+            }
+
+            return snapped
+        }
+    }
+
+    private snapTiny(planet: Planet, pos: Vector) {
+        // okay, we need the closest building with any built machine that HAS a tiny slot
         let bldg = planet.colony.closestBuildingByType(pos,
             allStructures,
-            (bldg: Building) => {
-                let hasSpace = bldg.hasPlaceForDevice()
-                return hasSpace && bldg.structure.machines.some(Machine => this.machine instanceof Machine)
-
-            }
+            (bldg: Building) => bldg.getDevices().some(
+                (device: Device) => device.built && device.hasTinyPlace()
+            )
         )
 
-        let snapped = false
-        if (bldg) {
-            let spot = bldg.nextDevicePlace().position
-            let d = spot.distance(pos)
-            snapped = d < 150
-        }
+        // todo look at all devices? (closest bldg may not house closest device!!)
+        let device: Device = closest(
+            pos,
+            bldg.getDevices().filter((d: Device) => d.built && d.hasTinyPlace()),
+            (d: Device) => d.pos,
+        )
 
-        if (snapped) {
-            this.building = bldg;
-            this.pos = this.building.nextDevicePlace().position
-        } else {
-            this.pos = pos
+        this.pos = pos
+        let snapped = false
+        if (device) {
+            let spot = device.nextTinyPlace().add(device.pos).add(device.building.pos)
+            let d = spot.distance(pos)
+            snapped = d < 50
+
+            if (snapped) {
+                this.building = device.building
+                this.parentDevice = device
+                this.pos = spot
+            }
         }
 
         return snapped
+    }
+
+    public parentDevice: Device = null
+    tinyDevices: Device[] = []
+    private hasTinyPlace() {
+        if (!this.machine.tinySlots) {
+            return false
+        } else {
+            return this.tinyDevices.length < 3
+        }
+    }
+
+    private nextTinyPlace() {
+        let tx0 = -this.getWidth()/3, ty0 = -2
+        let ndx = this.tinyDevices.length
+        return new Vector(tx0 + (ndx * 14), ty0)
+    }
+
+    public addTinyDevice(device: Device) {
+        console.log("ADD TINY DEVICE", { device: device.machine })
+        // device.pos = this.nextTinyPlace().add(this.pos)
+        device.pos.addEqual(this.pos.add(this.nextTinyPlace()))
+        this.tinyDevices.push(device)
+        this.add(device)
     }
 }

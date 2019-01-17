@@ -48,7 +48,9 @@ export class Card extends Actor {
             src = this.entity.machine.image
         }
         // console.log("img src", { src })
-        this.image.src = src
+        if (src) {
+            this.image.src = src
+        }
     }
 
 }

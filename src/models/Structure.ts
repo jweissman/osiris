@@ -25,6 +25,8 @@ const largeBelow = largeMachines.filter(machine => !(new machine()).forDome)
 const hugeDome = hugeMachines.filter(machine => (new machine()).forDome)
 const hugeBelow = hugeMachines.filter(machine => !(new machine()).forDome)
 
+const medGroundVehicles = mediumMachines.filter(machine => (new machine()).isVehicle)
+
 export class Structure {
     name: string = '(structure name)';
     description: string = '(structure description)';
@@ -296,24 +298,16 @@ export class Arcology extends Dome {
 
 }
 
-//////
+/// vehicles...!
 
-// export class MissionControl extends Structure {
-//     name: string = 'Mission Control';
-//     description: string = 'Keeping everything on track';
-//     view: string = 'MissionControlView';
-//     width: number = 6 * major.eighth
-//     height: number = 1 * major.sixth
-//     zoom = 0.1
-//     connections: { [key in Orientation]: (typeof Structure)[] } = {
-//         [Orientation.Left]: [ SurfaceRoad ],
-//         [Orientation.Right]: [ SurfaceRoad ],
-//         [Orientation.Up]: [ MainTunnel ],
-//         [Orientation.Down]: [ MainTunnel ],
-//     }
+export class GroundVehiclePool extends Dome {
+    name = 'Veh. Pool'
+    // view = 'G'
+    width = 2 * major.eighth
+    height = minor.second
+    machines = medGroundVehicles
+}
 
-//     machines = [ CommandCenter ]
-// }
 
 export const allStructures =
     [

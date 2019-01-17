@@ -49,8 +49,8 @@ export class Citizen extends Actor {
         this.eatingStrategy = new WhenHungryEatingStrategy(this)
     }
 
-    get isHungry() { return this.hunger > 0.6 }
-    get isTired()  { return this.energy < 85 }
+    get isHungry() { return this.hunger > 0.3 }
+    get isTired()  { return this.energy < 45 }
 
     // get isWorking() { return this.isWorking }
     get currentPlanet() { return this.planet }
@@ -209,8 +209,8 @@ export class Citizen extends Actor {
         let choice = this.strategies.find(strat => strat.canApply())
         if (choice) {
             await choice.attempt()
-            this.energy -= 5
-            this.hunger += 0.04
+            this.energy -= 1
+            this.hunger += 0.01
         }
         this.isPlanning = false
     }

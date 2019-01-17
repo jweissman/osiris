@@ -83,6 +83,9 @@ export class Machine {
 
     capacity: boolean
 
+    isVehicle: boolean = false
+
+    tinySlots: boolean = false
 
     concretize(): Machine { return this; } 
 
@@ -116,8 +119,6 @@ export class CommandCenter extends Machine {
         }
         let { building } = device
         building.populate(device.pos.add(building.pos), true)
-
-        // building.updateFunction()
     }
 }
 
@@ -183,7 +184,24 @@ export class WaterCondensingMachine extends Machine {
     }
 }
 
-/// small subsurface
+// tiny
+export class LavaLamp extends Machine {
+    name = 'Lava Lamp'
+    description = 'mesmerizing'
+    size = DeviceSize.Tiny
+    prereqs = [ Table ]
+    // image  = [lava-lamp]
+}
+
+// /// small subsurface
+
+export class Table extends Machine {
+    name = 'Table'
+    description = 'a simple table'
+    image = images.bench
+    // this device provides slots for tiny-sized deviecs
+    tinySlots = true
+}
 
 export class Statue extends Machine {
     name = 'Statue'
@@ -799,4 +817,7 @@ export const allMachines = [
     Couch,
     Statue,
     Codex,
+
+    Table,
+    LavaLamp,
 ]
