@@ -201,6 +201,18 @@ export class LavaLamp extends Machine {
     }
 }
 
+export class Figurine extends Machine {
+    name = 'Figurine'
+    description = 'not an action figure'
+    size = DeviceSize.Tiny
+    prereqs = [ Table ]
+    image = images.statue   
+    economy = {
+        ...emptyMarket(),
+        Beauty: { supply: 0.1, demand: 0 },
+    }
+}
+
 // /// small subsurface
 
 export class Table extends Machine {
@@ -217,9 +229,10 @@ export class Statue extends Machine {
     economy = {
         ...emptyMarket(),
         Hope: { supply: 0.1, demand: 0 },
-        Beauty: { supply: 0.1, demand: 0 },
+        Beauty: { supply: 1, demand: 0 },
     }
     image = images.statue
+    prereqs = [ Figurine ]
 }
 
 export class StudyMachine extends Machine {
@@ -828,4 +841,6 @@ export const allMachines = [
 
     Table,
     LavaLamp,
+
+    Figurine,
 ]

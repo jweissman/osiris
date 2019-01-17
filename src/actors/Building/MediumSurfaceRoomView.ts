@@ -18,11 +18,18 @@ export class MediumSurfaceRoomView extends Building {
     devicePlaceCount = 3
     get floorHeight() { return this.getHeight() / 6 }
 
+   nodes(): Vector[] {
+        let x = this.pos.x + this.getWidth()/2;
+        let y = this.pos.y + this.getHeight() - 16
+        return [
+            new Vector(Math.floor(x), Math.floor(y))
+        ];
+    }
     devicePlaces() {
         let w = this.getWidth()/2
         let x = this.pos.x + w;
-        let y = this.pos.y + this.getHeight() - this.floorHeight // - 10 
-        y -= getVisibleDeviceSize(this.devicePlaceSize) / 3.5 ///2
+        let y = this.pos.y + this.getHeight() - this.floorHeight - 12 
+        y -= getVisibleDeviceSize(this.devicePlaceSize) / 3.5
 
         let ds = [
             new Vector(x - w/2, y),
@@ -31,15 +38,18 @@ export class MediumSurfaceRoomView extends Building {
         ]
 
         return ds.map(d => new DevicePlace(d, this.devicePlaceSize)) 
-        //DeviceSize.Small))
     }
+
+    //deviceInteractionPlaces() {
+
+    //}
 
     graph(sg) {
         let g = super.graph(sg)
         let find = (s: Vector) => g.findOrCreate(s, measureDistance)
         let slots: Vector[] = this.slots().map(s => s.pos)
         // draw from left slot to each device place to right slot?
-        let devices = this.devicePlaces().map(d => find(d.position))
+        let devices = this.deviceInteractionPlaces().map(p => find(p)) //d.position))
         eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
 
         if (this.isGroundFloor) {
@@ -75,7 +85,7 @@ export class MediumSurfaceRoomView extends Building {
         theSlots.push(
             this.buildSlot(
                 this.pos.x + this.getWidth() / 2,
-                this.pos.y + this.getHeight() + 1, // + (2*this.floorHeight),
+                this.pos.y + this.getHeight(), // + (2*this.floorHeight),
                 Orientation.Down
             )
         )

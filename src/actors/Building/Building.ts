@@ -78,8 +78,8 @@ export class Building extends Actor {
         this.collisionType = CollisionType.PreventCollision
 
         this.nameLabel = new Label(this.structure.name, 0, 0, 'Helvetica')
-        this.nameLabel.fontSize = 16
-        this.nameLabel.fontStyle = FontStyle.Italic
+        this.nameLabel.fontSize = 9
+        // this.nameLabel.fontStyle = FontStyle.Italic
         this.nameLabel.color = Color.White
 
         if (this.structure.infra) { this.active = true }
@@ -96,6 +96,7 @@ export class Building extends Actor {
 
         if (this.showLabel && this.spaceFunction) {
             this.nameLabel.pos = this.pos.add(new Vector(28, 24)) //get getCenter().
+            // this.nameLabel.color = Color.White
             // this.nameLabel.pos.x = this.getCenter().x //ctx.measureText(this.structure.name).width / 2
             // this.nameLabel.pos.x -= ctx.measureText(this.structure.name).width / 2
             this.nameLabel.draw(ctx, delta)
@@ -251,14 +252,20 @@ export class Building extends Actor {
         let x = this.pos.x + this.getWidth()/2;
         let y = this.pos.y + this.getHeight()
         return [
-            new Vector(Math.floor(x), Math.floor(y)-4)
+            new Vector(Math.floor(x), Math.floor(y))
         ];
     }
 
     devicePlaces(): DevicePlace[] {
         return []; //this.nodes();
     }
-    
+
+    deviceInteractionPlaces(): Vector[] {
+        return this.devicePlaces().map(place => {
+            place.position.y += (place.visibleSize/2)
+            return place.position
+        })
+    }
 
     graph(supergraph: Graph<Vector> = new Graph()): Graph<Vector> {
         let g = supergraph

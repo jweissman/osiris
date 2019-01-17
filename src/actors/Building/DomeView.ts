@@ -1,7 +1,7 @@
 import { Color, Vector } from "excalibur";
 import { Building, DevicePlace } from "./Building";
 import { Orientation } from "../../values/Orientation";
-import { DeviceSize } from "../../values/DeviceSize";
+import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { Graph } from "../../values/Graph";
 import { measureDistance, eachCons } from "../../Util";
 
@@ -15,7 +15,7 @@ export class DomeView extends Building {
 
         let slots: Vector[] = this.slots().map(s => s.pos)
         let leftSlot = find(slots[0]), rightSlot = find(slots[slots.length-1])
-        let devices = this.devicePlaces().map(d => find(d.position))
+        let devices = this.deviceInteractionPlaces().map(position => find(position))
         g.edge(leftSlot, devices[0])
         eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
         g.edge(devices[devices.length-1], rightSlot)
@@ -75,15 +75,18 @@ export class DomeView extends Building {
 
     colorBase() { return Color.White.clone().darken(0.05); } 
 
+    deviceSize = DeviceSize.Small
+    devicePlaceCount = 2
     devicePlaces() {
         let w = this.getWidth()/2
         let x = this.pos.x + w;
-        let y = this.pos.y + this.getHeight() - 6
+        let y = this.pos.y + this.getHeight() - getVisibleDeviceSize(this.deviceSize)/3 // - 16
         let ds = [
             new Vector(x - w/3, y),
+            ...(this.devicePlaceCount === 3 ? [new Vector(x,y)] : []),
             new Vector(x + w/3, y),
         ]
 
-        return ds.map(d => new DevicePlace(d, DeviceSize.Small))
+        return ds.map(d => new DevicePlace(d, this.deviceSize)) // DeviceSize.Small))
     }
 }

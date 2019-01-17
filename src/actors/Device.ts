@@ -67,7 +67,7 @@ export class Device extends Actor {
     }
 
     get imageX() { return this.pos.x - this.getWidth() / 2 }
-    get imageY() { return this.pos.y - this.getHeight() / 2 - 10 }
+    get imageY() { return this.pos.y - this.getHeight() / 2 } //- 10 }
 
     get economy() { return this.built ? this.computeEconomy() : emptyMarket() }
 
@@ -101,7 +101,7 @@ export class Device extends Actor {
             }
         }
 
-        let iv = new Vector(this.imageX, this.imageY)
+        let iv = new Vector(this.imageX, this.imageY + this.getHeight() / 8)
 
         let showLabel = true
         if (showLabel) {

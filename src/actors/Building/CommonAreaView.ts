@@ -106,9 +106,8 @@ export class CommonAreaView extends Building {
         let g = super.graph(sg)
         let slots: Slot[] = this.slots()
         let find = (s: Vector) => g.findOrCreate(s, measureDistance)
-        // draw from left slot to each device place to right slot?
         let leftSlot = find(slots[0].pos), rightSlot = find(slots[1].pos)
-        let devices = this.devicePlaces().map(d => find(d.position))
+        let devices = this.deviceInteractionPlaces().map(p => find(p))
         g.edge(leftSlot, devices[0])
         eachCons(devices, 2).forEach(([left, right]) => g.edge(left, right))
         g.edge(devices[devices.length-1], rightSlot)
@@ -125,7 +124,7 @@ export class CommonAreaView extends Building {
     devicePlaces() {
         let w = this.getWidth()/2
         let x = this.pos.x + w;
-        let y = this.pos.y + this.getHeight() - this.floorHeight // - 10 
+        let y = this.pos.y + this.getHeight() - this.floorHeight - 10 
         y -= getVisibleDeviceSize(this.devicePlaceSize) / 3.5 ///2
 
         let ds = [

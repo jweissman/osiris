@@ -15,7 +15,7 @@ import { SleepingStrategy } from "../strategies/SleepingStrategy";
 import { AnyBedSleepingStrategy } from "../strategies/AnyBedSleepingStrategy";
 import { EatingStrategy } from "../strategies/EatingStrategy";
 import { WhenHungryEatingStrategy } from "../strategies/WhenHungryEatingStrategy";
-import { DeviceSize } from "../values/DeviceSize";
+import { DeviceSize, getVisibleDeviceSize } from "../values/DeviceSize";
 
 export class Citizen extends Actor {
     isPlanning: boolean = false // 
@@ -172,17 +172,18 @@ export class Citizen extends Actor {
             const path = this.planet.pathBetweenPoints(this.pos.clone(), target)
             await this.followPath(path)
         }
-        // let target = device.pos.add(device.building.pos)
         await this.glideTo(target)
         this.currentBuilding = device.building
     }
 
     private targetForDevice(device: Device) {
         let target = device.pos.add(device.building.pos)
-        if (device.parentDevice) { //size === DeviceSize.Tiny) {
-            // console.log("device has parent!!")
-            target = (device.parentDevice.pos).add(device.building.pos) //target.add(device.parentDevice.pos)
-            target.x = target.x + device.pos.x
+        if (device.parentDevice) {
+            target = (device.parentDevice.pos).add(device.building.pos)
+            target.x += device.pos.x
+            target.y += getVisibleDeviceSize(device.parentDevice.size) / 2
+        } else {
+            target.y += getVisibleDeviceSize(device.size) / 2
         }
         return target
     }

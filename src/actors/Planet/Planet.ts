@@ -37,7 +37,7 @@ export class Planet extends Actor {
         this.add(this.sky)
 
         let yBase = -depth / 2
-        let crustHeight = 24
+        let crustHeight = 40
         this.createLayer(yBase, crustHeight, this.color.lighten(0.45))
 
 

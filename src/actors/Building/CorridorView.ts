@@ -9,6 +9,13 @@ export class CorridorView extends Building {
     pickingOrigin: boolean = true
     facing: Orientation = Orientation.Left
 
+   nodes(): Vector[] {
+        let x = this.pos.x + this.getWidth()/2;
+        let y = this.pos.y + this.getHeight()/2
+        return [
+            new Vector(Math.floor(x), Math.floor(y))
+        ];
+    }
     colorBase() { return this.color.darken(0.2); }
 
     slots() {
