@@ -32,6 +32,8 @@ const miner = require('../images/miner-plain.svg')
 const statue = require('../images/statue-plain.svg')
 const codex = require('../images/codex-plain.svg')
 
+const lavaLamp = require('../images/lava-lamp-plain.svg')
+
 const images = {
     bookshelf: bookshelfSvg,
     vat: vatSvg,
@@ -59,6 +61,7 @@ const images = {
     statue,
 
     codex,
+    lavaLamp,
 }
 
 
@@ -190,7 +193,12 @@ export class LavaLamp extends Machine {
     description = 'mesmerizing'
     size = DeviceSize.Tiny
     prereqs = [ Table ]
-    // image  = [lava-lamp]
+    image  = images.lavaLamp
+    economy = {
+        ...emptyMarket(),
+        Joy: { supply: 1, demand: 0 },
+        Power: { supply: 0, demand: 0.1 },
+    }
 }
 
 // /// small subsurface

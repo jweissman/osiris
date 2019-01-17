@@ -1,7 +1,7 @@
 import { Actor, Label, Color, Vector } from "excalibur";
 import { Machine } from "../models/Machine";
 import { Building } from "./Building";
-import { ResourceBlock, blockColor, emptyMarket } from "../models/Economy";
+import { ResourceBlock, blockColor, emptyMarket, sumMarkets } from "../models/Economy";
 import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
@@ -36,7 +36,8 @@ export class Device extends Actor {
             initialPos.y,
             getVisibleDeviceSize(machine.size),
             getVisibleDeviceSize(machine.size),
-            machine.color
+            Color.Transparent
+            // machine.color
         )
 
         this.nameLabel = new Label(this.machine.name, 0, 0, 'Helvetica')
@@ -50,17 +51,16 @@ export class Device extends Actor {
         this.on('pointerenter', () => {
             console.log("HOVER OVER", { machine: this.machine })
             this.hover = true
-            if (this.building) {
+            let tinyDevices = this.tinyDevices.length > 0 &&
+              this.tinyDevices.some(d => d.hover)
+            if (this.building && !tinyDevices) {
                 this.building.planet.currentlyViewing = this
             }
         })
 
-        // this.on('pointerdown', () => {
-        // })
-
         this.on('pointerleave', () => {
             this.hover = false
-            if (this.building) {
+            if (this.building && this.building.planet.currentlyViewing === this) {
                 this.building.planet.currentlyViewing = null
             }
         })
@@ -69,7 +69,12 @@ export class Device extends Actor {
     get imageX() { return this.pos.x - this.getWidth() / 2 }
     get imageY() { return this.pos.y - this.getHeight() / 2 - 10 }
 
-    get economy() { return this.built ? this.machine.economy : emptyMarket() }
+    get economy() { return this.built ? this.computeEconomy() : emptyMarket() }
+
+    private computeEconomy() {
+        let econs = [ this.machine.economy, ...this.tinyDevices.map(d => d.economy) ]
+        return econs.reduce(sumMarkets, emptyMarket())
+    }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (this.imageLoaded) {
@@ -112,14 +117,9 @@ export class Device extends Actor {
             ctx.fillRect(bx + blockSize * index, by - blockSize + yOff, blockSize-1, blockSize-1)
         })
 
-        this.tinyDevices.forEach(d => d.draw(ctx, delta))
+        super.draw(ctx ,delta)
+        // this.tinyDevices.forEach(d => d.draw(ctx, delta))
     }
-
-    // update(game, delta) {
-    //     super.update(game, delta)
-    //     this.tinyDevices.forEach(d => d.update(game, delta))
-
-    // }
 
     get name() { return this.machine.name }
     get description() { return this.machine.description }
@@ -133,8 +133,6 @@ export class Device extends Actor {
                 citizen.drop(res)
             }
             this.built = true
-            // this.building.updateFunction()
-            // this.building.planet.upd
         }
     }
 
@@ -328,15 +326,15 @@ export class Device extends Actor {
     }
 
     private nextTinyPlace() {
-        let tx0 = -this.getWidth()/3, ty0 = -2
+        let tx0 = -this.getWidth()/3, ty0 = -3
         let ndx = this.tinyDevices.length
         return new Vector(tx0 + (ndx * 14), ty0)
     }
 
     public addTinyDevice(device: Device) {
         console.log("ADD TINY DEVICE", { device: device.machine })
-        // device.pos = this.nextTinyPlace().add(this.pos)
-        device.pos.addEqual(this.pos.add(this.nextTinyPlace()))
+        device.pos = this.nextTinyPlace() //.add(this.pos)
+        // device.pos.addEqual(this.pos.add(this.nextTinyPlace()))
         this.tinyDevices.push(device)
         this.add(device)
     }

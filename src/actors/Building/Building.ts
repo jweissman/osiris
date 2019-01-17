@@ -78,7 +78,7 @@ export class Building extends Actor {
         this.collisionType = CollisionType.PreventCollision
 
         this.nameLabel = new Label(this.structure.name, 0, 0, 'Helvetica')
-        this.nameLabel.fontSize = 14
+        this.nameLabel.fontSize = 16
         this.nameLabel.fontStyle = FontStyle.Italic
         this.nameLabel.color = Color.White
 
@@ -95,7 +95,7 @@ export class Building extends Actor {
         super.draw(ctx, delta)
 
         if (this.showLabel && this.spaceFunction) {
-            this.nameLabel.pos = this.pos.add(new Vector(32, 24)) //get getCenter().
+            this.nameLabel.pos = this.pos.add(new Vector(28, 24)) //get getCenter().
             // this.nameLabel.pos.x = this.getCenter().x //ctx.measureText(this.structure.name).width / 2
             // this.nameLabel.pos.x -= ctx.measureText(this.structure.name).width / 2
             this.nameLabel.draw(ctx, delta)
