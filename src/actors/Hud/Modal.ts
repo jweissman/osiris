@@ -40,17 +40,21 @@ export class Modal {
         this._element.style.flexWrap = 'wrap';
         this._element.style.width = '200px';
         this._element.style.border = 'none'; //1px solid black'; //0.5px solid white';
+        document.body.appendChild(this._element);
+
         let title = document.createElement('div');
         title.textContent = this.title;
         title.style.fontFamily = 'Verdana';
-        title.style.fontSize = '7pt';
-        title.style.fontWeight = '400';
+        title.style.fontSize = '8pt';
+        title.style.fontWeight = '700';
+        title.style.textTransform = 'uppercase';
         title.style.width = '200px';
         title.style.color = Color.White.toRGBA();
         title.style.backgroundColor = Color.Violet.darken(0.92).toRGBA();
         title.style.padding = '4px';
         title.style.margin = '0px';
         this._element.appendChild(title);
+
         let body = document.createElement('div');
         body.textContent = this.message;
         body.style.fontFamily = 'Verdana';
@@ -62,7 +66,6 @@ export class Modal {
         body.style.padding = '4px';
         body.style.margin = '0px';
         this._element.appendChild(body);
-        document.body.appendChild(this._element);
     }
 
     private buttonFactory(label: string, color: Color = Color.DarkGray) {

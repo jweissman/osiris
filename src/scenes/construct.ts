@@ -75,12 +75,18 @@ export class Construct extends Scene {
             new Timer(() => { this.stepTime() }, this.timeStepIntervalMillis, true)
         )
 
-        this.systemMessage("HELLOOOO")
+        this.systemMessage(
+            "Welcome to the Colony, sir... "
+            + "We are what is left of the crew of the Osiris. "
+            + "Can you help us build a functioning society? "
+            + "First, choose a location for the Command post. "
+            + "Then we'll lay out some infrastructure."
+        )
     }
 
     systemMessage(message: string) {
         this.hasActiveModal = true
-        this.hud.systemMessage("hello world", "hey commander", {
+        this.hud.systemMessage(message, "commander, a moment", {
             dismiss: () => { this.closeSystemMessage() }
         })
         //, () => {
@@ -267,8 +273,10 @@ export class Construct extends Scene {
         let nextMissing = this.nextMissingStructureOrFunction() //this.nextMissingRequiredStructure();
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
+            this.systemMessage(`Now we need to build a ${structure.name}...`)
             this.startConstructing(structure, pos)
         } else {
+            // this.systemMessage(`Now we need to build a ${structure.name}...`)
             this.hud.showPalettes()
         }
     }

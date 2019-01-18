@@ -7,7 +7,6 @@ import { Resource } from "excalibur";
 export class CapacityBasedProduction extends ProductionStrategy {
     canApply(): boolean {
         let hasOpenStore = !!(this.findStore())
-        console.log("Do we have an open store?", hasOpenStore)
         return hasOpenStore
     }
 
@@ -18,19 +17,15 @@ export class CapacityBasedProduction extends ProductionStrategy {
 
 
         if (recipe && containsUniq(this.planet.storedResources, recipe.consumes)) {
-            // if (
-                if (await this.workRecipe(recipe)) {
-                    await this.storeBlock(recipe.produces)
-                }
-            // }
+            if (await this.workRecipe(recipe)) {
+                await this.storeBlock(recipe.produces)
+            }
         } else if (explorer) {
-            // console.warn("would explore!")
             if (await this.workExploration(explorer)) {
                 await this.storeBlock(explorer.gathers)
             }
         } else {
-            console.warn("No recipe or explorer!")
-            /// ....
+            // console.warn("No recipe or explorer!")
         }
     }
 

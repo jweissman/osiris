@@ -34,7 +34,6 @@ export abstract class Strategy {
                 explores.push(op)
             }
         })
-        console.log("Found all explorers: ", { explores })
         return explores;
     }
 
@@ -59,7 +58,6 @@ export abstract class Strategy {
     }
 
     protected async gatherBlock(res: ResourceBlock): Promise<boolean> {
-        console.debug("GATHER BLOCK", { res })
         let gathered = false
         let generatesDesiredBlock = (d: Device) => (d.operation.type === 'generator') &&
             d.product.some(stored => res === stored) //&& !d.inUse
@@ -73,14 +71,12 @@ export abstract class Strategy {
 
         if (device) {
             // device.inUse = true
-            console.debug("Found device to gather, visting...")
             await this.visitDevice(device)
 
             if (device.inUse) {
                 // at least wait a bit and try again?
                 let waitTimes = 0
                 while (device.inUse) {
-                    console.warn("waiting for device to be ready!")
                     await this.pause() //sleep(5000) //this.pause()
                     if (waitTimes++ > 10) {
                         return false 
@@ -88,9 +84,7 @@ export abstract class Strategy {
                 }
             }
 
-            console.debug("Attempt to interact with device...")
             if (await device.interact(this.pawn, retrieveResource(res))) {
-                console.debug("Interacted successfully!")
                 gathered = true
             }
         } else {
@@ -166,7 +160,6 @@ export abstract class Strategy {
         if (!this.pawn.isCarryingUnique(blocks)) {
             console.debug("Gathering blocks...")
             for (let ingredient of blocks) {
-                console.debug("attempting to gather", { ingredient })
                 let tries = 0
                 let gathered = false
                 while (!gathered && tries < 20) {

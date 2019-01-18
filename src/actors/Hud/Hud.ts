@@ -62,8 +62,8 @@ export class Hud extends UIActor {
     // modal: { message: string, title: string } = null
     systemMessage(message: string, title: string = 'Commander, a message for you',
       buttons: { [intent: string]: () => any }) { //} = { dismiss: () => this.closeSystemMessage() }) {
-        console.log("SET MODAL", { message })
-        this.modal = new Modal(title, message, this.getWidth()/2, this.getHeight()/2)
+        // console.log("SET MODAL", { message })
+        this.modal = new Modal(title, message, this.getWidth()/2 - 100, this.getHeight()/2 - 200)
         this.modal.addButtons(buttons)
 
         // this.showModal = true
