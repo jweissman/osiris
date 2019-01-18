@@ -7,7 +7,7 @@ import { retrieveResource, drive } from "../values/InteractionRequest";
 import { Recipe, MechanicalOperation, ExploreForResource } from "../models/MechanicalOperation";
 
 export abstract class Strategy {
-    private sleepInterval: number = 50
+    private sleepInterval: number = 150
     protected isActive: boolean = false;
     constructor(protected pawn: Citizen) { }
 

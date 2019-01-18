@@ -138,8 +138,8 @@ export class Device extends Actor {
     async assemble(citizen: Citizen) {
         if (citizen.isCarryingUnique(this.machine.cost)) {
             for (let res of this.machine.cost) {
-                await citizen.progressBar(1000)
                 citizen.drop(res)
+                await citizen.progressBar(3000)
             }
             this.built = true
         }
@@ -174,10 +174,11 @@ export class Device extends Actor {
             let storeOrExplore: ResourceStorage | ExploreForResource = op
             if (request && request.type === 'retrieve') { // assume dispense request for now?
                 this.inUse = true
+                await citizen.progressBar(1000)
                 worked = this.dispense(citizen, request)
-                if (worked) {
-                    await citizen.progressBar(500)
-                }
+                //if (worked) {
+                //    await citizen.progressBar(500)
+                //}
                 this.inUse = false
             } else {
                 if (storeOrExplore.type === 'store') {
@@ -217,7 +218,8 @@ export class Device extends Actor {
             citizen.driving = this
             // let oldAnchor = citizen.anchor
             // citizen.anchor = this.anchor
-            await this.actions.moveTo(this.pos.x - 2500, this.pos.y, groundSpeed).asPromise()
+            let xOff = 5000 * (Math.random() > 0.5 ? -1 : 1)
+            await this.actions.moveTo(this.pos.x + xOff, this.pos.y, groundSpeed).asPromise()
             // for (let times in range(op.capacity)) {
             this.produceResource(op.gathers)
             // }

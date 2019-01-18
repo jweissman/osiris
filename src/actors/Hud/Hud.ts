@@ -97,6 +97,12 @@ export class Hud extends UIActor {
 
     }
 
+    // breakingNews()
+    modal(message: string) {
+
+    }
+
+
     showPalettes() {
         this.hidePalettes = false
     }

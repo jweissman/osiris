@@ -6,8 +6,20 @@ import { Strategy } from "./Strategy";
 
 export abstract class ProductionStrategy extends Strategy {
 
-
     protected async storeBlock(res: ResourceBlock) {
+        let stored = false
+        let tries = 0
+        while (!stored && tries < 30) {
+            tries++
+            if (await this.tryStoreBlock(res)) {
+                stored = true
+            } else {
+                await this.pause()
+            }
+        }
+    }
+
+    private async tryStoreBlock(res: ResourceBlock): Promise<boolean> {
         let storesDesiredBlock = (d: Device) => d.operation.type === 'store' &&
             d.product.length < d.getEffectiveOperationalCapacity(d.operation) && //operation.capacity &&
             d.operation.stores.includes(res)
@@ -20,10 +32,13 @@ export abstract class ProductionStrategy extends Strategy {
             }
         }
 
-        if (!stored) {
-            // await this.pause()
-            await this.storeBlock(res)
-        }
+        //if (!stored) {
+        //    await this.pause()
+        //    // should try agi
+        //    // await this.storeBlock(res)
+        //}
+
+        return stored
     }
 
 }
