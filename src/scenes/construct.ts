@@ -29,6 +29,8 @@ export class Construct extends Scene {
 
     time: number = Game.startHour*60
 
+    hasActiveModal: boolean = false
+
     static requiredStructuresAndFunctions: (typeof SpaceFunction | typeof Structure)[] = [
         MissionControl,
         SurfaceRoad,
@@ -72,7 +74,25 @@ export class Construct extends Scene {
         this.addTimer(
             new Timer(() => { this.stepTime() }, this.timeStepIntervalMillis, true)
         )
+
+        this.systemMessage("HELLOOOO")
     }
+
+    systemMessage(message: string) {
+        this.hasActiveModal = true
+        this.hud.systemMessage("hello world", "hey commander", {
+            dismiss: () => { this.closeSystemMessage() }
+        })
+        //, () => {
+        //    this.hasActiveModal = false
+        //})
+    }
+
+    private closeSystemMessage() {
+        this.hud.closeSystemMessage()
+        this.hasActiveModal = false
+    }
+
 
     timeStepIntervalMillis: number = 50
     private stepTime() { 
@@ -82,6 +102,8 @@ export class Construct extends Scene {
 
     public onActivate() {
         this.game.input.pointers.primary.on('move', (e: Input.PointerMoveEvent) => {
+            if (this.hasActiveModal) { return }
+
             if (this.dragging) {
                 this.camera.pos = this.camera.pos.add(
                     this.dragOrigin.sub(e.pos)
@@ -108,6 +130,8 @@ export class Construct extends Scene {
         })
 
         this.game.input.pointers.primary.on('down', (e: Input.PointerDownEvent) => {
+            if (this.hasActiveModal) { return }
+
             if (e.button == Input.PointerButton.Left) {
                 const currentlyBuilding = this.planet.currentlyConstructing
                 if (currentlyBuilding) {
@@ -129,7 +153,7 @@ export class Construct extends Scene {
                                 this.placingFunction = null
                             }
 
-                            this.hud.setMessage(this.defaultMessage)
+                            this.hud.setStatus(this.defaultMessage)
                             this.planet.colony.currentlyConstructing = null
                             this.prepareNextBuilding(e.pos)
                             // this.hud.updateDetails(this.planet)
@@ -145,7 +169,7 @@ export class Construct extends Scene {
                                 bldg.addDevice(deviceUnderConstruction)
                             }
                             this.planet.colony.currentlyConstructing = null
-                            this.hud.setMessage(this.defaultMessage)
+                            this.hud.setStatus(this.defaultMessage)
                             // this.hud.updateDetails(this.planet)
                         }
                     }
@@ -157,6 +181,8 @@ export class Construct extends Scene {
         })
 
         this.game.input.pointers.primary.on('wheel', (e: Input.WheelEvent) => {
+            if (this.hasActiveModal) { return }
+
             let z = this.camera.getZoom()
             let step = 0.05
             let min = 0.05, max = 8
@@ -191,7 +217,7 @@ export class Construct extends Scene {
             } else if (e.key === Input.Keys.Esc) {
                 this.planet.colony.currentlyConstructing = null
                 this.placingFunction = null
-                this.hud.setMessage(this.defaultMessage); //'Welcome to the Colony, Commander.')
+                this.hud.setStatus(this.defaultMessage); //'Welcome to the Colony, Commander.')
             } else if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
                 moveCam(Up)
             } else if (e.key === Input.Keys.Left || e.key === Input.Keys.A) {
@@ -254,7 +280,7 @@ export class Construct extends Scene {
         let theNextOne = null
         if (structureOrMachine instanceof Structure) {
             let structure = structureOrMachine
-            this.hud.setMessage(`Place ${structure.name} (${structure.description})`)
+            this.hud.setStatus(`Place ${structure.name} (${structure.description})`)
             theNextOne = this.spawnBuilding(structure, pos)
             if (this.firstBuilding) {
                 this.camera.zoom(structure.zoom, 250)
@@ -263,12 +289,12 @@ export class Construct extends Scene {
             } 
         } else if (structureOrMachine instanceof Machine) {
             let machine = structureOrMachine
-            this.hud.setMessage(`Install ${machine.name} (${machine.description})`)
+            this.hud.setStatus(`Install ${machine.name} (${machine.description})`)
             theNextOne = this.spawnDevice(machine, pos)
             // this.camera.zoom(1.5, 250)
         } else if (structureOrMachine instanceof SpaceFunction) {
             let fn: SpaceFunction = structureOrMachine
-            this.hud.setMessage(`Place ${fn.name} (${fn.description})`)
+            this.hud.setStatus(`Place ${fn.name} (${fn.description})`)
             theNextOne = this.spawnFunction(fn, pos)
             this.placingFunction = fn
 

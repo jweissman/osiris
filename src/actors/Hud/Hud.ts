@@ -1,4 +1,4 @@
-import { UIActor, Label, Color } from "excalibur";
+import { UIActor, Label } from "excalibur";
 import { Structure, Corridor, SurfaceRoad, Ladder, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket, PureValue } from "../../models/Economy";
@@ -12,60 +12,20 @@ import { Card } from "./Card";
 import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { Palette } from "./Palette";
 import { Building } from "../Building";
-
-class Tabs { //extends UIActor {
-    //private structurePalette: Palette
-    //private machinePalette: Palette
-    //private functionPalette: Palette
-    // private active: number = null
-
-    _rootElement: HTMLDivElement
-    private tabs: {name: string, element: HTMLDivElement}[] = []
-
-    constructor(private x: number, private y: number, private title: string) { //}, x: number, y: number) {
-        // super(0,0,300,300)
-        this._rootElement = this.makeRootElement()
-    }
-
-    addTab(name: string, element: HTMLDivElement) {
-        this.tabs.push({ name, element })
-    }
-
-    draw(ctx: CanvasRenderingContext2D) {
-        if (this._rootElement) {
-            let left = ctx.canvas.offsetLeft;
-            let top = ctx.canvas.offsetTop;
-            this._rootElement.style.left = `${left + this.x}px`;
-            this._rootElement.style.top = `${top + this.y}px`;
-        }
-    }
-
-    private makeRootElement() {
-        let root = document.createElement('div')
-        root.style.position = 'absolute'
-        root.style.width = '240px'
-        root.style.padding = '10px'
-
-        let title = document.createElement('h2')
-        title.style.fontSize = '14pt'
-        root.appendChild(title)
-
-        return root
-    }
-    
-}
+import { Modal } from "./Modal";
 
 export class Hud extends UIActor {
     // private hint: Label
 
     private hidePalettes: boolean = true
-
     private structurePalette: Palette
     private machinePalette: Palette
     private functionPalette: Palette
     private card: Card
-
     private status: StatusAnalysisView
+
+    private modal: Modal = null
+
     static structuresForPalette = [
         SurfaceRoad,
         Corridor,
@@ -98,8 +58,24 @@ export class Hud extends UIActor {
     }
 
     // breakingNews()
-    modal(message: string) {
+    // showModal: boolean = false
+    // modal: { message: string, title: string } = null
+    systemMessage(message: string, title: string = 'Commander, a message for you',
+      buttons: { [intent: string]: () => any }) { //} = { dismiss: () => this.closeSystemMessage() }) {
+        console.log("SET MODAL", { message })
+        this.modal = new Modal(title, message, this.getWidth()/2, this.getHeight()/2)
+        this.modal.addButtons(buttons)
 
+        // this.showModal = true
+        // this.modal = {
+            // message, title
+        // }
+    }
+
+    closeSystemMessage() {
+        console.log("hide system message")
+        this.modal.teardown()
+        this.modal = null
     }
 
 
@@ -107,7 +83,7 @@ export class Hud extends UIActor {
         this.hidePalettes = false
     }
 
-    setMessage(text: string) { this.status.setMessage(text) }
+    setStatus(text: string) { this.status.setMessage(text) }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta)
@@ -116,6 +92,14 @@ export class Hud extends UIActor {
             this.machinePalette.draw(ctx)
             this.functionPalette.draw(ctx)
         }
+
+        if (this.modal) {
+            // console.log("okay, we have modal!!")
+            this.modal.draw(ctx)
+        } else {
+            // console.log("no modal")
+        }
+        // if (this.showModal)
     }
 
     update(game: Game, delta: number) {
