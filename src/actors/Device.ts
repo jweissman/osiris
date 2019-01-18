@@ -6,10 +6,11 @@ import { Citizen } from "./Citizen";
 import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
 import { getVisibleDeviceSize, DeviceSize } from "../values/DeviceSize";
-import { Recipe, ResourceStorage, MechanicalOperation, ResourceGenerator } from "../models/MechanicalOperation";
+import { Recipe, ResourceStorage, MechanicalOperation, ResourceGenerator, ExploreForResource } from "../models/MechanicalOperation";
 import { range, deleteByValueOnce, closest } from "../Util";
 import { drawRect } from "../Painting";
-import { InteractionRequest } from "../values/InteractionRequest";
+import { InteractionRequest, retrieveResource } from "../values/InteractionRequest";
+import { Game } from "../Game";
 
 export class Device extends Actor {
     // constructionMaterials: ResourceBlock[] = []
@@ -78,27 +79,35 @@ export class Device extends Actor {
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (this.imageLoaded) {
+            ctx.save()
             if (!this.built) { ctx.globalAlpha = 0.5 }
+            ctx.translate(this.imageX, this.imageY)
+            if (this.vel.x > 0) {
+                // flip? (assume we're drawn facing left)
+                ctx.translate(this.getWidth(), 0)
+                ctx.scale(-1,1)
+            }
             ctx.drawImage(
                 this.image,
-                this.imageX,
-                this.imageY,
+                0,
+                0, //this.imageY,
 
                 this.getWidth(),
                 this.getHeight()
             )
-            if (!this.built) { ctx.globalAlpha = 1.0 }
+            // if (!this.built) { ctx.globalAlpha = 1.0 }
 
             if (this.hover) {
                 let c = Color.White.clone()
                 c.a = 0.6
                 drawRect(
                     ctx,
-                    { x: this.imageX, y: this.imageY, width: this.getWidth(), height: this.getHeight() },
+                    { x: 0, y: 0, width: this.getWidth(), height: this.getHeight() },
                     0,
                     c
                 )
             }
+            ctx.restore()
         }
 
         let iv = new Vector(this.imageX, this.imageY + this.getHeight() / 8)
@@ -160,9 +169,9 @@ export class Device extends Actor {
                 }
                 this.inUse = false
             }
-        } else if (op.type === 'store') {
+        } else if ((op.type === 'store' || op.type === 'explore') && (request.type === 'retrieve' || request.type === 'store')) {
             // accept it! (whatever you have that matches...?)
-            let store: ResourceStorage = op
+            let storeOrExplore: ResourceStorage | ExploreForResource = op
             if (request && request.type === 'retrieve') { // assume dispense request for now?
                 this.inUse = true
                 worked = this.dispense(citizen, request)
@@ -170,16 +179,21 @@ export class Device extends Actor {
                     await citizen.progressBar(500)
                 }
                 this.inUse = false
-            } else if (request && request.type === 'store' &&
-                citizen.carrying.some(it => store.stores.includes(it))) { // maybe trying to store?
-                if (this.product.length < this.getEffectiveOperationalCapacity(store)) { // store.capacity) {
-                    let res = null
-                    if (store.stores.some(stored => { res = citizen.drop(stored); return res })) {
-                        if (res) {
-                            this.produceResource(res)
-                            // this.product.push(res)
-                            // this.building.redeem(res)
-                            worked = true
+            } else {
+                if (storeOrExplore.type === 'store') {
+                    let store: ResourceStorage = storeOrExplore
+                    if (request.type === 'store' &&
+                        citizen.carrying.some(it => store.stores.includes(it))) { // maybe trying to store?
+                        if (this.product.length < this.getEffectiveOperationalCapacity(store)) { // store.capacity) {
+                            let res = null
+                            if (store.stores.some(stored => { res = citizen.drop(stored); return res })) {
+                                if (res) {
+                                    this.produceResource(res)
+                                    // this.product.push(res)
+                                    // this.building.redeem(res)
+                                    worked = true
+                                }
+                            }
                         }
                     }
                 } else {
@@ -194,14 +208,39 @@ export class Device extends Actor {
                 await citizen.progressBar(500)
             }
             this.inUse = false
+        } else if (op.type === 'explore') {
+            this.inUse = true
+            // this.add(citizen)
+            // if (this.product.length < this.getEffectiveOperationalCapacity(op)) {
+            let origX = this.pos.x
+            let groundSpeed = Game.citizenSpeed * 3
+            citizen.driving = this
+            // let oldAnchor = citizen.anchor
+            // citizen.anchor = this.anchor
+            await this.actions.moveTo(this.pos.x - 2500, this.pos.y, groundSpeed).asPromise()
+            // for (let times in range(op.capacity)) {
+            this.produceResource(op.gathers)
+            // }
+            await this.actions.moveTo(origX, this.pos.y, groundSpeed).asPromise()
+            worked = true
+            citizen.driving = null
+            // citizen.anchor = oldAnchor
+
+            this.inUse = false
+
+            //await this.interact(citizen, retrieveResource(op.gathers))
+            // }
+            // this.remove(citizen)
         }
 
         return worked
     }
 
-    getEffectiveOperationalCapacity(op: ResourceGenerator | ResourceStorage) {
+
+
+    getEffectiveOperationalCapacity(op: ResourceGenerator | ResourceStorage | ExploreForResource) {
         let bonus = this.building.spaceFunction
-        ? this.building.spaceFunction.bonuses.capacity 
+            ? this.building.spaceFunction.bonuses.capacity 
         : 0
         return op.capacity + bonus
     }

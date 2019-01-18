@@ -6,6 +6,7 @@ export type MechanicalOperation =
     ResourceStorage |
     SpawnClone |
     AccelerateTime |
+    ExploreForResource |
     Noop
 
 export interface Noop {
@@ -39,6 +40,12 @@ export interface SpawnClone {
 export interface AccelerateTime {
     type: 'accelerate'
     factor: number
+}
+
+export interface ExploreForResource {
+    type: 'explore'
+    gathers: ResourceBlock
+    capacity: number
 }
 
 function store(res: ResourceBlock[], capacity: number = 10): ResourceStorage {
@@ -80,10 +87,19 @@ function accelerateTime(): AccelerateTime {
     }
 }
 
+function explore(block: ResourceBlock, cap: number = 4): ExploreForResource {
+    return {
+        type: 'explore',
+        gathers: block,
+        capacity: cap
+    }
+}
+
 export const mechanicalOperations = {
     store,
     generate,
     recipe,
     spawn,
     accelerateTime,
+    explore,
 }

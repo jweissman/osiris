@@ -3,11 +3,11 @@ import { Planet } from "../actors/Planet/Planet";
 import { Device } from "../actors/Device";
 import { sleep } from "../Util";
 import { ResourceBlock } from "../models/Economy";
-import { retrieveResource } from "../values/InteractionRequest";
-import { Recipe, MechanicalOperation } from "../models/MechanicalOperation";
+import { retrieveResource, drive } from "../values/InteractionRequest";
+import { Recipe, MechanicalOperation, ExploreForResource } from "../models/MechanicalOperation";
 
 export abstract class Strategy {
-    private sleepInterval: number = 250
+    private sleepInterval: number = 50
     protected isActive: boolean = false;
     constructor(protected pawn: Citizen) { }
 
@@ -27,6 +27,17 @@ export abstract class Strategy {
         return recipes;
     }
 
+    protected get explorers(): ExploreForResource[] {
+        let explores: ExploreForResource[] = []
+        this.operations.forEach(op => {
+            if (op.type === 'explore') {
+                explores.push(op)
+            }
+        })
+        console.log("Found all explorers: ", { explores })
+        return explores;
+    }
+
 
     async attempt(): Promise<void> {
         if (this.isActive) {
@@ -39,7 +50,7 @@ export abstract class Strategy {
             this.isActive = false
         }
 
-        await this.pause()
+        // await this.pause()
         // setInterval(() => { this.attempt() }, this.sleepInterval)
     }
 
@@ -70,7 +81,7 @@ export abstract class Strategy {
                 let waitTimes = 0
                 while (device.inUse) {
                     console.warn("waiting for device to be ready!")
-                    await sleep(5000) //this.pause()
+                    await this.pause() //sleep(5000) //this.pause()
                     if (waitTimes++ > 10) {
                         return false 
                     }
@@ -99,6 +110,35 @@ export abstract class Strategy {
         await this.pawn.visit(device)
     }
 
+    protected async workExploration(exploring: ExploreForResource): Promise<boolean> {
+        let knowsHow = (d: Device) => d.operation === exploring && !d.reserved
+        let vehicle = this.planet.colony.closestDeviceByType(this.pawn.pos, [], knowsHow)
+        let explored = false
+        if (vehicle) {
+            vehicle.reserved = true
+            if (await this.drive(vehicle, exploring)) {
+                explored = true
+            }
+
+            vehicle.reserved = false
+        }
+        return explored
+    }
+
+    private async drive(vehicle: Device, exploring: ExploreForResource) {
+        let driven = false
+        if (!vehicle.machine.isVehicle) {
+            throw new Error("Tried to drive a device that wasn't a vehicle!")
+        } else {
+            await this.visitDevice(vehicle)
+            if (await vehicle.interact(this.pawn, drive())) {
+                if (await vehicle.interact(this.pawn, retrieveResource(exploring.gathers))) {
+                    driven = true
+                }
+            }
+        }
+        return driven
+    }
 
     protected async workRecipe(recipe: Recipe): Promise<boolean> {
         console.debug("Working recipe", { product: recipe.produces })

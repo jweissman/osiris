@@ -17,7 +17,7 @@ const smallDome = smallMachines.filter(machine => (new machine()).forDome)
 const smallBelow = smallMachines.filter(machine => !(new machine()).forDome)
 
 const midDome = mediumMachines.filter(machine => (new machine()).forDome)
-const midBelow = mediumMachines.filter(machine => !(new machine()).forDome)
+const midBelow = mediumMachines.filter(machine => !(new machine()).forDome && !(new machine()).isVehicle)
 
 const largeDome = largeMachines.filter(machine => (new machine()).forDome)
 const largeBelow = largeMachines.filter(machine => !(new machine()).forDome)
@@ -324,6 +324,8 @@ export const allStructures =
         MediumRoomThree,
         LargeRoom,
         HugeRoom,
+
+        GroundVehiclePool,
     ]
 
 

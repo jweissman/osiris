@@ -30,6 +30,8 @@ export class Card extends Actor {
                 // if (this.image.src !== null) {
                     let ix = this.pos.x + 48, iy = this.pos.y - 16
                     let isz = 92
+
+                    // maybe try-fail around this? something for painting?
                     ctx.drawImage(this.image, ix, iy, isz, isz)
                 // }
             }

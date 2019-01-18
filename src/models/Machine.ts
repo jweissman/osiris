@@ -67,7 +67,7 @@ const images = {
 
 const { Red, Green, Blue, Orange, Violet, Yellow } = Color;
 
-let { store, generate, recipe, spawn, accelerateTime } = mechanicalOperations
+let { store, generate, recipe, spawn, accelerateTime, explore } = mechanicalOperations
 
 export class Machine {
     name: string = '(machine name)'
@@ -101,7 +101,7 @@ export class CommandCenter extends Machine {
     name = 'Command Console'
     description = 'commander, we need your help'
     operation = store(
-        [ResourceBlock.Mineral], //,ResourceBlock.Biomass],
+        [ResourceBlock.Mineral, ResourceBlock.Ore], //,ResourceBlock.Biomass],
         24
     )
     image = images.megaconsole
@@ -475,6 +475,19 @@ export class LifeSciencesConsole extends Machine {
 
 // medium
 
+export class Miner extends Machine {
+    name = 'Miner (Rover)'
+    description = 'mobile drill unit'
+
+    // gather actually takes the machine/citizen around?
+    operation = explore(ResourceBlock.Ore, 2)
+
+    color = Red
+    size = DeviceSize.Medium
+    isVehicle = true
+    image = images.miner
+}
+
 export class MetalStorage extends Machine {
     name = 'Metal Storage'
     description = 'contain minerals and alloys?'
@@ -843,4 +856,6 @@ export const allMachines = [
     LavaLamp,
 
     Figurine,
+
+    Miner,
 ]

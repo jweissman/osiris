@@ -18,6 +18,10 @@ export interface StoreResource {
     resource: ResourceBlock
 }
 
+export interface DriveAround {
+    type: 'drive'
+}
+
 export function retrieveResource(res: ResourceBlock): RetrieveResource {
     return {
         type: 'retrieve',
@@ -26,6 +30,9 @@ export function retrieveResource(res: ResourceBlock): RetrieveResource {
     }
 }
 
+export function drive(): DriveAround {
+    return { type: 'drive' }
+}
 
-export type InteractionRequest = StoreResource | RetrieveResource | WorkRecipe; // | ...
+export type InteractionRequest = StoreResource | RetrieveResource | WorkRecipe | DriveAround
 

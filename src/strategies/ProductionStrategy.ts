@@ -21,7 +21,7 @@ export abstract class ProductionStrategy extends Strategy {
         }
 
         if (!stored) {
-            await this.pause()
+            // await this.pause()
             await this.storeBlock(res)
         }
     }

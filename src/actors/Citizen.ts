@@ -40,6 +40,8 @@ export class Citizen extends Actor {
     private hunger: number = 0.0;
     private energy: number = 100
 
+    driving: Device = null
+
     constructor(private home: Vector, protected planet: Planet, private elite: boolean = false) {
         super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White.clone())
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
@@ -50,8 +52,8 @@ export class Citizen extends Actor {
         this.eatingStrategy = new WhenHungryEatingStrategy(this)
     }
 
-    get isHungry() { return this.hunger > 0.3 }
-    get isTired()  { return this.energy < 45 }
+    get isHungry() { return this.hunger > 0.6 }
+    get isTired()  { return this.energy < 90 }
 
     // get isWorking() { return this.isWorking }
     get currentPlanet() { return this.planet }
@@ -64,8 +66,6 @@ export class Citizen extends Actor {
     update(engine, delta) {
         super.update(engine, delta)
 
-        // make sure we are busy!
-        this.work()
 
         // check wip
         if (this.workInProgress) {
@@ -75,16 +75,31 @@ export class Citizen extends Actor {
                   (now - this.workStarted) / this.workDuration,
                   1
               )
+
+            this.energy -= 0.1
+            this.hunger += 0.001
+        } else if (this.path.length > 0) {
+            // we have a non-empty path
+        } else {
+
+            // we aren't working or walking -- make sure we are busy!
+            this.work()
         }
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
+        let { x, y } = this
+        if (this.driving) {
+            x = this.driving.pos.x
+            y = this.driving.pos.y
+        }
+
         ctx.save()
         // ctx.globalAlpha = 1.0
-        ctx.translate(this.x, this.y - this.getHeight()/2 - 5)
+        ctx.translate(x, y - this.getHeight()/2 - 5)
         if (this.sleeping) {
             ctx.rotate(-Math.PI / 2);
-            ctx.translate(-10, -10)
+            ctx.translate(5, -10)
         }
         // ctx.globalAlpha = 1.0 //?
         drawRect(
@@ -112,7 +127,7 @@ export class Citizen extends Actor {
 
         if (this.workInProgress) {
             ctx.lineWidth = 1
-            let pw = 10, ph = 3
+            let pw = 10 + Math.floor(this.workDuration / 1000), ph = 3
             let px = this.x - pw/2, py = this.y - 10;
             ctx.strokeStyle = Color.White.toRGBA()
             ctx.strokeRect(px, py, pw, ph)
