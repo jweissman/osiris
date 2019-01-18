@@ -1,4 +1,4 @@
-import { Actor, Color, Traits, Vector } from "excalibur";
+import { Actor, Color, Traits, Vector, VisibleEvent } from "excalibur";
 import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
 import { ResourceBlock, blockColor } from "../models/Economy";
@@ -90,9 +90,10 @@ export class Citizen extends Actor {
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         let { x, y } = this
         if (this.driving) {
-            x = this.driving.pos.x
-            y = this.driving.pos.y
-        }
+
+            x = this.driving.pos.add(this.driving.building.pos).x //- getVisibleDeviceSize(this.driving.size)/2
+            y = this.driving.pos.add(this.driving.building.pos).y // - 14
+        } 
 
         ctx.save()
         // ctx.globalAlpha = 1.0
