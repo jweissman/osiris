@@ -128,7 +128,7 @@ export class Citizen extends Actor {
 
         if (this.workInProgress) {
             ctx.lineWidth = 1
-            let pw = 10 + Math.floor(this.workDuration / 1000), ph = 3
+            let pw = 10 + Math.floor(this.workDuration / 10000), ph = 3
             let px = this.x - pw/2, py = this.y - 10;
             ctx.strokeStyle = Color.White.toRGBA()
             ctx.strokeRect(px, py, pw, ph)

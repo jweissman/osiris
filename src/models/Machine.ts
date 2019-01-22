@@ -165,6 +165,7 @@ export class SolarCell extends Machine {
     name = 'Solar Cell'
     description = 'feel the warmth'
     image = images.solar
+    prereqs = [ Bed ] 
 
     forDome = true
     economy = {
@@ -177,7 +178,8 @@ export class SolarCell extends Machine {
 export class WaterCondensingMachine extends Machine {
     name = 'H2O Condenser'
     description = 'have a drink'
-    prereqs = [ SolarCell ]
+// setup a loop here so we have to get survival I?
+    prereqs = [ SolarCell, OxygenExtractor ]
 
     forDome = true
     economy = {
@@ -802,7 +804,7 @@ export class LogicCrystal extends Machine {
 
 // export class MiniSun extends Machine {}
 
-export const allMachines = [
+export const allMachines: (typeof Machine)[] = [
     AlgaeVat,
     Arbor,
     Bed,

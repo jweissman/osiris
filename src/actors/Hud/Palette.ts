@@ -1,5 +1,6 @@
 import { Color } from "excalibur";
 import { EntityKind } from "../../values/Entity";
+import { onlyUnique } from "../../Util";
 
 class PaletteGroup {
 
@@ -34,10 +35,10 @@ export class Palette {
         }
     }
 
-    updateBuilt(built: (EntityKind)[]) {
+    updateBuilt(built: (EntityKind)[], unlocked: (EntityKind)[] = []) {
         this.built = built;
         if (this.comprehend) {
-            this.comprehended = this.all.filter((e: EntityKind) => {
+            let nowComprehended = this.all.filter((e: EntityKind) => {
                 let s = new e();
                 let prereqs: (EntityKind)[] = s.prereqs;
                 return prereqs.every((prereq: EntityKind) => {
@@ -45,15 +46,19 @@ export class Palette {
                     return built;
                 });
             });
+            this.comprehended = [
+                ...nowComprehended,
+                ...unlocked
+            ].filter(onlyUnique)
         } else {
-            this.comprehended = this.built
+            this.comprehended = [ ...this.built, ...unlocked ].filter(onlyUnique)
         }
         this.makePalette();
     }
 
     private dragStart = (e) => {
         if (e.target === this.title) {
-            console.log("drag start")
+            // console.log("drag start")
             this.initialX = e.clientX - this.xOff;
             this.initialY = e.clientY - this.yOff;
             this.dragging = true
@@ -63,25 +68,21 @@ export class Palette {
     private drag = (e) => {
         if (this.dragging) {
             e.preventDefault()
-            console.log("drag")
+            // console.log("drag")
             let currentX = e.clientX - this.initialX;
             let currentY = e.clientY - this.initialY;
             this.xOff = currentX
             this.yOff = currentY
         }
 
-        // this.x = this.xOff
-        // this.y = this.yOff
     }
 
     private dragEnd = (e) => {
         if (this.dragging) {
-            console.log("drag end")
+            // console.log("drag end")
             this.dragging = false
         }
 
-        // this.x = this.xOff
-        // this.y = this.yOff
     }
 
     title: HTMLDivElement

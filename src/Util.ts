@@ -114,3 +114,7 @@ export function mixColors(a: Color, b: Color, factor: number = 0.5): Color {
     1
   )
 }
+
+export function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}

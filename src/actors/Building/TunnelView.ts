@@ -5,8 +5,10 @@ import { Slot } from "../../values/Slot";
 import { Orientation, flip } from "../../values/Orientation";
 import { Graph } from "../../values/Graph";
 import { drawRect } from "../../Painting";
+import { Scale } from "../../values/Scale";
 
 export class TunnelView extends Building {
+    slotSize: number = Scale.major.eighth + 10
     pickingOrigin: boolean = true
     hideBox = true
 
@@ -76,13 +78,23 @@ export class TunnelView extends Building {
     }
 
     private slotHeights() {
-        let slotSize = 50
-        let slotCount = Math.floor((this.getHeight()) / slotSize)
+            // let minDepth = Scale.major.eighth + 50
+            // let buffer = 20
+
+        // let slotSize = Scale.major.eighth + 5 //minDepth + buffer
+        let slotCount = Math.floor((this.getHeight()) / this.slotSize)
         let heights = []
-        for (let i of range(slotCount)) {
-            heights.push(
-                50 + this.pos.y + i * slotSize,
-            )
+
+        let y = this.pos.y // + minDepth + buffer
+
+        if (slotCount > 0) {
+            for (let i of range(slotCount)) {
+                heights.push(
+                    y + ((i+1) * this.slotSize),
+                )
+            }
+        } else {
+            heights.push(this.slotSize)
         }
         return heights
     }
@@ -146,11 +158,18 @@ export class TunnelView extends Building {
         // this.pos.y = this.planet.getTop() + 2
         if (this.pickingOrigin) {
             this.alignToSlot(cursor)
-        } else {
+        } // else {
+            // min depth/height has to be at least 
+            // let minDepth = Scale.major.eighth
+            // let buffer = 100
+
+            let depth = 
+                (this.slotSize * Math.floor(Math.abs(cursor.y - this.planet.getTop()) / this.slotSize)) + 15
+
           this.setHeight(
-             (100 * Math.floor(Math.abs(cursor.y - this.planet.getTop()) / 100)) - 5
+              Math.max(depth, this.slotSize + 15)
           )
-        }
+        // }
     }
 
 }

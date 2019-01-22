@@ -6,12 +6,14 @@ import { Hud } from "../actors/Hud/Hud";
 import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
 import { Game } from "../Game";
-import { Machine } from "../models/Machine";
+import { Machine, allMachines } from "../models/Machine";
 import { LivingQuarters, MissionControl, SolarArray, SpaceFunction, CloneReception, Kitchen, Workshop, Archive, Refinery, Mine } from "../models/SpaceFunction";
 import { Corridor, HugeRoom, LargeRoom, MainTunnel, MediumRoomThree, SmallDome, SmallRoomThree, Structure, SurfaceRoad } from "../models/Structure";
 import { flatSingle, zip } from "../Util";
 import { DeviceSize } from "../values/DeviceSize";
 import { Orientation } from "../values/Orientation";
+import { TechnologyRank } from "../models/TechnologyRank";
+import { TechTree } from "../models/TechTree";
 
 
 export class Construct extends Scene {
@@ -31,6 +33,8 @@ export class Construct extends Scene {
 
     hasActiveModal: boolean = false
 
+    techTree: TechTree = new TechTree()
+
     static requiredStructuresAndFunctions: (typeof SpaceFunction | typeof Structure)[] = [
         MissionControl,
         SurfaceRoad,
@@ -43,7 +47,19 @@ export class Construct extends Scene {
     update(engine, delta) {
         super.update(engine, delta)
 
-        this.hud.updateDetails(this.planet, true, this.time)
+
+        let devices = this.planet.colony.findPoweredDevices()
+        let machines = allMachines.filter(machine => devices.some(device => device.machine instanceof machine))
+
+        let discipline = this.techTree.findDisciplineToRankUp(machines)
+        if (discipline) {
+            let rank = this.techTree.rankUp(discipline)
+            this.rankUp(rank)
+        }
+
+        // hmm!
+        this.hud.updateDetails(this.planet, this.techTree, true, this.time)
+
     }
 
     public onInitialize(game: Game) {
@@ -84,14 +100,41 @@ export class Construct extends Scene {
         )
     }
 
-    systemMessage(message: string) {
+    showTutorial: boolean = true
+    private systemMessage(message: string) {
         this.hasActiveModal = true
         this.hud.systemMessage(message, "commander, a moment", {
-            dismiss: () => { this.closeSystemMessage() }
+            continue: () => { this.closeSystemMessage() },
+            //stopTutorial: () => {
+            //    this.closeSystemMessage()
+            //    this.tuto
+            //}
+
         })
-        //, () => {
-        //    this.hasActiveModal = false
-        //})
+    }
+
+    private tutorialMessage(message: string) {
+        if (this.showTutorial) {
+        this.hasActiveModal = true
+            this.hud.systemMessage(message, "commander, some advice", {
+                continue: () => { this.closeSystemMessage() },
+                'i got this': () => {
+                    this.closeSystemMessage()
+                    this.showTutorial = false
+                }
+            })
+        }
+    }
+
+    private rankUp(rank: TechnologyRank) {
+        // systemMessage(`)
+        this.hasActiveModal = true
+        let rankUpMessage = `${rank.name} -- ${rank.description} -- unlocked: ${rank.unlocks.map(m => (new m()).name).join(', ')}`
+        this.hud.systemMessage(
+            rankUpMessage,
+            "rank up",
+            { yay: () => { this.closeSystemMessage() }
+        })
     }
 
     private closeSystemMessage() {
@@ -273,7 +316,7 @@ export class Construct extends Scene {
         let nextMissing = this.nextMissingStructureOrFunction() //this.nextMissingRequiredStructure();
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
-            this.systemMessage(`Now we need to build a ${structure.name}...`)
+            this.tutorialMessage(`Great work! Now we need to build a ${structure.name}...`)
             this.startConstructing(structure, pos)
         } else {
             // this.systemMessage(`Now we need to build a ${structure.name}...`)

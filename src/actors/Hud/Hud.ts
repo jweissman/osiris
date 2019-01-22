@@ -13,6 +13,7 @@ import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
 import { Palette } from "./Palette";
 import { Building } from "../Building";
 import { Modal } from "./Modal";
+import { TechTree } from "../../models/TechTree";
 
 export class Hud extends UIActor {
     // private hint: Label
@@ -56,22 +57,23 @@ export class Hud extends UIActor {
         let canvasHeight = game.canvasHeight / window.devicePixelRatio;
         // let canvasWidth = this._engine.canvasWidth / window.devicePixelRatio;
 
-        this.card = new Card(null, 20, canvasHeight - 200) //game.canvas.height - 200)
+        this.card = new Card(null, 20, canvasHeight - 200)
         this.add(this.card)
 
 
     }
 
-    // breakingNews()
-    // showModal: boolean = false
-    // modal: { message: string, title: string } = null
     systemMessage(message: string, title: string = 'Commander, a message for you',
-      buttons: { [intent: string]: () => any }) { //} = { dismiss: () => this.closeSystemMessage() }) {
-        // console.log("SET MODAL", { message })
+      buttons: { [intent: string]: () => any }) {
 
         let canvasHeight = this.game.canvasHeight / window.devicePixelRatio;
         let canvasWidth = this.game.canvasWidth / window.devicePixelRatio;
-        this.modal = new Modal(title, message, canvasWidth/2 - 100, canvasHeight/2 - 100) //this.getWidth()/2 - 100, this.getHeight()/2 - 200)
+        this.modal = new Modal(
+            title,
+            message,
+            canvasWidth/2 - 100,
+            canvasHeight/2 - 100
+        ) 
         this.modal.addButtons(buttons)
 
         // this.showModal = true
@@ -122,10 +124,10 @@ export class Hud extends UIActor {
         this.status.decrementResource(resource)
     }
 
-    updateDetails(planet: Planet, rebuildPalettes: boolean = true, time: number = 0) {
+    updateDetails(planet: Planet, techTree: TechTree, rebuildPalettes: boolean = true, time: number = 0) {
         if (!planet) { return }
         if (rebuildPalettes) {
-            this.updatePalettes(planet.colony)
+            this.updatePalettes(planet.colony, techTree)
         }
         this.updateEconomy(planet)
         this.updateMaxPop(planet.economy[PureValue.Shelter].demand, planet.maxPop)
@@ -145,9 +147,9 @@ export class Hud extends UIActor {
         this.status.showEconomy(planet.economy)
     }
 
-    private updatePalettes(colony: Colony) {
+    private updatePalettes(colony: Colony, techTree: TechTree) {
         this.updateBuildingPalette(colony)
-        this.updateMachinePalette(colony)
+        this.updateMachinePalette(colony, techTree)
         this.updateFunctionPalette(colony)
     }
 
@@ -159,11 +161,14 @@ export class Hud extends UIActor {
         }
     }
 
-    private updateMachinePalette(colony: Colony) {
+    private updateMachinePalette(colony: Colony, techTree: TechTree) {
         let devices = colony.findAllDevices()
-        let builtMachines = Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine && d.built))
+        let builtMachines = [
+            ...Hud.machinesForPalette.filter((machine) => devices.some(d => d.machine instanceof machine && d.built)),
+            // ...techTree.allUnlockedMachines()
+        ]
         if (!builtMachines.every(machine => this.machinePalette.built.includes(machine))) {
-            this.machinePalette.updateBuilt(builtMachines)
+            this.machinePalette.updateBuilt(builtMachines, techTree.allUnlockedMachines())
         }
     }
 

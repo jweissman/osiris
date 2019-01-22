@@ -113,8 +113,8 @@ export class Ladder extends Structure {
     name = 'Ladder'
     description = 'connect vertically'
     view = 'LadderView'
-    width = minor.sixth
-    height = 20 + major.third
+    width = major.second
+    height = major.third
     zoom = 0.5
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Up]: [ CommonArea ],
