@@ -35,8 +35,10 @@ export class Hud extends UIActor {
     static machinesForPalette = allMachines
     static functionsForPalette = allSpaceFunctions
 
+    // viewportHeight: nu
+
     constructor(
-        game: Game,
+        private game: Game,
         protected onBuildingSelect = null,
         protected onMachineSelect = null,
         protected onFunctionSelect = null
@@ -51,7 +53,10 @@ export class Hud extends UIActor {
         this.structurePalette = new Palette('Structure', 20, 300, Hud.structuresForPalette, onBuildingSelect, displayInfo)
         this.functionPalette = new Palette('Function', 20, 435, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
-        this.card = new Card(null, 20, game.canvas.height - 200)
+        let canvasHeight = game.canvasHeight / window.devicePixelRatio;
+        // let canvasWidth = this._engine.canvasWidth / window.devicePixelRatio;
+
+        this.card = new Card(null, 20, canvasHeight - 200) //game.canvas.height - 200)
         this.add(this.card)
 
 
@@ -63,7 +68,10 @@ export class Hud extends UIActor {
     systemMessage(message: string, title: string = 'Commander, a message for you',
       buttons: { [intent: string]: () => any }) { //} = { dismiss: () => this.closeSystemMessage() }) {
         // console.log("SET MODAL", { message })
-        this.modal = new Modal(title, message, this.getWidth()/2 - 100, this.getHeight()/2 - 200)
+
+        let canvasHeight = this.game.canvasHeight / window.devicePixelRatio;
+        let canvasWidth = this.game.canvasWidth / window.devicePixelRatio;
+        this.modal = new Modal(title, message, canvasWidth/2 - 100, canvasHeight/2 - 100) //this.getWidth()/2 - 100, this.getHeight()/2 - 200)
         this.modal.addButtons(buttons)
 
         // this.showModal = true

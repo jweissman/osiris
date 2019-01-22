@@ -45,8 +45,10 @@ export class MusicPlayer {
         this._wrapper = document.createElement('div')
         this._wrapper.style.position = 'absolute'
         this._wrapper.style.width = '20%'
+        this._wrapper.style.maxHeight = '20px'
         this._wrapper.style.textAlign = 'left'
         this._wrapper.style.border = 'none';
+        this._wrapper.style.overflow = 'hidden';
         document.body.appendChild(this._wrapper);
 
         this._element = document.createElement('div');

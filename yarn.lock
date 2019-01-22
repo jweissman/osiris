@@ -2626,10 +2626,10 @@ evp_bytestokey@^1.0.0, evp_bytestokey@^1.0.3:
     md5.js "^1.3.4"
     safe-buffer "^5.1.1"
 
-excalibur@0.18.0:
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/excalibur/-/excalibur-0.18.0.tgz#41a4fc476188f9d27d7143a2992e309a989b4708"
-  integrity sha512-riFgGzYvhvOy9aBI0gP3dRaSU1p8/n22bSJhOARdxxHkupoOWIFA6kX+Up8W+nGwNPxN0be+OzkPxpC5SwRkXg==
+excalibur@0.20:
+  version "0.20.0"
+  resolved "https://registry.yarnpkg.com/excalibur/-/excalibur-0.20.0.tgz#5cbaa7f3edbed6efdefe3306a5cb0e7c868de4c4"
+  integrity sha512-RujHRkv3KFsFBjYjuHj6bcr3Phb2WrAUSpPpYTF7C5u/nltlLprF0LXhVkRNyDQESkifGX5kBmUR6RKgJ49XvA==
 
 exec-sh@^0.2.0:
   version "0.2.2"
