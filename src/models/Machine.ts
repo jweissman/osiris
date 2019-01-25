@@ -33,6 +33,8 @@ const statue = require('../images/statue-plain.svg')
 const codex = require('../images/codex-plain.svg')
 
 const lavaLamp = require('../images/lava-lamp-plain.svg')
+const orrery = require('../images/orrery-plain.svg')
+const telescope = require('../images/telescope-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -62,6 +64,8 @@ const images = {
 
     codex,
     lavaLamp,
+    orrery,
+    telescope
 }
 
 
@@ -145,6 +149,44 @@ export class MissionLog extends Machine {
 //    description = 'food paste'
 //}
 
+// tiny
+export class LavaLamp extends Machine {
+    name = 'Lava Lamp'
+    description = 'mesmerizing'
+    size = DeviceSize.Tiny
+    prereqs = [ Table ]
+    image  = images.lavaLamp
+    economy = {
+        ...emptyMarket(),
+        Joy: { supply: 1, demand: 0 },
+        Power: { supply: 0, demand: 0.1 },
+    }
+}
+
+export class Figurine extends Machine {
+    name = 'Figurine'
+    description = 'not an action figure'
+    size = DeviceSize.Tiny
+    prereqs = [ Table ]
+    image = images.statue   
+    economy = {
+        ...emptyMarket(),
+        Beauty: { supply: 0.1, demand: 0 },
+    }
+}
+
+export class Orrery extends Machine {
+    name = 'Orrery'
+    description = 'to the stars'
+    size = DeviceSize.Tiny
+    prereqs = [ Table ]
+    image = images.orrery
+    economy = {
+        ...emptyMarket(),
+        Wonder: { supply: 0.1, demand: 0 },
+    }
+}
+
 // small
 /// small surface
 
@@ -189,31 +231,18 @@ export class WaterCondensingMachine extends Machine {
     }
 }
 
-// tiny
-export class LavaLamp extends Machine {
-    name = 'Lava Lamp'
-    description = 'mesmerizing'
-    size = DeviceSize.Tiny
-    prereqs = [ Table ]
-    image  = images.lavaLamp
+export class Telescope extends Machine {
+    name = 'Telescope'
+    description = 'look to the stars'
+    prereqs = [ Orrery ]
+    forDome = true
+    image = images.telescope
     economy = {
         ...emptyMarket(),
-        Joy: { supply: 1, demand: 0 },
-        Power: { supply: 0, demand: 0.1 },
-    }
+        Wisdom: { supply: 1, demand: 0 },
+    } 
 }
 
-export class Figurine extends Machine {
-    name = 'Figurine'
-    description = 'not an action figure'
-    size = DeviceSize.Tiny
-    prereqs = [ Table ]
-    image = images.statue   
-    economy = {
-        ...emptyMarket(),
-        Beauty: { supply: 0.1, demand: 0 },
-    }
-}
 
 // /// small subsurface
 
@@ -860,4 +889,6 @@ export const allMachines: (typeof Machine)[] = [
     Figurine,
 
     Miner,
+    Orrery,
+    Telescope,
 ]
