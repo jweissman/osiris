@@ -4,7 +4,7 @@ import { Resources } from './Resources';
 
 export class Game extends Engine {
   // static showTutorial: boolean = true
-  static citizenSpeed: number = 50
+  static citizenSpeed: number = 130
   static debugPath: boolean = false
   static startHour: number = 9
 

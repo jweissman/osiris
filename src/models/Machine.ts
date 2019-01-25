@@ -35,6 +35,7 @@ const codex = require('../images/codex-plain.svg')
 const lavaLamp = require('../images/lava-lamp-plain.svg')
 const orrery = require('../images/orrery-plain.svg')
 const telescope = require('../images/telescope-plain.svg')
+const books = require('../images/books-plain.svg')
 
 const images = {
     bookshelf: bookshelfSvg,
@@ -65,7 +66,8 @@ const images = {
     codex,
     lavaLamp,
     orrery,
-    telescope
+    telescope,
+    books,
 }
 
 
@@ -184,6 +186,18 @@ export class Orrery extends Machine {
     economy = {
         ...emptyMarket(),
         Wonder: { supply: 0.1, demand: 0 },
+    }
+}
+
+export class Books extends Machine {
+    name = 'Books'
+    description = 'black and white'
+    size = DeviceSize.Tiny
+    prereqs = [ Table ]
+    image = images.books
+    economy = {
+        ...emptyMarket(),
+        Wisdom: { supply: 0.1, demand: 0 },
     }
 }
 
@@ -891,4 +905,5 @@ export const allMachines: (typeof Machine)[] = [
     Miner,
     Orrery,
     Telescope,
+    Books,
 ]

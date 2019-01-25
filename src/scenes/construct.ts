@@ -1,4 +1,4 @@
-import { Input, Scene, Timer, Vector } from "excalibur";
+import { Input, Scene, Timer, Vector, LockCameraToActorStrategy } from "excalibur";
 import { Building, structureViews } from "../actors/Building";
 import { DevicePlace } from "../actors/Building/Building";
 import { Device } from "../actors/Device";
@@ -35,6 +35,9 @@ export class Construct extends Scene {
 
     techTree: TechTree = new TechTree()
 
+    firstBuilding: boolean = true
+
+
     static requiredStructuresAndFunctions: (typeof SpaceFunction | typeof Structure)[] = [
         MissionControl,
         SurfaceRoad,
@@ -66,8 +69,9 @@ export class Construct extends Scene {
         this.game = game
 
         let buildIt = (e) => this.startConstructing(e)
+        let followIt = (c) => this.startFollowing(c)
 
-        this.hud = new Hud(game, buildIt, buildIt, buildIt)
+        this.hud = new Hud(game, buildIt, buildIt, buildIt, followIt)
         this.add(this.hud)
 
         this.planet = new Planet(
@@ -266,6 +270,7 @@ export class Construct extends Scene {
             } else if (e.key === Input.Keys.Esc) {
                 this.planet.colony.currentlyConstructing = null
                 this.placingFunction = null
+                this.stopFollowing()
                 this.hud.setStatus(this.defaultMessage); //'Welcome to the Colony, Commander.')
             } else if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
                 moveCam(Up)
@@ -324,7 +329,21 @@ export class Construct extends Scene {
         }
     }
 
-    firstBuilding: boolean = true
+    cameraStrategy: LockCameraToActorStrategy
+    startFollowing(citizen) {
+        this.stopFollowing()
+        this.cameraStrategy = new LockCameraToActorStrategy(citizen)
+        this.camera.zoom(2, 1000)
+        this.camera.addStrategy(this.cameraStrategy)
+    }
+
+    stopFollowing() {
+        if (this.cameraStrategy) {
+            this.camera.removeStrategy(this.cameraStrategy)
+            this.camera.zoom(1, 1000)
+        }
+    }
+
     startConstructing(structureOrMachine: Structure | Machine | SpaceFunction, pos: Vector = new Vector(0, 0)) {
         this.hud.showCard(structureOrMachine)
         

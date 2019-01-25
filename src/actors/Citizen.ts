@@ -42,7 +42,7 @@ export class Citizen extends Actor {
 
     driving: Device = null
 
-    constructor(private home: Vector, protected planet: Planet, private elite: boolean = false) {
+    constructor(public name: string, private home: Vector, protected planet: Planet, private elite: boolean = false) {
         super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White.clone())
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 

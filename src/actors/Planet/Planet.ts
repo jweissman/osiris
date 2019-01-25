@@ -27,7 +27,7 @@ export class Planet extends Actor {
         // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
-        private w: number = 100000,
+        private w: number = 200000,
         private depth: number = 40000,
     ) {
         super(0, depth / 2, w, depth, world.color)
@@ -53,11 +53,11 @@ export class Planet extends Actor {
         let c = this.color.clone()
 
         this.skyLayers =new SkyLayers(
-            -depth/2,
-            this.getWidth(),
-            this.color.lighten(0.04),
-            world.skyColor,
-            2
+           -depth/2, // - 20,
+           this.getWidth(),
+           this.color.lighten(0.04),
+           world.skyColor,
+           15
         )
         this.add(this.skyLayers)
 
@@ -87,7 +87,8 @@ export class Planet extends Actor {
 
         let mixC = mixColors(newC, oldC, inc)
 
-        this.assignColors(mixC)
+        this.sky.color = mixC // skyColor
+        // this.assignColors(mixC)
     }
 
     private assignColors(skyColor: Color) {

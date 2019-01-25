@@ -2,6 +2,7 @@ import { Actor, Traits } from 'excalibur';
 import { Citizen } from '../Citizen';
 import { Planet } from './Planet';
 import { Device } from '../Device';
+import { World } from '../../models/World';
 
 export class Population extends Actor {
     citizens: Citizen[] = [];
@@ -11,7 +12,7 @@ export class Population extends Actor {
     }
 
     increase(pos, elite: boolean = false) {
-        let citizen = new Citizen(pos, this.planet, elite);
+        let citizen = new Citizen(World.nameCitizen(), pos, this.planet, elite);
         citizen.work();
         this.citizens.push(citizen);
         this.add(citizen);

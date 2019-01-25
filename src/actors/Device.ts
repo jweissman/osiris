@@ -50,7 +50,7 @@ export class Device extends Actor {
         this.image.src = machine.image
 
         this.on('pointerenter', () => {
-            console.log("HOVER OVER", { machine: this.machine })
+            // console.log("HOVER OVER", { machine: this.machine })
             this.hover = true
             let tinyDevices = this.tinyDevices.length > 0 &&
               this.tinyDevices.some(d => d.hover)
@@ -373,7 +373,7 @@ export class Device extends Actor {
     }
 
     public addTinyDevice(device: Device) {
-        console.log("ADD TINY DEVICE", { device: device.machine })
+        // console.log("ADD TINY DEVICE", { device: device.machine })
         device.pos = this.nextTinyPlace() //.add(this.pos)
         // device.pos.addEqual(this.pos.add(this.nextTinyPlace()))
         this.tinyDevices.push(device)

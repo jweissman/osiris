@@ -1,4 +1,4 @@
-import { UIActor, Label } from "excalibur";
+import { UIActor, Label, Color } from "excalibur";
 import { Structure, Corridor, SurfaceRoad, Ladder, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket, PureValue } from "../../models/Economy";
@@ -14,6 +14,32 @@ import { Palette } from "./Palette";
 import { Building } from "../Building";
 import { Modal } from "./Modal";
 import { TechTree } from "../../models/TechTree";
+import { Pane } from "./Pane";
+import { Citizen } from "../Citizen";
+
+class CitizenList extends Pane {
+    citizens: Citizen[] = []
+
+    constructor(x: number, y: number, private onCitizenSelect: (Citizen) => any = null) {
+        super("Citizens", x, y)
+    }
+
+    updateRoster(citizens: Citizen[]): any {
+        this.citizens = citizens
+        this.makeRoster()
+    }
+
+    private makeRoster() {
+        this.makeRootElement()
+        this.citizens.forEach(citizen => {
+            let btn = this.buttonFactory(citizen.name, Color.DarkGray)
+            this._element.appendChild(btn)
+            if (this.onCitizenSelect) {
+                btn.onclick = () => { this.onCitizenSelect(citizen) }
+            }
+        })
+    }
+}
 
 export class Hud extends UIActor {
     // private hint: Label
@@ -22,6 +48,11 @@ export class Hud extends UIActor {
     private structurePalette: Palette
     private machinePalette: Palette
     private functionPalette: Palette
+
+    // private showCitizenList: boolean = false
+    private citizenList: CitizenList
+
+
     private card: Card
     private status: StatusAnalysisView
 
@@ -40,11 +71,14 @@ export class Hud extends UIActor {
 
     constructor(
         private game: Game,
-        protected onBuildingSelect = null,
-        protected onMachineSelect = null,
-        protected onFunctionSelect = null
+        private onBuildingSelect = null,
+        private onMachineSelect = null,
+        private onFunctionSelect = null,
+        private onCitizenSelect = null,
     ) {
         super(0, 0, game.canvasWidth, game.canvasHeight);
+        let canvasHeight = game.canvasHeight / window.devicePixelRatio;
+        let canvasWidth = game.canvasWidth / window.devicePixelRatio;
 
         this.status = new StatusAnalysisView(emptyMarket(), game.canvasWidth, 64);
         this.add(this.status)
@@ -54,8 +88,8 @@ export class Hud extends UIActor {
         this.structurePalette = new Palette('Structure', 20, 300, Hud.structuresForPalette, onBuildingSelect, displayInfo)
         this.functionPalette = new Palette('Function', 20, 435, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
-        let canvasHeight = game.canvasHeight / window.devicePixelRatio;
-        // let canvasWidth = this._engine.canvasWidth / window.devicePixelRatio;
+        this.citizenList = new CitizenList(canvasWidth - 220, 55, onCitizenSelect) //, (citizen) => {})
+
 
         this.card = new Card(null, 20, canvasHeight - 200)
         this.add(this.card)
@@ -110,6 +144,7 @@ export class Hud extends UIActor {
             // console.log("no modal")
         }
         // if (this.showModal)
+        this.citizenList.draw(ctx)
     }
 
     update(game: Game, delta: number) {
@@ -133,6 +168,10 @@ export class Hud extends UIActor {
         this.updateMaxPop(planet.economy[PureValue.Shelter].demand, planet.maxPop)
 
         this.status.setClock(time)
+
+        if (planet.population.citizens.some(c => !this.citizenList.citizens.includes(c))) { 
+            this.citizenList.updateRoster(planet.population.citizens)
+        }
     }
 
     showCard(entity: Machine | Structure | SpaceFunction | Building | Device) {

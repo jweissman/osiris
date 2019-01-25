@@ -16,19 +16,19 @@ export class MountainLayers extends PlanetBackground {
     }[] = []
 
     skyColor: Color = Color.Blue.clone()
-    layerHeight: number = 200
+    layerHeight: number = 100
     layerCount = 1
-    peakCount = 400
+    peakCount = 100
 
     get peakWidth() {
         return Math.floor(this.getWidth() / this.peakCount)
     }
 
     onInitialize() {
-        let min = -this.layerHeight
+        // let min = -this.layerHeight
         for (let layerIndex of range(this.layerCount)) {
             this.layers.unshift({
-                baseY: -this.layerHeight - (10 * layerIndex),
+                baseY: (layerIndex+1) * -this.layerHeight, // - (20 * layerIndex),
                 deltas: this.genPeaks(layerIndex)
             })
         }
@@ -72,7 +72,7 @@ export class MountainLayers extends PlanetBackground {
         let deltas = []
         let randomDelta = () => (Math.random() * (dMax)) - (dMax/2)
         let last = 0
-        let maxDiff = 5 + (n*2)
+        let maxDiff = 15 // + (n*2)
         for (let times in range(this.peakCount)) {
             let curr = randomDelta()
             let pick = Math.max(
@@ -95,7 +95,7 @@ export class Mountains extends PlanetBackground {
     }[] = [];
     onInitialize() {
         let peakCount = 3
-        let peakHeight = 4800
+        let peakHeight = 480
         let xOff = this.getWidth() / 2
         let peakDistance = this.getWidth() / peakCount
         for (let times of range(2)) {

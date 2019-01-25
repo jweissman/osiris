@@ -5,6 +5,24 @@ import { Planet } from '../actors/Planet/Planet';
 
 
 export class World {
+    static nameCitizen(): string {
+      return sample([
+        'Parthas',
+        'Athos',
+        'Karzak',
+        'Echo',
+        'Jaen',
+        'Xavier',
+        'Mante',
+        'Ern',
+        'Leor',
+        'Exiel',
+        'Tomlien',
+        'Amriel',
+        'Sariel',
+        'Arthax'
+      ])
+    }
   static colors = [Color.Orange, Color.Red, Color.Blue, Color.Green] //, Color.Violet] //, Color.White]
 
   color: Color = sample(World.colors).
