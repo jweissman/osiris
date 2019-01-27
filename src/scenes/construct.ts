@@ -213,7 +213,9 @@ export class Construct extends Scene {
                         }
                     } else {
                         let deviceUnderConstruction = currentlyBuilding
-                        if (deviceUnderConstruction.snap(this.planet)) {
+                        let placementValid = (deviceUnderConstruction.size === DeviceSize.Tiny) ||
+                            !deviceUnderConstruction.overlapsAny()
+                        if (deviceUnderConstruction.snap(this.planet) && placementValid) {
                             if (deviceUnderConstruction.size === DeviceSize.Tiny) {
                                 let parent = deviceUnderConstruction.parentDevice
                                 parent.addTinyDevice(deviceUnderConstruction)

@@ -11,6 +11,7 @@ import { range, deleteByValueOnce, closest } from "../Util";
 import { drawRect } from "../Painting";
 import { InteractionRequest, retrieveResource } from "../values/InteractionRequest";
 import { Game } from "../Game";
+import { Rectangle } from "../values/Rectangle";
 
 export class Device extends Actor {
     // constructionMaterials: ResourceBlock[] = []
@@ -97,16 +98,26 @@ export class Device extends Actor {
             )
             // if (!this.built) { ctx.globalAlpha = 1.0 }
 
+            let c = Color.Transparent.clone()
             if (this.hover) {
-                let c = Color.White.clone()
-                c.a = 0.6
+                c = Color.White.clone()
+                c.a = 0.5
+            }
+            if (!(this.size === DeviceSize.Tiny) && this.overlapsAny()) {
+                c = Color.Red.clone()
+                c.a = 0.3
+            }
+
+            // if (this.hover || this.overlapsAny()) {
+                // let c = Color.White.clone()
+                // c.a = 0.6
                 drawRect(
                     ctx,
                     { x: 0, y: 0, width: this.getWidth(), height: this.getHeight() },
                     0,
                     c
                 )
-            }
+            // }
             ctx.restore()
         }
 
@@ -299,29 +310,67 @@ export class Device extends Actor {
             let bldg = planet.colony.closestBuildingByType(pos,
                 allStructures,
                 (bldg: Building) => {
-                    let hasSpace = bldg.hasPlaceForDevice()
-                    return hasSpace && bldg.structure.machines.some(Machine => this.machine instanceof Machine)
+                    // let hasSpace = bldg.hasPlaceForDevice()
+                    let compatible = bldg.structure.machines.some(Machine => this.machine instanceof Machine)
+                    return compatible
 
                 }
             )
 
             let snapped = false
             if (bldg) {
-                let spot = bldg.nextDevicePlace().position
-                let d = spot.distance(pos)
-                snapped = d < 150
+                let spot = bldg.getCenter() //.y //+ bldg.flo //nextDevicePlace().position
+                let d = spot.distance(pos) //Math.abs(spotY - pos.y) //.distance(pos)
+                snapped = d < (bldg.getWidth()/2 - getVisibleDeviceSize(this.size)/2) && (Math.abs(spot.y - pos.y) < 50)
             }
 
             if (snapped) {
                 this.building = bldg;
-                this.pos = this.building.nextDevicePlace().position
+                this.pos = pos //.x //this.building.nextDevicePlace().position
+                this.pos.y = bldg.getCenter().y + (bldg.getHeight()/8)
             } else {
                 this.pos = pos
             }
 
-            return snapped
+            // let overlapping = !this.overlapsAny()
+
+            return snapped // && !overlapping
         }
     }
+
+    public overlapsAny(): boolean {
+        if (this.building) {
+            return !!this.building.planet.colony.findAllDevices().find(device => device !== this && this.overlaps(device))
+        } else {
+            return true
+        }
+    }
+
+    private overlaps(other: Device): boolean {
+        let rect1 = this.aabb(), rect2 = other.aabb();
+        let doesOverlap = (
+            rect1.x < rect2.x + rect2.width &&
+            rect1.x + rect1.width > rect2.x &&
+            rect1.y < rect2.y + rect2.height &&
+            rect1.y + rect1.height > rect2.y
+        )
+        return(!!doesOverlap);
+    }
+
+    placed: boolean = false
+    private aabb(): Rectangle {
+        let pos = this.pos.clone()
+        if (this.placed) {
+            pos.addEqual(this.building.pos)
+        }
+        return {
+            x: pos.x,
+            y: pos.y,
+            width: this.getWidth(),
+            height: this.getHeight()
+        }
+    }
+    // private overlapsAny()
 
     private snapTiny(planet: Planet, pos: Vector) {
         // okay, we need the closest building with any built machine that HAS a tiny slot

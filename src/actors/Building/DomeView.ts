@@ -31,17 +31,19 @@ export class DomeView extends Building {
         let theSlots = [];
         let slotY = this.getHeight();
 
+        let buffer = this.getWidth() / 4
+
 
         theSlots.push(
             this.buildSlot(
-                this.pos.x, this.pos.y + slotY,
+                this.pos.x - buffer, this.pos.y + slotY,
                 Orientation.Left
             )
         )
 
         theSlots.push(
             this.buildSlot(
-                this.pos.x + this.getWidth(),
+                this.pos.x + this.getWidth() + buffer,
                 this.pos.y + slotY,
                 Orientation.Right
             )
@@ -57,11 +59,13 @@ export class DomeView extends Building {
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         let color: Color = this.mainColor()
 
+        let h = this.getHeight() //getWidth()/2
+
         ctx.beginPath()
         ctx.arc(
             this.pos.x + this.getWidth()/2,
-            this.pos.y + this.getHeight(),
-            this.getHeight()/1.5,
+            this.pos.y + h, //this.getHeight(),
+            this.getWidth()/1.5,
             0,
             Math.PI,
             true

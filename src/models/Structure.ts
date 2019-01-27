@@ -133,7 +133,7 @@ class Dome extends Structure {
 
     view: string = 'DomeView';
     width: number  = 2 * major.sixth
-    height: number = major.eighth
+    height: number = major.fifth
     zoom = 0.2
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ SurfaceRoad ],
@@ -196,7 +196,7 @@ export class MediumRoom extends CommonArea {
     prereqs = [ SmallRoomThree ]
     view = 'MediumRoomView'
     width = 2 * major.eighth
-    machines = midBelow
+    machines = [ ...midBelow, ...smallBelow ]
 }
 
 export class MediumRoomThree extends CommonArea {
@@ -206,7 +206,7 @@ export class MediumRoomThree extends CommonArea {
     width = 3 * major.eighth
     height = major.eighth
 
-    machines = midBelow
+    machines = [ ...midBelow, ...smallBelow ]
 }
 
 export class LargeRoom extends CommonArea {
@@ -215,7 +215,7 @@ export class LargeRoom extends CommonArea {
     prereqs = [ MediumRoom ]
     width = 4 * major.eighth
     height = 2*major.eighth
-    machines = largeBelow
+    machines = [ ...largeBelow, ...midBelow, ...smallBelow ]
 }
 
 export class HugeRoom extends CommonArea {
@@ -250,15 +250,15 @@ export class MediumSurfaceRoom extends Dome {
         [Orientation.Down]: [ MainTunnel, MediumSurfaceRoom ],
     }
 
-    machines = midBelow
+    machines = [ ...midBelow, ...smallBelow ]
 
     // hide = false // need another one which cares about connecting to roads...
 }
 
 export class SmallDome extends Dome {
     name = 'Sm. Dome'
-    width = major.eighth
-    height = major.fifth
+    width = 2 * major.fifth
+    // height = major.seventh
     machines = smallDome
 }
 
@@ -266,7 +266,7 @@ export class SmallDomeThree extends Dome {
     name = 'Sm. Dome (3)'
     view = 'SmallDomeThreeView'
     width = 3 * major.fifth
-    height = 2*major.fifth
+    // height = 2*major.fifth
     machines = smallDome
 }
 
@@ -274,18 +274,18 @@ export class MidDome extends Dome {
     name = 'Mid Dome'
     view = 'MidDomeView'
     width = 3 * major.seventh
-    height = 2 * major.seventh
+    // height = 2 * major.seventh
     prereqs = [ SmallDome, MediumRoom ]
-    machines = midDome
+    machines = [ ...midDome, ...smallDome ]
 }
 
 export class LargeDome extends Dome {
     name = 'Lg. Dome'
     view = 'BigDomeView'
     width = 4 * major.eighth
-    height = 3 * major.eighth
+    // height = 3 * major.eighth
     prereqs = [MidDome, LargeRoom]
-    machines = largeDome
+    machines = [ ...largeDome, ...midDome, ...smallDome ]
 }
 
 export class Arcology extends Dome {

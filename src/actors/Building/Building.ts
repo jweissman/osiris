@@ -122,7 +122,7 @@ export class Building extends Actor {
 
         }
 
-        let showDevicePlaces = true
+        let showDevicePlaces = false
         if (showDevicePlaces && this.devicePlaces().length > 0 && this.devices.length < this.devicePlaces().length) {
             this.devicePlaces().forEach(p => {
                 let place = p.position
@@ -447,6 +447,8 @@ export class Building extends Actor {
         this.updateFunction()
         device.machine.onPlacement(device)
         this.toggleActive()
+
+        device.placed = true
     }
 
     public hasPlaceForDevice() {
