@@ -3,7 +3,7 @@ import { Structure } from "../../models/Structure";
 import { Machine } from "../../models/Machine";
 import { CardTitle } from "./CardTitle";
 import { CardBody } from "./CardBody";
-import { SpaceFunction } from "../../models/SpaceFunction";
+import { RoomRecipe } from "../../models/RoomRecipe";
 import { Building } from "../Building";
 import { Device } from "../Device";
 
@@ -12,7 +12,7 @@ export class Card extends Actor {
     cardBody: CardBody
     image: HTMLImageElement
 
-    constructor(private entity: Machine | Structure | SpaceFunction | Building | Device, x: number, y: number) {
+    constructor(private entity: Machine | Structure | RoomRecipe | Building | Device, x: number, y: number) {
         super(x + 160, y + 90, 320, 180, Color.White);
         let x0 = -150, y0 = -50;
         this.title = new CardTitle(entity, x0 - 3, y0); //x, y)
@@ -38,7 +38,7 @@ export class Card extends Actor {
         }
     }
 
-    present(entity: Machine | Structure | SpaceFunction | Building | Device): any {
+    present(entity: Machine | Structure | RoomRecipe | Building | Device): any {
         this.title.announce(entity)
         this.cardBody.show(entity)
 

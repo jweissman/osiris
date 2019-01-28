@@ -2,7 +2,7 @@ import { Label, Actor, FontStyle, Color } from "excalibur";
 import { Structure } from "../../models/Structure";
 import { Machine } from "../../models/Machine";
 import { PureValue, Economy, ResourceBlock } from "../../models/Economy";
-import { SpaceFunction } from "../../models/SpaceFunction";
+import { RoomRecipe } from "../../models/RoomRecipe";
 import { Building } from "../Building";
 import { Device } from "../Device";
 import { countOccurrences, flatSingle } from "../../Util";
@@ -13,7 +13,7 @@ export class CardBody extends Actor {
     notes: Label
     footer: Label
 
-    constructor(private entity: Machine | Structure | SpaceFunction | Building | Device, x: number, y: number) {
+    constructor(private entity: Machine | Structure | RoomRecipe | Building | Device, x: number, y: number) {
         super(x, y, 0, 0)
         // resources / recipes
 
@@ -46,7 +46,7 @@ export class CardBody extends Actor {
             .join(' + ')
     }
 
-    show(entity: Machine | Structure | SpaceFunction | Building | Device) {
+    show(entity: Machine | Structure | RoomRecipe | Building | Device) {
         if (entity) {
             this.description.text = entity.description;
 
@@ -74,7 +74,7 @@ export class CardBody extends Actor {
                         this.notes.text = 'Decants clones.'
                     }
                 }
-            } else if (entity instanceof SpaceFunction) {
+            } else if (entity instanceof RoomRecipe) {
                 let { capacity, workSpeed } = entity.bonuses
                 let bonusMessages = [];
                 if (capacity > 0) {

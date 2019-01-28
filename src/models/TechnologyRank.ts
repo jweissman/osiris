@@ -1,5 +1,5 @@
 import { Machine, Houseplant, Orchard, AlgaeVat, Statue, Figurine, Bed, OxygenExtractor, WaterCondensingMachine, ResearchServer, Desk, Codex, Botany, Bookshelf, SolarCell, TimeCrystal } from "./Machine";
-import { SolarArray, TimeChamber } from "./SpaceFunction";
+import { SolarArray, TimeChamber } from "./RoomRecipe";
 
 export enum Discipline {
     Survival = 'Survival',

@@ -103,7 +103,7 @@ export class Device extends Actor {
                 c = Color.White.clone()
                 c.a = 0.5
             }
-            if (!(this.size === DeviceSize.Tiny) && this.overlapsAny()) {
+            if (!(this.size === DeviceSize.Tiny || this.placed) && this.overlapsAny()) {
                 c = Color.Red.clone()
                 c.a = 0.3
             }

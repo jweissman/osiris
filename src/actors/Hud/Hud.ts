@@ -1,4 +1,4 @@
-import { UIActor, Label, Color } from "excalibur";
+import { UIActor, Label } from "excalibur";
 import { Structure, Corridor, SurfaceRoad, Ladder, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket, PureValue } from "../../models/Economy";
@@ -9,47 +9,19 @@ import { StatusAnalysisView } from "./StatusAnalysisView";
 import { Device } from "../Device";
 import { Planet } from "../Planet/Planet";
 import { Card } from "./Card";
-import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
+import { allSpaceFunctions, RoomRecipe } from "../../models/RoomRecipe";
 import { Palette } from "./Palette";
 import { Building } from "../Building";
 import { Modal } from "./Modal";
 import { TechTree } from "../../models/TechTree";
-import { Pane } from "./Pane";
-import { Citizen } from "../Citizen";
-
-class CitizenList extends Pane {
-    citizens: Citizen[] = []
-
-    constructor(x: number, y: number, private onCitizenSelect: (Citizen) => any = null) {
-        super("Citizens", x, y)
-    }
-
-    updateRoster(citizens: Citizen[]): any {
-        this.citizens = citizens
-        this.makeRoster()
-    }
-
-    private makeRoster() {
-        this.makeRootElement()
-        this.citizens.forEach(citizen => {
-            let btn = this.buttonFactory(citizen.name, Color.DarkGray)
-            this._element.appendChild(btn)
-            if (this.onCitizenSelect) {
-                btn.onclick = () => { this.onCitizenSelect(citizen) }
-            }
-        })
-    }
-}
+import { CitizenList } from "./CitizenList";
 
 export class Hud extends UIActor {
-    // private hint: Label
-
     private hidePalettes: boolean = true
     private structurePalette: Palette
     private machinePalette: Palette
     private functionPalette: Palette
 
-    // private showCitizenList: boolean = false
     private citizenList: CitizenList
 
 
@@ -67,7 +39,6 @@ export class Hud extends UIActor {
     static machinesForPalette = allMachines
     static functionsForPalette = allSpaceFunctions
 
-    // viewportHeight: nu
 
     constructor(
         private game: Game,
@@ -86,7 +57,7 @@ export class Hud extends UIActor {
         let displayInfo = (e) => this.showCard(e)
         this.machinePalette = new Palette('Machine', 20, 55, allMachines, onMachineSelect, displayInfo) // (e) => this.showCard(e))
         this.structurePalette = new Palette('Structure', 20, 300, Hud.structuresForPalette, onBuildingSelect, displayInfo)
-        this.functionPalette = new Palette('Function', 20, 435, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
+        this.functionPalette = new Palette('Room Recipe', 20, 435, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
         this.citizenList = new CitizenList(canvasWidth - 220, 55, onCitizenSelect) //, (citizen) => {})
 
@@ -97,18 +68,23 @@ export class Hud extends UIActor {
 
     }
 
-    systemMessage(message: string, title: string = 'Commander, a message for you',
-      buttons: { [intent: string]: () => any }) {
+    systemMessage(
+        message: string,
+        title: string = 'Commander, a message for you',
+        // subtitle: string = ''
+        buttons: { [intent: string]: () => any },
+    ): Modal {
 
         let canvasHeight = this.game.canvasHeight / window.devicePixelRatio;
         let canvasWidth = this.game.canvasWidth / window.devicePixelRatio;
         this.modal = new Modal(
             title,
             message,
-            canvasWidth/2 - 100,
+            canvasWidth/2, // - 100,
             canvasHeight/2 - 100
         ) 
         this.modal.addButtons(buttons)
+        return this.modal
 
         // this.showModal = true
         // this.modal = {
@@ -174,7 +150,7 @@ export class Hud extends UIActor {
         }
     }
 
-    showCard(entity: Machine | Structure | SpaceFunction | Building | Device) {
+    showCard(entity: Machine | Structure | RoomRecipe | Building | Device) {
         this.card.present(entity)
     }
 

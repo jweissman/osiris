@@ -9,7 +9,7 @@ import { closest, measureDistance, deleteByValue, containsUniq, flatSingle } fro
 import { Graph } from "../../values/Graph";
 import { ResourceBlock, emptyMarket, Economy, sumMarkets, equilibrium, allValues, availableCapacity } from "../../models/Economy";
 import { Device } from "../Device";
-import { allSpaceFunctions, SpaceFunction } from "../../models/SpaceFunction";
+import { allSpaceFunctions, RoomRecipe } from "../../models/RoomRecipe";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
 import { World } from "../../models/World";
 import { Machine, allMachines, CommandCenter, MissionLog, StudyMachine } from "../../models/Machine";
@@ -37,7 +37,7 @@ export class Building extends Actor {
     parentSlot: Slot
     childrenBuildings: Building[] = []
 
-    spaceFunction: SpaceFunction
+    spaceFunction: RoomRecipe
 
     private devices: Device[] = []
     givenName: string

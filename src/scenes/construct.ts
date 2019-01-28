@@ -1,4 +1,4 @@
-import { Input, Scene, Timer, Vector, LockCameraToActorStrategy } from "excalibur";
+import { Input, Scene, Timer, Vector, LockCameraToActorStrategy, Color } from "excalibur";
 import { Building, structureViews } from "../actors/Building";
 import { DevicePlace } from "../actors/Building/Building";
 import { Device } from "../actors/Device";
@@ -7,9 +7,9 @@ import { Planet } from "../actors/Planet/Planet";
 import { Player } from "../actors/player";
 import { Game } from "../Game";
 import { Machine, allMachines } from "../models/Machine";
-import { LivingQuarters, MissionControl, SolarArray, SpaceFunction, CloneReception, Kitchen, Workshop, Archive, Refinery, Mine } from "../models/SpaceFunction";
+import { LivingQuarters, MissionControl, SolarArray, RoomRecipe, CloneReception, Kitchen, Workshop, Archive, Refinery, Mine } from "../models/RoomRecipe";
 import { Corridor, HugeRoom, LargeRoom, MainTunnel, MediumRoomThree, SmallDome, SmallRoomThree, Structure, SurfaceRoad } from "../models/Structure";
-import { flatSingle, zip } from "../Util";
+import { flatSingle, zip, sample } from "../Util";
 import { DeviceSize } from "../values/DeviceSize";
 import { Orientation } from "../values/Orientation";
 import { TechnologyRank } from "../models/TechnologyRank";
@@ -27,7 +27,7 @@ export class Construct extends Scene {
 
     defaultMessage: string = 'Welcome to the Colony, Commander.'
 
-    placingFunction: SpaceFunction = null
+    placingFunction: RoomRecipe = null
 
     time: number = Game.startHour*60
 
@@ -38,7 +38,7 @@ export class Construct extends Scene {
     firstBuilding: boolean = true
 
 
-    static requiredStructuresAndFunctions: (typeof SpaceFunction | typeof Structure)[] = [
+    static requiredStructuresAndFunctions: (typeof RoomRecipe | typeof Structure)[] = [
         MissionControl,
         SurfaceRoad,
         SolarArray,
@@ -131,14 +131,32 @@ export class Construct extends Scene {
     }
 
     private rankUp(rank: TechnologyRank) {
-        // systemMessage(`)
+        if (this.hasActiveModal) {
+            this.closeSystemMessage()
+        }
+
         this.hasActiveModal = true
-        let rankUpMessage = `${rank.name} -- ${rank.description} -- unlocked: ${rank.unlocks.map(m => (new m()).name).join(', ')}`
-        this.hud.systemMessage(
+        let rankUpMessage =
+            "Your colony's mastery of a discipline has improved! " +
+            "The following new machines are now available for construction:"
+
+        let okay = sample([ 'excellent!', 'great', 'fine', 'good work', 'cool', 'ok' ])
+
+        let modal = this.hud.systemMessage(
             rankUpMessage,
             "rank up",
-            { yay: () => { this.closeSystemMessage() }
+            { [okay]: () => { this.closeSystemMessage() }
         })
+
+        modal.addHeading(rank.name, 28, Color.Orange)
+        modal.addHeading(rank.description, 12)
+
+        modal.addIconMatrix(
+            rank.unlocks.map(m => new m()).map(machine => { return {
+                image: machine.image,
+                label: machine.name
+            }})
+        )
     }
 
     private closeSystemMessage() {
@@ -307,7 +325,7 @@ export class Construct extends Scene {
     get buildings() { return this.planet.colony.buildings }
 
 
-    private nextMissingStructureOrFunction(): Structure | SpaceFunction {
+    private nextMissingStructureOrFunction(): Structure | RoomRecipe {
         let reqs = Construct.requiredStructuresAndFunctions.map(req => new req())
 
         let actualStructureNames = this.buildings.map(building => building.structure.name)
@@ -323,7 +341,9 @@ export class Construct extends Scene {
         let nextMissing = this.nextMissingStructureOrFunction() //this.nextMissingRequiredStructure();
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
-            this.tutorialMessage(`Great work! Now we need to build a ${structure.name}...`)
+            let congrats = sample([ 'Nice!', 'Perfect.', 'Great work!', 'Excellent!', 'Good.', 'That works.' ])
+            let nextUp = sample([ 'Now we need to', 'Next we will', 'Okay, time to'])
+            this.tutorialMessage(`${congrats} ${nextUp} build a ${structure.name}...`)
             this.startConstructing(structure, pos)
         } else {
             // this.systemMessage(`Now we need to build a ${structure.name}...`)
@@ -346,7 +366,7 @@ export class Construct extends Scene {
         }
     }
 
-    startConstructing(structureOrMachine: Structure | Machine | SpaceFunction, pos: Vector = new Vector(0, 0)) {
+    startConstructing(structureOrMachine: Structure | Machine | RoomRecipe, pos: Vector = new Vector(0, 0)) {
         this.hud.showCard(structureOrMachine)
         
         let theNextOne = null
@@ -364,8 +384,8 @@ export class Construct extends Scene {
             this.hud.setStatus(`Install ${machine.name} (${machine.description})`)
             theNextOne = this.spawnDevice(machine, pos)
             // this.camera.zoom(1.5, 250)
-        } else if (structureOrMachine instanceof SpaceFunction) {
-            let fn: SpaceFunction = structureOrMachine
+        } else if (structureOrMachine instanceof RoomRecipe) {
+            let fn: RoomRecipe = structureOrMachine
             this.hud.setStatus(`Place ${fn.name} (${fn.description})`)
             theNextOne = this.spawnFunction(fn, pos)
             this.placingFunction = fn
@@ -400,7 +420,7 @@ export class Construct extends Scene {
         return building;
     }
 
-    protected spawnFunction(fn: SpaceFunction, pos: Vector): Building {
+    protected spawnFunction(fn: RoomRecipe, pos: Vector): Building {
         let theStructure: Structure = (fn.structure && new fn.structure()) // || new SmallRoomThree()
         if (!theStructure) {
             theStructure = new SmallRoomThree()

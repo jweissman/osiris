@@ -3,13 +3,13 @@ import { Color } from 'excalibur';
 import { Structure, MediumSurfaceRoom } from './Structure';
 import { BackgroundPattern } from '../actors/Building/BackgroundPatterns';
 
-export class SpaceFunction {
+export class RoomRecipe {
      name: string = '(generic)'
      description: string = '(generic description)'
      machines: (typeof Machine)[] = []
      color: Color = Color.Gray
 
-     prereqs: (typeof SpaceFunction)[] =  [] 
+     prereqs: (typeof RoomRecipe)[] =  [] 
 
      structure: typeof Structure = null
      hide: boolean = false
@@ -24,7 +24,7 @@ export class SpaceFunction {
      }
 }
 
-export class MissionControl extends SpaceFunction {
+export class MissionControl extends RoomRecipe {
      hide = true
      name = 'Mission Control'
      description = 'keeping everything on track'
@@ -34,19 +34,19 @@ export class MissionControl extends SpaceFunction {
      background = BackgroundPattern.Window
 }
 
-export class LivingQuarters extends SpaceFunction {
+export class LivingQuarters extends RoomRecipe {
      name = 'Living Quarters'
      description = 'good night'
      machines = [ Bed ]
 }
 
-class Barracks extends SpaceFunction {
+class Barracks extends RoomRecipe {
      name = 'Barracks'
      description = 'sleep tight'
      machines = [ Bed, Bed, Bed ]
 }
 
-export class Kitchen extends SpaceFunction {
+export class Kitchen extends RoomRecipe {
      name = 'Kitchen'
      description = 'stay together'
      machines = [ Stove, Fridge ]
@@ -57,138 +57,138 @@ export class Kitchen extends SpaceFunction {
      background = BackgroundPattern.Checker
 }
 
-export class LifeSupportPod extends SpaceFunction {
+export class LifeSupportPod extends RoomRecipe {
      name = 'Life Support'
      description = 'keep it going'
      machines = [ OxygenExtractor, WaterCondensingMachine ]
 }
 
-class Retreat extends SpaceFunction {
+class Retreat extends RoomRecipe {
      name = 'Retreat'
      description = 'take it easy'
      machines = [ Cabin, Cabin ]
 }
 
-export class CloneMatrix extends SpaceFunction {
+export class CloneMatrix extends RoomRecipe {
      name = 'Clone Matrix'
      description = 'clone home'
      machines = [ CloningVat, CloningVat ]
 }
 
-export class CloneReception extends SpaceFunction {
+export class CloneReception extends RoomRecipe {
      name = 'Clone Reception'
      description = 'welcome clone'
      machines = [ CloningVat, OrientationConsole, PersonnelRegistry ]
 }
 
-class ReadingRoom extends SpaceFunction {
+class ReadingRoom extends RoomRecipe {
      name = 'Reading Room'
      description = 'butterflies in the sky'
      machines = [ Bookshelf, Bookshelf ]
 }
 
-export class Library extends SpaceFunction {
+export class Library extends RoomRecipe {
      name = 'Library'
      description = 'take a look'
      machines = [ Bookshelf, Bookshelf, Bookshelf ]
      background = BackgroundPattern.Books
 }
 
-export class Study extends SpaceFunction {
+export class Study extends RoomRecipe {
      name = 'Study'
      description = 'plan it out'
      machines = [ StudyMachine, Bookshelf ]
      background = BackgroundPattern.Wood
 }
 
-class ComputerLab extends SpaceFunction {
+class ComputerLab extends RoomRecipe {
      name = 'Computer Lab'
      description = 'make it happen'
      machines = [ Workstation, Workstation, Workstation ]
 }
 
-export class Archive extends SpaceFunction {
+export class Archive extends RoomRecipe {
      name = 'Archive'
      description = 'write it down'
      machines = [ ResearchServer, ResearchServer ]
 }
 
-class Arboretum extends SpaceFunction {
+class Arboretum extends RoomRecipe {
      name = 'Arboretum'
      description = 'walk it out'
      machines = [ Arbor, Arbor ]
 }
 
-class AlgaeFarm extends SpaceFunction {
+class AlgaeFarm extends RoomRecipe {
      name = 'Algae Farm'
      description = 'make do'
      machines = [ AlgaeVat, AlgaeVat ]
 }
 
-export class SolarArray extends SpaceFunction {
+export class SolarArray extends RoomRecipe {
      name = 'Solar Array'
      description = 'warm up'
      machines = [ SolarCell, SolarCell ]
 }
 
-export class Workshop extends SpaceFunction {
+export class Workshop extends RoomRecipe {
      name = 'Workshop'
      description = 'take form'
      machines = [ Fabricator, Fabricator ]
 }
 
-class Nursery extends SpaceFunction {
+class Nursery extends RoomRecipe {
      name = 'Nursery'
      description = 'quiet please'
      machines = [ Houseplant, Houseplant, Houseplant ]
      background = BackgroundPattern.Leafy
 }
 
-class Farm extends SpaceFunction {
+class Farm extends RoomRecipe {
      name = 'Farm'
      description = 'food for the masses'
      machines = [ Orchard, Orchard ]
 }
 
-class Factory extends SpaceFunction {
+class Factory extends RoomRecipe {
      name = 'Factory'
      description = 'production lines'
      machines = [ Megafabricator, Megafabricator ]
 }
 
 
-export class ComputerCore extends SpaceFunction {
+export class ComputerCore extends RoomRecipe {
      name = 'Computer Core'
      description = 'let us calculate'
      machines = [ Mainframe, Mainframe ]
      background = BackgroundPattern.Tech
 }
 
-export class LifeSciencesLab extends SpaceFunction {
+export class LifeSciencesLab extends RoomRecipe {
      name = 'Life Sciences Lab'
      description = 'where do i come from'
      machines = [ Botany, Botany ]
 }
 
-export class Refinery extends SpaceFunction {
+export class Refinery extends RoomRecipe {
      name = 'Refinery'
      description = 'separation'
      machines = [ MineralProcessor ]
 }
 
-export class Mine extends SpaceFunction {
+export class Mine extends RoomRecipe {
      name = 'Mine'
      description = 'ore from the stone'
      machines = [ MiningDrill ]
 }
 
-export class HoloMatrix extends SpaceFunction {
+export class HoloMatrix extends RoomRecipe {
      name = 'Hologram Matrix'
      description = 'dream it'
      machines = [ HoloProjector, HoloProjector ]
 }
 
-export class TimeChamber extends SpaceFunction {
+export class TimeChamber extends RoomRecipe {
      name = 'Time Chamber'
      description = 'believe it'
      machines = [ TimeCrystal, TimeCrystal ]
@@ -196,19 +196,21 @@ export class TimeChamber extends SpaceFunction {
 
 // export class DreamMatrix extends 
 
-export class LivingRoom extends SpaceFunction {
+export class LivingRoom extends RoomRecipe {
      name = 'Living Room'
      description = 'just relax'
      machines = [ Couch, Couch ]
 }
 
-export class Statuary extends SpaceFunction {
+export class Statuary extends RoomRecipe {
      name = 'Statuary'
      description = 'to remember'
      machines = [ Statue, Statue, Statue ]
 }
 
 export const allSpaceFunctions = [
+    MissionControl,
+
     Library,
     Barracks,
     LifeSupportPod,
@@ -230,7 +232,6 @@ export const allSpaceFunctions = [
 
     ComputerCore,
 
-    MissionControl,
     LifeSciencesLab,
 
     CloneReception,

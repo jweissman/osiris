@@ -3,7 +3,7 @@ import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
 import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Orchard, Cabin, SolarCell, Arbor, Megafabricator, MiningDrill, Preserve, Workstation, Houseplant, Fabricator, LogicCrystal, Microcity, allMachines } from './Machine';
-import { SpaceFunction } from './SpaceFunction';
+import { RoomRecipe } from './RoomRecipe';
 import { DeviceSize } from '../values/DeviceSize';
 
 const { major, minor } = Scale
