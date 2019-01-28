@@ -56,11 +56,11 @@ export class StatusAnalysisView extends Actor {
         this.add(this.messageLabel)
 
         this.musicPlayer = new MusicPlayer(726, 12, {
-            'Crater Rock': Resources.CraterRock,
-            'Indivision': Resources.Indivision,
+            // 'Crater Rock': Resources.CraterRock,
+            // 'Indivision': Resources.Indivision,
             'Future Tense': Resources.FutureTense,
             // 'Isomer': Resources.Isomer,
-            'Understanding': Resources.Understanding,
+            // 'Understanding': Resources.Understanding,
             // 'Outbound': Resources.Outbound,
             'Assembler': Resources.Assembler,
         })

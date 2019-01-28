@@ -11,10 +11,10 @@ const futureTense = require('./sounds/future tense.mp3')
 let Resources = {
     Sword: new Texture(sword),
 
-    CraterRock: new Sound(craterRock),
+    // CraterRock: new Sound(craterRock),
     Assembler: new Sound(assembler),
-    Indivision: new Sound(indivision),
-    Understanding: new Sound(understanding),
+    // Indivision: new Sound(indivision),
+    // Understanding: new Sound(understanding),
     FutureTense: new Sound(futureTense),
     // Isomer: new Sound(isomer),
     // Outbound: new Sound(outbound),

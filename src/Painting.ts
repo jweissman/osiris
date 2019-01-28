@@ -43,14 +43,7 @@ export function drawPatternedRect(
   const gridPattern = getBackgroundPattern(ctx, pattern)
   if (gridPattern) {
     drawPatternedPoly(ctx, pathFromRect(rect), pattern)
-    // let { x, y, width, height } = rect;
-    // ctx.fillStyle = gridPattern
-    // ctx.fillRect(x,y,width,height)
 
-    //ctx.lineWidth = 0
-    //ctx.setLineDash([])
-    //ctx.strokeStyle = Color.White.toRGBA()
-    //ctx.strokeRect(x,y,width,height)
   }
 }
 
