@@ -3,12 +3,12 @@ import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
 import { ResourceBlock, blockColor } from "../models/Economy";
 import { Game } from "../Game";
-import { eachCons, deleteByValueOnce, sleep, containsUniq, deleteByValue } from "../Util";
+import { eachCons, deleteByValueOnce, sleep, containsUniq, deleteByValue, sample } from "../Util";
 import { Device } from "./Device";
 import { Scale } from "../values/Scale";
 import { ProductionStrategy } from "../strategies/ProductionStrategy";
 import { CapacityBasedProduction } from "../strategies/CapacityBasedProduction";
-import { drawStar, drawRect } from "../Painting";
+import { drawStar, drawRect, drawCircle, drawEllipse } from "../Painting";
 import { ConstructionStrategy } from "../strategies/ConstructionStrategy";
 import { ProxmityBasedConstruction } from "../strategies/ProximityBasedConstruction";
 import { SleepingStrategy } from "../strategies/SleepingStrategy";
@@ -42,6 +42,8 @@ export class Citizen extends Actor {
 
     driving: Device = null
 
+    private shirtColor: Color
+
     constructor(public name: string, private home: Vector, protected planet: Planet, private elite: boolean = false) {
         super(home.x, home.y, Scale.minor.first, Scale.minor.fourth, Color.White.clone())
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
@@ -50,6 +52,13 @@ export class Citizen extends Actor {
         this.constructionStrategy = new ProxmityBasedConstruction(this)
         this.sleepingStrategy = new AnyBedSleepingStrategy(this)
         this.eatingStrategy = new WhenHungryEatingStrategy(this)
+
+
+        this.shirtColor = sample([
+            Color.Green,
+            Color.Blue,
+            Color.Red
+        ]).clone()
     }
 
     get isHungry() { return this.hunger > 0.6 }
@@ -103,16 +112,13 @@ export class Citizen extends Actor {
             ctx.translate(5, -10)
         }
         // ctx.globalAlpha = 1.0 //?
-        drawRect(
-            ctx,
-            { x: 0, y: 0, width: this.getWidth(), height: this.getHeight() },
-            0,
-            Color.White
-        )
+
+        this.drawSelf(ctx)
+        
 
         if (this.elite) {
             // draw a little star?
-            drawStar(ctx, 8, -5)
+            drawStar(ctx, 12, -8)
         }
 
         // super.draw(ctx, delta)
@@ -153,6 +159,24 @@ export class Citizen extends Actor {
         }
     }
 
+    private drawSelf(ctx: CanvasRenderingContext2D) {
+        // assume we are at 0,0 and draw ourselves
+        drawRect(
+            ctx,
+            { x: 0, y: 0, width: this.getWidth(), height: this.getHeight() },
+            0,
+            Color.White
+        )
+
+        drawCircle(ctx, 2, 8,
+            9, // 5,
+            this.shirtColor.desaturate(0.5).lighten(0.4))
+
+        drawCircle(ctx, 2, -4,
+             4.5, Color.Orange.lighten(0.8))
+
+    }
+
     async progressBar(duration: number) {
         this.workInProgress = true
         this.workStarted = (new Date()).getTime()
@@ -186,6 +210,8 @@ export class Citizen extends Actor {
         let target = this.targetForDevice(device)
         if (this.currentBuilding != device.building) {
             const path = this.planet.pathBetweenPoints(this.pos.clone(), target)
+            path.pop()
+
             await this.followPath(path)
         }
         await this.glideTo(target)

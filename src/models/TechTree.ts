@@ -8,6 +8,9 @@ export class TechTree {
     } = {
             [Discipline.Survival]: -1,
             [Discipline.LibraryScience]: -1,
+            [Discipline.Agriculture]: -1,
+            [Discipline.Cooking]: -1,
+            [Discipline.MineralProduction]: -1,
         };
 
     findDisciplineToRankUp(machines: (typeof Machine)[]): Discipline {

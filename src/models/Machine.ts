@@ -4,6 +4,7 @@ import { DeviceSize } from "../values/DeviceSize";
 import { MechanicalOperation, mechanicalOperations } from "./MechanicalOperation";
 import { shuffle, range, sample } from "../Util";
 import { Device } from "../actors/Device";
+import { doesNotReject } from "assert";
 
 const bookshelfSvg = require('../images/bookshelf-plain.svg');
 const vatSvg = require('../images/vat-plain.svg');
@@ -37,6 +38,12 @@ const orrery = require('../images/orrery-plain.svg')
 const telescope = require('../images/telescope-plain.svg')
 const books = require('../images/books-plain.svg')
 
+const greenhouse = require('../images/greenhouse-plain.svg')
+const o2 = require('../images/oxygen-extractor-plain.svg')
+const h20 = require('../images/water-condenser-plain.svg')
+
+const minProcessor = require('../images/mineral-processor-plain.svg')
+
 const images = {
     bookshelf: bookshelfSvg,
     vat: vatSvg,
@@ -68,6 +75,13 @@ const images = {
     orrery,
     telescope,
     books,
+    greenhouse,
+
+    o2,
+    h20,
+
+    minProcessor,
+
 }
 
 
@@ -95,6 +109,7 @@ export class Machine {
     isVehicle: boolean = false
 
     tinySlots: boolean = false
+    isEatingSurface: boolean = false
 
     concretize(): Machine { return this; } 
 
@@ -114,8 +129,8 @@ export class CommandCenter extends Machine {
     size = DeviceSize.Medium
     economy = {
         ...emptyMarket(),
-        Power: { supply: 6, demand: 0 },
-        Oxygen: { supply: 16, demand: 0 },
+        Power: { supply: 1, demand: 0 },
+        Oxygen: { supply: 10, demand: 0 },
         Water: { supply: 1, demand: 0 },
         Hope: { supply: 1, demand: 0 },
         Shelter: { supply: 1, demand: 0}
@@ -191,7 +206,8 @@ export class Orrery extends Machine {
 
 export class Books extends Machine {
     name = 'Books'
-    description = 'black and white'
+    description = 'all there in black and white'
+    operation = generate(ResourceBlock.Idea, 2)
     size = DeviceSize.Tiny
     prereqs = [ Table ]
     image = images.books
@@ -207,7 +223,7 @@ export class Books extends Machine {
 export class OxygenExtractor extends Machine {
     name = 'O2 Extractor'
     description = 'breathe deep'
-    image = images.vat
+    image = images.o2
     prereqs = [ WaterCondensingMachine, SolarCell ]
     forDome = true
     economy = {
@@ -236,6 +252,7 @@ export class WaterCondensingMachine extends Machine {
     description = 'have a drink'
 // setup a loop here so we have to get survival I?
     prereqs = [ SolarCell, OxygenExtractor ]
+    image = images.h20
 
     forDome = true
     economy = {
@@ -264,6 +281,7 @@ export class Table extends Machine {
     name = 'Table'
     description = 'a simple table'
     image = images.bench
+    isEatingSurface = true
     // this device provides slots for tiny-sized deviecs
     tinySlots = true
 }
@@ -286,16 +304,16 @@ export class StudyMachine extends Machine {
         ResourceBlock.Data
     )
     color = Blue
-    concretize(): Machine { return new (sample([Workstation, Desk]))() }
+    concretize(): Machine { return new Workstation() } //(sample([Workstation, Desk]))() }
 }
 
-export class Desk extends StudyMachine {
-    name = 'Desk'
-    description = 'get to work'
-    image = images.bench
-    prereqs = [ OxygenExtractor ]
-    concretize() { return this }
-}
+// export class Desk extends StudyMachine {
+//     name = 'Desk'
+//     description = 'get to work'
+//     image = images.bench
+//     prereqs = [ OxygenExtractor ]
+//     concretize() { return this }
+// }
 
 export class Codex extends Machine {
     name = 'Codex'
@@ -337,7 +355,7 @@ export class Bookshelf extends Machine {
     description = 'brainstorm'
     operation = generate(ResourceBlock.Idea)
     image = images.bookshelf
-    prereqs = [ ]
+    prereqs = [ Books, Codex ] // setup a loop...
     color = Blue
 }
 
@@ -387,7 +405,7 @@ export class Bed extends Machine {
 export class Houseplant extends Machine {
     name = 'House Plant'
     description = 'so nice'
-    prereqs = [ Bed ]
+    prereqs = [ Botany, Bed ]
     // produces = ResourceBlock.Food
     cost = [ ResourceBlock.Biomass ]
     operation = generate(ResourceBlock.Biomass, 1)
@@ -412,6 +430,10 @@ export class PersonnelRegistry extends Machine {
         Power: { supply: 0, demand: 0.1 },
         Wisdom: { supply: 1, demand: 0 },
     }
+
+    // onPlacement(device: Device) {
+    //     device.building.planet
+    // }
 }
 
 export class OrientationConsole extends Machine {
@@ -527,6 +549,7 @@ export class Miner extends Machine {
     // gather actually takes the machine/citizen around?
     operation = explore(ResourceBlock.Ore, 2)
 
+    prereqs = [MineralProcessor, MiningDrill]
     color = Red
     size = DeviceSize.Medium
     isVehicle = true
@@ -556,21 +579,23 @@ export class ResearchServer extends Machine {
     }
 }
 
-export class Orchard extends Machine {
-   name = 'Orchard'
+export class Greenhouse extends Machine {
+   name = 'Greenhouse'
    description = 'grow some food'
    operation = generate(ResourceBlock.Biomass)
    size = DeviceSize.Medium
    prereqs = [AlgaeVat]
    color = Green
     forDome = true
+    image = images.greenhouse
     economy = {
         ...emptyMarket(),
         Power: { supply: 0, demand: 1 },
         Water: { supply: 0, demand: 1 },
-        Oxygen: { supply: 2, demand: 0 },
+        Oxygen: { supply: 4, demand: 0 },
     }
 }
+
 
 export class Cabin extends Machine {
    name = 'Cabin'
@@ -626,6 +651,7 @@ export class MineralProcessor extends Machine {
     )
     size = DeviceSize.Medium
     color = Red
+    image = images.minProcessor
     prereqs = [Workstation, Fabricator]
     economy = {
         ...emptyMarket(),
@@ -720,6 +746,23 @@ export class AtomicCompiler extends Machine {
 
 
 // large devices!
+
+export class Orchard extends Machine {
+   name = 'Orchard'
+   description = 'grow some food'
+   operation = generate(ResourceBlock.Biomass, 10)
+   size = DeviceSize.Large
+   prereqs = [AlgaeVat]
+   color = Green
+    forDome = true
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 1 },
+        Water: { supply: 0, demand: 1 },
+        Oxygen: { supply: 2, demand: 0 },
+    }
+}
+
 
 export class MiningDrill extends Machine {
     name = 'Mining Drill'
@@ -854,7 +897,7 @@ export const allMachines: (typeof Machine)[] = [
     Bookshelf,
     Cabin,
     CloningVat,
-    Desk,
+    // Desk,
     Fabricator,
     Fridge,
     Houseplant,

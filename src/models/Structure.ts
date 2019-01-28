@@ -1,9 +1,7 @@
 import { Color } from 'excalibur';
-import { ResourceBlock } from './Economy';
 import { Scale } from '../values/Scale';
 import { Orientation } from '../values/Orientation';
-import { Machine, Bookshelf, CommandCenter, CloningVat, OxygenExtractor, WaterCondensingMachine, Desk, AlgaeVat, Stove, Bed, Fridge, ResearchServer, Orchard, Cabin, SolarCell, Arbor, Megafabricator, MiningDrill, Preserve, Workstation, Houseplant, Fabricator, LogicCrystal, Microcity, allMachines } from './Machine';
-import { RoomRecipe } from './RoomRecipe';
+import { Machine, OxygenExtractor, WaterCondensingMachine, SolarCell, allMachines } from './Machine';
 import { DeviceSize } from '../values/DeviceSize';
 
 const { major, minor } = Scale
@@ -228,6 +226,12 @@ export class HugeRoom extends CommonArea {
     machines = hugeBelow
 }
 
+// export class Octagon extends CommonArea {
+//     // ...
+//     name = 'Octagon'
+//     view = 'OctagonView'
+// }
+
 /// surface bldgs
 
 export class MediumSurfaceRoom extends Dome {
@@ -302,7 +306,8 @@ export class Arcology extends Dome {
 
 export class GroundVehiclePool extends Dome {
     name = 'Veh. Pool'
-    // view = 'G'
+    description = 'ground transit hub'
+    view = 'GroundVehiclePoolView'
     width = 2 * major.eighth
     height = minor.second
     machines = medGroundVehicles

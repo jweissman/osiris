@@ -175,3 +175,40 @@ export function drawStar(ctx, cx, cy, outerRadius=3.6, innerRadius=1.4, spikes=5
     ctx.fillStyle = 'yellow';
     ctx.fill();
 }
+
+export function drawCircle(ctx, cx, cy: number, radius: number, color: Color, hemi=false) {
+  let theta = hemi ? Math.PI : (2 * Math.PI)
+  ctx.beginPath()
+
+  ctx.arc(
+    cx,
+    cy, //this.getHeight(),
+    radius,
+    0,
+    theta,
+    true
+  )
+  ctx.closePath()
+
+  ctx.fillStyle = color.toRGBA()
+  ctx.fill()
+}
+
+export function drawEllipse(ctx, cx, cy, radiusX: number, radiusY: number, color: Color, hemi=false) {
+  let theta = hemi ? Math.PI : (2 * Math.PI)
+  ctx.beginPath()
+
+  ctx.ellipse(
+    cx,
+    cy, //this.getHeight(),
+    radiusX,
+    radiusY,
+    0,
+    theta,
+    true
+  )
+  ctx.closePath()
+
+  ctx.fillStyle = color.toRGBA()
+  ctx.fill()
+}

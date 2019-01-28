@@ -52,9 +52,9 @@ export class DomeView extends Building {
         return theSlots;
     } 
 
-    reshape(cursor: Vector) {
-        this.alignToSlot(cursor)
-    }
+    //reshape(cursor: Vector) {
+    //    this.alignToSlot(cursor)
+    //}
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         let color: Color = this.mainColor()

@@ -5,6 +5,7 @@ import { EconomyView } from "./EconomyView";
 import { MusicPlayer } from "./MusicPlayer";
 import { Resources } from "../../Resources";
 import { drawRect } from "../../Painting";
+import { Game } from "../../Game";
 
 export class StatusAnalysisView extends Actor {
     private messageLabel: Label
@@ -21,13 +22,13 @@ export class StatusAnalysisView extends Actor {
 
         let ty = 14
 
-        let brand = new Label("OSIRIS", 5, ty+18)
+        let brand = new Label(Game.title, 5, ty+18, Game.font)
         brand.fontSize = 28
         brand.color = Color.Gray
         brand.fontStyle = FontStyle.Italic
         this.add(brand)
 
-        let version = new Label("v0.1", 100, ty + 14)
+        let version = new Label("v0.1", 100, ty + 14, Game.font)
         version.fontSize = 7
         version.color = Color.Gray.darken(0.4)
         this.add(version)
@@ -39,16 +40,16 @@ export class StatusAnalysisView extends Actor {
         this.economy = new EconomyView(market, 280, ty)
         this.add(this.economy)
 
-        this.clock = new Label('current time', 600, ty, 'Verdana')
+        this.clock = new Label('current time', 600, ty, Game.font) // 'Verdana')
         this.clock.color = Color.White // 'white'
         this.add(this.clock)
 
-        this.popLabel = new Label("", 600, ty + 14, 'Verdana')
+        this.popLabel = new Label("", 600, ty + 14, Game.font) // 'Verdana')
         this.popLabel.fontSize = 10
         this.popLabel.color = Color.White
         this.add(this.popLabel)
 
-        this.messageLabel = new Label('hi', 750, ty, 'Verdana')
+        this.messageLabel = new Label('hi', 750, ty, Game.font) // 'Verdana')
         this.messageLabel.fontSize = 10
         this.messageLabel.color = Color.White
         this.messageLabel.fontStyle = FontStyle.Italic

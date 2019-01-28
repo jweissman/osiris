@@ -1,6 +1,5 @@
 import { EatingStrategy } from "./EatingStrategy";
 import { ResourceBlock } from "../models/Economy";
-import { Fridge, Desk } from "../models/Machine";
 
 export class WhenHungryEatingStrategy extends EatingStrategy {
     canApply(): boolean {
@@ -25,7 +24,7 @@ export class WhenHungryEatingStrategy extends EatingStrategy {
             await fridge.interact(this.pawn, { type: 'retrieve', resource: ResourceBlock.Meal })
             fridge.reserved = false
 
-            let desk = this.devices.find(d => d.machine instanceof Desk)
+            let desk = this.devices.find(d => d.machine.isEatingSurface) // instanceof Desk)
             if (desk) {
                 await this.visitDevice(desk)
             }

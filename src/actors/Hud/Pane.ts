@@ -1,4 +1,5 @@
 import { Color } from "excalibur";
+import { Game } from "../../Game";
 
 export class Pane {
     protected _element: HTMLDivElement;
@@ -42,7 +43,7 @@ export class Pane {
 
             this.title = document.createElement('div')
             this.title.textContent = this.name
-            this.title.style.fontFamily = 'Verdana'
+            this.title.style.fontFamily = Game.font //'Verdana'
             this.title.style.border = 'none'
             this.title.style.fontSize = '7pt'
             this.title.style.fontWeight = '400'
@@ -111,7 +112,7 @@ export class Pane {
 
         theButton.style.display = 'block';
         theButton.style.fontSize = '6pt';
-        theButton.style.fontFamily = 'Verdana';
+        theButton.style.fontFamily = Game.font // 'Verdana';
         theButton.style.fontWeight = '500';
         theButton.style.padding = '2px';
         theButton.style.width = '100px';

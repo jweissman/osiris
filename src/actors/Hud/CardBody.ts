@@ -6,6 +6,7 @@ import { RoomRecipe } from "../../models/RoomRecipe";
 import { Building } from "../Building";
 import { Device } from "../Device";
 import { countOccurrences, flatSingle } from "../../Util";
+import { Game } from "../../Game";
 
 export class CardBody extends Actor {
     description: Label
@@ -17,21 +18,21 @@ export class CardBody extends Actor {
         super(x, y, 0, 0)
         // resources / recipes
 
-        this.values = new Label('')
+        this.values = new Label('', 0, 0, Game.font)
         this.values.fontSize = 10
         this.add(this.values)
 
-        this.notes = new Label('behavioral notes', 0, 30)
+        this.notes = new Label('behavioral notes', 0, 30, Game.font)
         this.notes.fontSize = 11
         this.add(this.notes)
 
-        this.description = new Label('description', 0, 60)
+        this.description = new Label('description', 0, 60, Game.font)
         this.description.fontSize = 12
         this.description.fontStyle = FontStyle.Italic
         this.description.color = Color.DarkGray
         this.add(this.description)
 
-        this.footer = new Label('footer', 20, 80)
+        this.footer = new Label('footer', 20, 80, Game.font)
         this.footer.fontSize = 10
         this.footer.fontStyle = FontStyle.Italic
         this.add(this.footer)
@@ -113,9 +114,9 @@ export class CardBody extends Actor {
             let { supply, demand } = econ[value]
             let delta = supply - demand
             if (delta > 0) {
-                values.push(`+${delta} ${value}`)
+                values.push(`+${delta.toFixed()} ${value}`)
             } else if (delta < 0) {
-                values.push(`${delta} ${value}`)
+                values.push(`${delta.toFixed()} ${value}`)
             }
         }
         return values.join(' | ')

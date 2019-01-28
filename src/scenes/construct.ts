@@ -107,7 +107,7 @@ export class Construct extends Scene {
     showTutorial: boolean = true
     private systemMessage(message: string) {
         this.hasActiveModal = true
-        this.hud.systemMessage(message, "commander, a moment", {
+        this.hud.systemMessage(message, "", {
             continue: () => { this.closeSystemMessage() },
             //stopTutorial: () => {
             //    this.closeSystemMessage()
@@ -120,7 +120,7 @@ export class Construct extends Scene {
     private tutorialMessage(message: string) {
         if (this.showTutorial) {
         this.hasActiveModal = true
-            this.hud.systemMessage(message, "commander, some advice", {
+            this.hud.systemMessage(message, "", {
                 continue: () => { this.closeSystemMessage() },
                 'i got this': () => {
                     this.closeSystemMessage()
@@ -140,7 +140,7 @@ export class Construct extends Scene {
             "Your colony's mastery of a discipline has improved! " +
             "The following new machines are now available for construction:"
 
-        let okay = sample([ 'excellent!', 'great', 'fine', 'good work', 'cool', 'ok' ])
+        let okay = sample([ 'excellent!', 'great!', 'perfect', 'good work', 'cool', 'wonderful', 'brilliant', 'that is what i am talking about', 'keep up the good work', 'learning is fun!' ])
 
         let modal = this.hud.systemMessage(
             rankUpMessage,
@@ -233,7 +233,8 @@ export class Construct extends Scene {
                         let deviceUnderConstruction = currentlyBuilding
                         let placementValid = (deviceUnderConstruction.size === DeviceSize.Tiny) ||
                             !deviceUnderConstruction.overlapsAny()
-                        if (deviceUnderConstruction.snap(this.planet) && placementValid) {
+                        let snapped = deviceUnderConstruction.snap(this.planet)
+                        if (snapped && placementValid) {
                             if (deviceUnderConstruction.size === DeviceSize.Tiny) {
                                 let parent = deviceUnderConstruction.parentDevice
                                 parent.addTinyDevice(deviceUnderConstruction)
@@ -243,7 +244,6 @@ export class Construct extends Scene {
                             }
                             this.planet.colony.currentlyConstructing = null
                             this.hud.setStatus(this.defaultMessage)
-                            // this.hud.updateDetails(this.planet)
                         }
                     }
                 }
@@ -276,8 +276,7 @@ export class Construct extends Scene {
             case Up: dv.y = -camMoveSpeed; break
             case Down: dv.y = camMoveSpeed; break
             }
-            // console.log("MOVING CAM", { direction, dv, camMoveSpeed })
-            this.camera.move(this.camera.pos.add(dv), 0) //pos.addEqual(dv)
+            this.camera.move(this.camera.pos.add(dv), 0)
         }
 
 
@@ -291,7 +290,7 @@ export class Construct extends Scene {
                 this.planet.colony.currentlyConstructing = null
                 this.placingFunction = null
                 this.stopFollowing()
-                this.hud.setStatus(this.defaultMessage); //'Welcome to the Colony, Commander.')
+                this.hud.setStatus(this.defaultMessage)
             } else if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
                 moveCam(Up)
             } else if (e.key === Input.Keys.Left || e.key === Input.Keys.A) {

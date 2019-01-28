@@ -18,6 +18,10 @@ export class MediumSurfaceRoomView extends Building {
     devicePlaceCount = 3
     get floorHeight() { return this.getHeight() / 6 }
 
+    get floorY() {
+        return this.pos.y + this.getHeight() - this.floorHeight
+    }
+
    nodes(): Vector[] {
         let x = this.pos.x + this.getWidth()/2;
         let y = this.pos.y + this.getHeight() - 16

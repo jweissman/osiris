@@ -42,6 +42,7 @@ export class Building extends Actor {
     private devices: Device[] = []
     givenName: string
 
+
     private active: boolean = true
     // private built: boolean = false
 
@@ -77,15 +78,13 @@ export class Building extends Actor {
 
         this.collisionType = CollisionType.PreventCollision
 
-        this.nameLabel = new Label(this.structure.name, 0, 0, 'Helvetica')
+        this.nameLabel = new Label(this.structure.name, 0, 0, Game.font) // 'Helvetica')
         this.nameLabel.fontSize = 9
         // this.nameLabel.fontStyle = FontStyle.Italic
         this.nameLabel.color = Color.White
 
         if (this.structure.infra) { this.active = true }
     }
-
-    poly() { return this.aabbPoly() }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (!this.hideBox) {
@@ -145,13 +144,23 @@ export class Building extends Actor {
 
         let tryProduce = this.placed;
         if (tryProduce) {
-            this.devices.forEach(device => device.tryProduce(this.step));
+            this.devices.forEach(device => {
+                device.tryProduce(this.step)
+                if(device.tinyDevices.length > 0) {
+                    device.tinyDevices.forEach(tinyDevice => tinyDevice.tryProduce(this.step))
+                }
+            });
+
         }
 
         // this.devices.forEach(d => d.update(engine, delta))
 
         this.step += 1
     }
+
+
+    poly() { return this.aabbPoly() }
+
 
     get name() {
         if (this.spaceFunction) {
@@ -167,6 +176,10 @@ export class Building extends Actor {
         } else {
             return this.structure.description
         }
+    }
+
+    get floorY() {
+        return this.pos.y + this.getHeight() //().y
     }
 
     economy(emptyUnlessActive: boolean = true): Economy {
@@ -237,7 +250,8 @@ export class Building extends Actor {
         return cursor.clone();
     }
     reshape(cursor: Vector): void {
-        this.pos = cursor.clone()
+        // this.pos = cursor.clone()
+        this.alignToSlot(cursor)
     }
 
     afterConstruct(): void {}

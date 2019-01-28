@@ -44,7 +44,7 @@ export class World {
         'Maigel',
       ])
     }
-  static colors = [Color.Orange, Color.Red, Color.Blue, Color.Green] //, Color.Violet] //, Color.White]
+  static colors = [Color.Orange, Color.Azure] //, Color.Red, Color.Blue, Color.Green] //, Color.Violet] //, Color.White]
 
   color: Color = sample(World.colors).
       clone().
@@ -52,7 +52,7 @@ export class World {
       desaturate(0.8);
   skyColor: Color = sample(
     //   [ Color.Blue ]
-      [Color.Cyan, Color.Vermillion, Color.Violet, Color.Chartreuse, Color.Orange, Color.Rose]
+      [Color.Cyan] //, Color.Vermillion, Color.Violet, Color.Chartreuse, Color.Orange, Color.Rose]
   ).
         clone().
         lighten(0.15).

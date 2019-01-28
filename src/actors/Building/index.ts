@@ -16,6 +16,7 @@ import { LargeRoomView } from './LargeRoomView';
 import { HugeRoomView } from './HugeRoomView';
 import { MediumRoomThreeView } from './MediumRoomThreeView';
 import { MediumSurfaceRoomView } from './MediumSurfaceRoomView';
+import { GroundVehiclePoolView } from './GroundVehiclePoolView';
 
 
 const structureViews: { [key: string]: typeof Building } = {
@@ -39,6 +40,8 @@ const structureViews: { [key: string]: typeof Building } = {
 
     ArcologyView,
     MediumSurfaceRoomView,
+
+    GroundVehiclePoolView,
 }
 
 export {

@@ -1,12 +1,14 @@
-import { Machine, Houseplant, Orchard, AlgaeVat, Statue, Figurine, Bed, OxygenExtractor, WaterCondensingMachine, ResearchServer, Desk, Codex, Botany, Bookshelf, SolarCell, TimeCrystal } from "./Machine";
-import { SolarArray, TimeChamber } from "./RoomRecipe";
+import { Machine, Houseplant, Orchard, Bed, OxygenExtractor, WaterCondensingMachine, Codex, Bookshelf, SolarCell, Fridge, Stove, Books, Workstation, Greenhouse, Botany, MineralProcessor, Miner, Table } from "./Machine";
 
 export enum Discipline {
-    Survival = 'Survival',
-    // Agriculture = 'Agriculture',
+    Survival = 'Environmental Control',
+    Agriculture = 'Food Production',
     LibraryScience = 'Library Science',
+    Cooking = 'Food Preparation',
+    // PowerGeneration = 'Power Generation',
     // LifeScience = 'Life Sciences',
     // PlasticArts = 'Plastic Arts',
+    MineralProduction = 'Mineral Production',
 }
 
 export interface TechnologyRank {
@@ -22,26 +24,52 @@ export const disciplineTree: { [key in Discipline]: TechnologyRank[] } = {
         { 
             name: "Survival I",
             level: 1,
-            description: "Keep it going",
+            description: "staying alive",
             prereqs: [ Bed, SolarCell ],
             unlocks: [ OxygenExtractor, WaterCondensingMachine ]
         },
     ],
 
-    // [Discipline.Agriculture]: [
-    //     // small planter?
-    //     { prereqs: [ Houseplant ], unlocks: [ Orchard ] } // Greenhouse...? ] }
-    // ],
+    [Discipline.Agriculture]: [
+        // small planter?
+        {
+            name: 'Food Prod. I',
+            level: 1,
+            description: "watch the calories",
+            prereqs: [Botany],
+            unlocks: [Houseplant, Greenhouse, Orchard],
+        } // Greenhouse...? ] }
+    ],
+
+    [Discipline.Cooking]: [
+        {
+            name: 'Food Prep. I',
+            level: 1,
+            description: "bam",
+            prereqs: [Fridge],
+            unlocks: [Stove],
+        }
+    ],
 
     [Discipline.LibraryScience]: [
         {
             name: "Library Science I",
             level: 1,
             description: "try to understand",
-            prereqs: [ Bookshelf ],
-            unlocks: [ Desk, Codex ],
+            prereqs: [ Books ],
+            unlocks: [ Bookshelf, Workstation, Codex ],
         }
     ],
+
+    [Discipline.MineralProduction]: [
+        {
+            name: 'Mineral Production I',
+            level: 1,
+            description: 'make it work',
+            prereqs: [ Table ],
+            unlocks: [ Miner, MineralProcessor ],
+        }
+    ]
 
     // [Discipline.LifeScience]: [ 
     //     { prereqs: [], unlocks: [ Botany, AlgaeVat ]}

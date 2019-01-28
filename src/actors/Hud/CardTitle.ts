@@ -5,18 +5,19 @@ import { DeviceSize } from "../../values/DeviceSize";
 import { RoomRecipe } from "../../models/RoomRecipe";
 import { Building } from "../Building";
 import { Device } from "../Device";
+import { Game } from "../../Game";
 export class CardTitle extends Actor {
     
     name: Label;
     type: Label;
     constructor(private entity: Machine | Structure | RoomRecipe | Building | Device, x: number, y: number) {
         super(x, y, 14, 32, entity && entity.color || Color.Gray);
-        this.name = new Label(entity && entity.name || '..', 20, 16)
+        this.name = new Label(entity && entity.name || '..', 20, 16, Game.font)
         this.name.fontSize = 28
         this.name.color = Color.Black
         this.add(this.name)
 
-        this.type = new Label('..', 220, 18)
+        this.type = new Label('..', 220, 18, Game.font)
         this.type.fontSize = 10
         this.type.color = Color.Gray
         this.type.fontStyle = FontStyle.Italic

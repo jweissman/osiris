@@ -2,7 +2,7 @@ import { UIActor, Label } from "excalibur";
 import { Structure, Corridor, SurfaceRoad, Ladder, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket, PureValue } from "../../models/Economy";
-import { Machine, allMachines } from "../../models/Machine";
+import { Machine, allMachines, PersonnelRegistry } from "../../models/Machine";
 import { flatSingle } from "../../Util";
 import { Colony } from "../Planet/Colony";
 import { StatusAnalysisView } from "./StatusAnalysisView";
@@ -22,6 +22,7 @@ export class Hud extends UIActor {
     private machinePalette: Palette
     private functionPalette: Palette
 
+    private showCitizenList: boolean = false
     private citizenList: CitizenList
 
 
@@ -70,7 +71,7 @@ export class Hud extends UIActor {
 
     systemMessage(
         message: string,
-        title: string = 'Commander, a message for you',
+        title: string = 'Commander...',
         // subtitle: string = ''
         buttons: { [intent: string]: () => any },
     ): Modal {
@@ -81,7 +82,7 @@ export class Hud extends UIActor {
             title,
             message,
             canvasWidth/2, // - 100,
-            canvasHeight/2 - 100
+            canvasHeight/2, // - 100
         ) 
         this.modal.addButtons(buttons)
         return this.modal
@@ -109,8 +110,11 @@ export class Hud extends UIActor {
         super.draw(ctx, delta)
         if (!this.hidePalettes) {
             this.structurePalette.draw(ctx)
-            this.machinePalette.draw(ctx)
             this.functionPalette.draw(ctx)
+
+            if (this.machinePalette.comprehended.length > 0) {
+                this.machinePalette.draw(ctx)
+            }
         }
 
         if (this.modal) {
@@ -120,7 +124,10 @@ export class Hud extends UIActor {
             // console.log("no modal")
         }
         // if (this.showModal)
-        this.citizenList.draw(ctx)
+
+        if (this.showCitizenList) {
+            this.citizenList.draw(ctx)
+        }
     }
 
     update(game: Game, delta: number) {
@@ -147,6 +154,11 @@ export class Hud extends UIActor {
 
         if (planet.population.citizens.some(c => !this.citizenList.citizens.includes(c))) { 
             this.citizenList.updateRoster(planet.population.citizens)
+        }
+
+        // custom unlocks?
+        if (!this.showCitizenList && planet.hasMachineKind(PersonnelRegistry)) {
+            this.showCitizenList = true
         }
     }
 

@@ -8,7 +8,13 @@ export class Game extends Engine {
   static debugPath: boolean = false
   static startHour: number = 9
 
-  static minuteTickMillis: number = 800
+  // 10000 = 1 min / 10 sec
+  // 1000 = 1 min / second
+  // 100 = 10 min / second
+  static minuteTickMillis: number = 1e3
+
+  static font = 'Helvetica'
+  static title: string = 'ASTRA';
 
   constructor(public world: World) {
     super({
@@ -38,13 +44,19 @@ export class Game extends Engine {
       myButton.textContent = 'Make Planetfall';
       myButton.style.border = 'none'
       myButton.style.display = 'block'
-      myButton.style.padding = '14px'
-      myButton.style.fontFamily = 'Helvetica'
+      myButton.style.padding = '24px'
+      myButton.style.fontFamily = Game.font //'Helvetica'
       myButton.style.color = 'white'
       myButton.style.fontSize = '20pt'
       myButton.style.fontWeight = '300'
 
       myButton.style.backgroundColor = '#9a5e5c'
+
+
+      myButton.onmouseenter = () => {
+        myButton.style.backgroundColor = Color.Red.darken(0.5).toRGBA()
+      }
+      myButton.onmouseleave = () => { myButton.style.backgroundColor = '#9a5e5c' }
       return myButton;
     };
 

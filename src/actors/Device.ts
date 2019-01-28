@@ -42,7 +42,7 @@ export class Device extends Actor {
             // machine.color
         )
 
-        this.nameLabel = new Label(this.machine.name, 0, 0, 'Helvetica')
+        this.nameLabel = new Label(this.machine.name, 0, 0, Game.font) // 'Helvetica')
         this.nameLabel.fontSize = this.machine.size === DeviceSize.Tiny ? 2 : 6
         this.nameLabel.color = Color.White
 
@@ -296,6 +296,7 @@ export class Device extends Actor {
                 }
             }
         }
+
     }
 
     public produceResource(res: ResourceBlock) {
@@ -304,9 +305,10 @@ export class Device extends Actor {
     }
 
     snap(planet: Planet, pos: Vector = this.pos) {
-        if (this.size === DeviceSize.Tiny) {
+        if (this.size === DeviceSize.Tiny) { // or large...
             return this.snapTiny(planet, pos)
         } else {
+            console.log("attempt to snap device...")
             let bldg = planet.colony.closestBuildingByType(pos,
                 allStructures,
                 (bldg: Building) => {
@@ -319,15 +321,23 @@ export class Device extends Actor {
 
             let snapped = false
             if (bldg) {
-                let spot = bldg.getCenter() //.y //+ bldg.flo //nextDevicePlace().position
-                let d = spot.distance(pos) //Math.abs(spotY - pos.y) //.distance(pos)
-                snapped = d < (bldg.getWidth()/2 - getVisibleDeviceSize(this.size)/2) && (Math.abs(spot.y - pos.y) < 50)
+                // console.log("we have a building!", { bldg })
+                let spot = bldg.getCenter()
+                let halfSize = getVisibleDeviceSize(this.size)/2
+                let d = spot.distance(pos)
+                snapped = d < (bldg.getWidth()/2 - halfSize) && (Math.abs(spot.y - pos.y) < 80)
+            } else {
+                // console.log("no bldg found")
             }
 
             if (snapped) {
                 this.building = bldg;
                 this.pos = pos //.x //this.building.nextDevicePlace().position
-                this.pos.y = bldg.getCenter().y + (bldg.getHeight()/8)
+                let gridGrain = 20
+                this.pos.x += bldg.x
+                this.pos.x = Math.floor(this.pos.x / gridGrain) * gridGrain
+                this.pos.x -= bldg.x
+                this.pos.y = bldg.floorY - getVisibleDeviceSize(this.size)/2 //getCenter().y + (bldg.getHeight()/8)
             } else {
                 this.pos = pos
             }

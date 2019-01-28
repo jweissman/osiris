@@ -3,21 +3,22 @@ import { Orientation } from "../../values/Orientation";
 import { Slot } from "../../values/Slot";
 import { Vector, Color } from "excalibur";
 import { DeviceSize, getVisibleDeviceSize } from "../../values/DeviceSize";
-// import { drawRect, drawPatternedRect } from "../../Util";
-import { BackgroundPattern } from "./BackgroundPatterns";
-import { drawPatternedRect, drawRect, drawPatternedPoly, drawPoly } from "../../Painting";
+import { drawRect, drawPatternedPoly, drawPoly } from "../../Painting";
 import { measureDistance, eachCons } from "../../Util";
 
 export class CommonAreaView extends Building {
     get floorHeight() { return this.getHeight() / 6 }
-    // floorHeight: number = 10
-    edgeWidth: number = 0 //.5 //.1
+    edgeWidth: number = 0
     showLabel = true
     hideBox = true
 
     colorBase() { return this.color.darken(0.3); }
 
-    poly() { return this.aabbPoly() } //angledRoofPoly() }
+    poly() { return this.aabbPoly() }
+
+    get floorY() {
+        return this.pos.y + this.getHeight() - this.floorHeight
+    }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
 
@@ -30,7 +31,6 @@ export class CommonAreaView extends Building {
         )
 
         if (!this.isActive) {
-            // draw overlay rect that darkens
             let c = Color.Black.clone()
             c.a = 0.6
             drawPoly(ctx, this.poly(), c)

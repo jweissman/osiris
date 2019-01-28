@@ -1,10 +1,11 @@
 import { Label, Color, Actor, UIActor } from "excalibur";
 import { ResourceBlock, blockColor } from "../../models/Economy";
+import { Game } from "../../Game";
 class Tooltip extends Actor {
     messageLabel: Label
     constructor(x: number, y: number, message: string) {
         super(x, y, 60, 16, Color.Black)
-        this.messageLabel = new Label(message, -16, 6, 'Verdana')
+        this.messageLabel = new Label(message, -16, 6, Game.font) //'Verdana')
         this.messageLabel.color = Color.White
         this.add(this.messageLabel)
     }
@@ -20,7 +21,7 @@ export class ResourceListEntry extends UIActor {
         super(x-5, y-5, 20, 10)
         let icon = new Actor(5, 5, 10, 10, blockColor(resourceBlock));
         this.add(icon);
-        this.count = new Label(`x${value}`, 15, 10, 'Helvetica');
+        this.count = new Label(`x${value}`, 15, 10, Game.font) //'Helvetica');
         this.count.fontSize = 10;
         this.count.color = Color.White;
         this.add(this.count);

@@ -95,19 +95,20 @@ export class Mountains extends PlanetBackground {
     }[] = [];
     onInitialize() {
         let peakCount = 3
-        let peakHeight = 480
+        let peakHeight = 800
         let xOff = this.getWidth() / 2
         let peakDistance = this.getWidth() / peakCount
-        for (let times of range(2)) {
-            let heightRange = 100
-            let drift = 3 * (peakDistance / 2)
-            for (let i of range(peakCount)) {
-                this.peaks.push({
-                    x: -xOff + i * peakDistance + ((Math.random() * drift) - (drift / 2)),
-                    height: Math.max(10, 200 + (Math.random() * peakHeight) + ((Math.random() * heightRange) - (heightRange / 2))) //(Util.randomIntInRange(-160,160))
-                })
-            }
+        // for (let times of range(2)) {
+        let heightRange = 100
+        let drift = 3 * (peakDistance / 2)
+        for (let i of range(peakCount)) {
+            let h = Math.max(400, 200 + (Math.random() * peakHeight) + ((Math.random() * heightRange) - (heightRange / 2))) //(Util.randomIntInRange(-160,160))
+            this.peaks.push({
+                x: Math.min(this.getWidth() / 2 - h / 2, -xOff + i * peakDistance + ((Math.random() * drift))), // - (drift / 2)),
+                height: h
+            })
         }
+        // }
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {

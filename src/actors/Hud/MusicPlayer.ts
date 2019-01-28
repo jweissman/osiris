@@ -1,5 +1,6 @@
 import { Sound, Color } from "excalibur";
 import { sample } from "../../Util";
+import { Game } from "../../Game";
 
 interface MusicPlayerPlay { type: 'play'}
 interface MusicPlayerPause { type: 'pause'}
@@ -57,7 +58,7 @@ export class MusicPlayer {
         this._wrapper.appendChild(this._element)
 
         this._titleElem = document.createElement('span');
-        this._titleElem.style.fontFamily = 'Verdana';
+        this._titleElem.style.fontFamily = Game.font //'Verdana';
         this._titleElem.style.fontSize = '7pt';
         this._titleElem.style.padding = '24px'
         this._titleElem.style.color = 'white';
@@ -120,7 +121,7 @@ export class MusicPlayer {
         icon.innerHTML = iconContent
         icon.style.display = 'block';
         icon.style.fontSize = '7pt';
-        icon.style.fontFamily = 'Verdana';
+        icon.style.fontFamily = Game.font //'Verdana';
         icon.style.border = 'none'
         icon.style.padding = '4px'
         icon.style.background = bg.toRGBA();

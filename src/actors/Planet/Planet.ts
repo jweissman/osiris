@@ -57,7 +57,7 @@ export class Planet extends Actor {
            this.getWidth(),
            this.color.lighten(0.04),
            world.skyColor,
-           15
+           20
         )
         this.add(this.skyLayers)
 
@@ -87,8 +87,8 @@ export class Planet extends Actor {
 
         let mixC = mixColors(newC, oldC, inc)
 
-        this.sky.color = mixC // skyColor
-        // this.assignColors(mixC)
+        // this.sky.color = mixC // skyColor
+        this.assignColors(mixC)
     }
 
     private assignColors(skyColor: Color) {
@@ -258,5 +258,9 @@ export class Planet extends Actor {
     get storedResources(): ResourceBlock[] {
         let devices = this.colony.findAllDevices()
         return flatSingle(devices.map(d => d.product))
+    }
+
+    hasMachineKind(kind: typeof Machine) {
+        return this.colony.findPoweredDevices().find(d => d.machine instanceof kind);
     }
 }
