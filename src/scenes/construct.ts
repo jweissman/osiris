@@ -15,6 +15,7 @@ import { Orientation } from "../values/Orientation";
 import { TechnologyRank } from "../models/TechnologyRank";
 import { TechTree } from "../models/TechTree";
 import { Citizen } from "../actors/Citizen";
+import { GameController } from "../GameController";
 
 
 export class Construct extends Scene {
@@ -22,8 +23,6 @@ export class Construct extends Scene {
     private planet: Planet
     private hud: Hud
     private player: Player
-    private dragging: boolean = false
-    private dragOrigin: Vector
     private defaultMessage: string = 'Welcome to the Colony, Commander.'
     private placingFunction: RoomRecipe = null
     private time: number = Game.startHour*60
@@ -72,7 +71,10 @@ export class Construct extends Scene {
             game.world,
             this.hud,
             (b) => this.hud.showCard(b),
-            (d) => this.hud.showCard(d)
+            (d) => this.hud.showCard(d),
+            200000,
+            40000,
+            this
         )
 
         this.add(this.planet)
@@ -160,52 +162,50 @@ export class Construct extends Scene {
         this.planet.setTime(this.time) 
     }
 
+    controller: GameController
     public onActivate() {
-        this.game.input.pointers.primary.on('move', (e: Input.PointerMoveEvent) => {
+        this.addTimer(
+            new Timer(() => {
+                // this.systemMessage("raiding party incoming -- perimeter alert")
+                this.planet.sendRaidingParty()
+            }, 120000, true)
+        )
+
+        this.controller = new GameController(this.game, this.camera)
+        this.controller.onCameraPan(() => this.stopFollowing())
+
+        this.controller.onMove((pos: Vector) => {
             if (this.hasActiveModal) { return }
+            this.player.pos = pos
 
-            if (this.dragging) {
-                this.camera.pos = this.camera.pos.add(
-                    this.dragOrigin.sub(e.pos)
-                )
+            let currentlyBuilding = this.planet.currentlyConstructing
+            if (currentlyBuilding instanceof Building) {
 
-            } else {
-                this.player.pos = e.pos
+                let constrained = currentlyBuilding.constrainCursor(this.player.pos)
+                this.player.pos = constrained
 
-                let currentlyBuilding = this.planet.currentlyConstructing
-                if (currentlyBuilding instanceof Building) {
-
-                    let constrained = currentlyBuilding.constrainCursor(this.player.pos)
-                    this.player.pos = constrained
-
-                    currentlyBuilding.reshape(this.player.pos)
-                } else if (currentlyBuilding instanceof Device) {
-                    currentlyBuilding.snap(this.planet, this.player.pos)
-                }
+                currentlyBuilding.reshape(this.player.pos)
+            } else if (currentlyBuilding instanceof Device) {
+                currentlyBuilding.snap(this.planet, this.player.pos)
             }
         })
 
-        this.game.input.pointers.primary.on('up', () => {
-            if (this.dragging) { this.dragging = false; }
-        })
-
-        this.game.input.pointers.primary.on('down', (e: Input.PointerDownEvent) => {
+        this.controller.onLeftClick((pos: Vector) => {
             if (this.hasActiveModal) { return }
-
-            if (e.button == Input.PointerButton.Left) {
-                const currentlyBuilding = this.planet.currentlyConstructing
+            const currentlyBuilding = this.planet.currentlyConstructing
                 if (currentlyBuilding) {
                     if (currentlyBuilding instanceof Building) {
                         let buildingUnderConstruction = currentlyBuilding
                         let placementValid = !buildingUnderConstruction.overlapsAny()
-                        if (buildingUnderConstruction && placementValid && buildingUnderConstruction.handleClick(e.pos)) {
+                        if (buildingUnderConstruction && placementValid && buildingUnderConstruction.handleClick(pos)) {
                             this.planet.placeBuilding(buildingUnderConstruction)
+                            if (this.firstBuilding){
+                                this.planet.sendRaidingParty()
+                            }
 
                             if (this.placingFunction) {
                                 let fn = this.placingFunction
-                                // console.log({ fn, bldg: buildingUnderConstruction })
                                 zip(fn.machines, buildingUnderConstruction.devicePlaces()).forEach(([machine, place]: [typeof Machine, DevicePlace]) => {
-                                    console.log("would add machine", { machine, place })
                                     let m = (new machine()).concretize()
                                     let device = new Device(m, place.position)
                                     buildingUnderConstruction.addDevice(device)
@@ -215,8 +215,7 @@ export class Construct extends Scene {
 
                             this.hud.setStatus(this.defaultMessage)
                             this.planet.colony.currentlyConstructing = null
-                            this.prepareNextBuilding(e.pos)
-                            // this.hud.updateDetails(this.planet)
+                            this.prepareNextBuilding(pos)
                         }
                     } else {
                         let deviceUnderConstruction = currentlyBuilding
@@ -236,74 +235,26 @@ export class Construct extends Scene {
                         }
                     }
                 }
-            } else if (e.button === Input.PointerButton.Middle) {
-                this.dragging = true;
-                this.dragOrigin = e.pos
-            }
         })
 
-        this.game.input.pointers.primary.on('wheel', (e: Input.WheelEvent) => {
+        this.controller.onKeyPress((key) => {
             if (this.hasActiveModal) { return }
-
-            let z = this.camera.getZoom()
-            let step = 0.05
-            let min = 0.05, max = 8
-            if (e.deltaY < 0) {
-                this.camera.zoom(Math.min(z + step, max))
-            } else if (e.deltaY > 0) {
-                this.camera.zoom(Math.max(z - step, min))
-            }
-        })
-
-        let { Up, Down, Left, Right } = Orientation;
-        let moveCam = (direction: Orientation) => {
-            this.stopFollowing()
-
-            let camMoveSpeed = 10 * (1/this.camera.getZoom())
-            let dv = new Vector(0,0)
-            switch(direction) {
-            case Left: dv.x = -camMoveSpeed; break
-            case Right: dv.x = camMoveSpeed; break
-            case Up: dv.y = -camMoveSpeed; break
-            case Down: dv.y = camMoveSpeed; break
-            }
-            this.camera.move(this.camera.pos.add(dv), 0)
-        }
-
-
-        this.game.input.keyboard.on('press', (e: Input.KeyEvent) => {
-            if (e.key === Input.Keys.H) {
+            if (key === Input.Keys.H) {
                 if (this.buildings && this.buildings[0]) {
                     this.stopFollowing()
                     this.camera.move(this.buildings[0].pos, 500)
                     this.camera.zoom(0.5, 1000)
                 }
-            } else if (e.key === Input.Keys.Esc) {
-                this.planet.colony.currentlyConstructing = null
-                this.placingFunction = null
-                this.stopFollowing(true)
-                this.hud.setStatus(this.defaultMessage)
-            } else if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
-                moveCam(Up)
-            } else if (e.key === Input.Keys.Left || e.key === Input.Keys.A) {
-                moveCam(Left)
-            } else if (e.key === Input.Keys.Down || e.key === Input.Keys.S) {
-                moveCam(Down)
-            } else if (e.key === Input.Keys.Right || e.key === Input.Keys.D) {
-                moveCam(Right)
+            } else if (key === Input.Keys.Esc) {
+
+                    this.planet.colony.currentlyConstructing = null
+                    this.placingFunction = null
+                    this.stopFollowing(true)
+                    this.hud.setStatus(this.defaultMessage)
             }
         })
-        this.game.input.keyboard.on('hold', (e: Input.KeyEvent) => {
-            if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
-                moveCam(Up)
-            } else if (e.key === Input.Keys.Left || e.key === Input.Keys.A) {
-                moveCam(Left)
-            } else if (e.key === Input.Keys.Down || e.key === Input.Keys.S) {
-                moveCam(Down)
-            } else if (e.key === Input.Keys.Right || e.key === Input.Keys.D) {
-                moveCam(Right)
-            }
-        })
+
+        this.controller.activate()
     }
 
     public onDeactivate() {
@@ -329,15 +280,14 @@ export class Construct extends Scene {
 
     protected prepareNextBuilding(pos: Vector = new Vector(0,0)) {
         let structure = null;
-        let nextMissing = this.nextMissingStructureOrFunction() //this.nextMissingRequiredStructure();
+        let nextMissing = this.nextMissingStructureOrFunction()
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
-            let congrats = sample([ 'Nice!', 'Perfect.', 'Great work!', 'Excellent!', 'Good.', 'That works.' ])
-            let nextUp = sample([ 'Now we need to', 'Next we will', 'Okay, time to'])
-            this.tutorialMessage(`${congrats} ${nextUp} build a ${structure.name}...`)
+            let congrats = sample([ 'Alright!', 'Perfect.', 'Great work!', 'Excellent!', 'Good.', 'That works.', 'Cool.', 'Fantastic!', 'Now we are cooking.', 'It looks good!' ])
+            let nextUp = sample([ 'Now we need to pick a location for a', 'Next we will build a', 'Okay, time to make a', 'Get ready to place a'])
+            this.tutorialMessage(`${congrats} ${nextUp} ${structure.name}...`)
             this.startConstructing(structure, pos)
         } else {
-            // this.systemMessage(`Now we need to build a ${structure.name}...`)
             this.hud.showPalettes()
         }
     }

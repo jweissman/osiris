@@ -8,6 +8,7 @@ import { Pane } from "../actors/Hud/Pane";
 import { assembleButton } from "../Elemental";
 import { ENOTEMPTY } from "constants";
 import { sample } from "../Util";
+import { GameController } from "../GameController";
 
 const noop = () => { }
 
@@ -32,33 +33,25 @@ export class Arena extends Scene {
     spawnPalette: SpawnPalette
     floorY: number
 
-    // we may need to build a minimal colony just for things to work?
     public onInitialize(game: Game) {
+
+        let controller = new GameController(game, this.camera)
+        controller.activate()
+
         let world = new World()
         let hud = new Hud(game)
-        this.planet = new Planet(world, hud, noop, noop) // () => {},)
+        this.planet = new Planet(world, hud, noop, noop, 200000, 40000, this)
         this.add(this.planet)
 
-        this.floorY = this.planet.getTop() //game.halfCanvasHeight
+        this.floorY = this.planet.getTop()
 
         this.spawnFriendly()
-        // let victor = new Citizen('Good Guy', new Vector(500, this.floorY), this.planet, true)
-        // this.defenders = [ victor ]
-        // this.defenders.forEach(defender => this.add(defender))
+
 
         this.spawnHostile()
-        // let foxtrot = new Citizen('Bad Guy', new Vector(0, this.floorY), this.planet)
-        // this.enemies = [
-            // foxtrot
-        // ]
-        // this.enemies.forEach(enemy => this.add(enemy))
 
-        // victor.engageHostile(foxtrot)
-        // foxtrot.engageHostile(victor)
 
         this.camera.move(this.defenders[0].pos, 1000)
-        // this.camera.addStrategy(new LockCameraToActorStrategy(victor))
-        // this.camera.zoom(.5)
 
         this.spawnPalette = new SpawnPalette(100,100,
             this.spawnFriendly, 
@@ -75,7 +68,7 @@ export class Arena extends Scene {
     update(engine, delta) {
         super.update(engine, delta)
 
-        let notKilled = c => !c.isKilled()
+        let notKilled = c => c.alive // && !c.isKilled()
         this.defenders = this.defenders.filter(notKilled)
         this.enemies = this.enemies.filter(notKilled)
 
@@ -83,7 +76,7 @@ export class Arena extends Scene {
         if (defender) {
             this.enemies.forEach(e => {
                 if (!e.engagedInCombat) {
-                    e.engageHostile(defender) //sample(this.defenders))
+                    e.engageHostile(defender)
                 }
             })
         }
@@ -92,7 +85,7 @@ export class Arena extends Scene {
         if (enemy) {
             this.defenders.forEach(d => {
                 if (!d.engagedInCombat) {
-                    d.engageHostile(enemy) //sample(this.enemies))
+                    d.engageHostile(enemy)
                 }
             })
         }
@@ -102,19 +95,13 @@ export class Arena extends Scene {
         let friendly = new Citizen('Good Guy', new Vector((Math.random() * 200) + 800, this.floorY), this.planet, true)
         this.defenders.push(friendly)
         this.add(friendly)
-        // let target = this.enemies.find(enemy => !enemy.isKilled())
-        // if (target) {
-        //     friendly.engageHostile(target)
-        // }
+
     }
 
     spawnHostile = () => {
         let hostile = new Citizen('Bad Guy', new Vector((Math.random() * 200) - 100, this.floorY), this.planet, false, true)
         this.enemies.push(hostile)
         this.add(hostile)
-        //let target = this.defenders.find(defender => !defender.isKilled())
-        //if (target) {
-        //    hostile.engageHostile(target)
-        //}
+
     }
 }

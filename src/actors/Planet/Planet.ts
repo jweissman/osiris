@@ -1,7 +1,7 @@
 import * as ex from 'excalibur';
-import { Actor, Color, Vector } from 'excalibur';
+import { Actor, Color, Vector, Scene } from 'excalibur';
 import { Building } from '../Building';
-import { range, flatSingle, mixColors } from '../../Util';
+import { range, flatSingle, mixColors, sample } from '../../Util';
 import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
 import { ResourceBlock, Economy, sumMarkets, emptyMarket, availableCapacity, PureValue } from '../../models/Economy';
@@ -13,10 +13,12 @@ import { MechanicalOperation } from '../../models/MechanicalOperation';
 import { World } from '../../models/World';
 import { Colorize } from 'excalibur/dist/Drawing/SpriteEffects';
 import { SkyLayers } from './SkyLayers';
+import { Citizen } from '../Citizen';
 
 export class Planet extends Actor {
     colony: Colony
     population: Population
+    hostiles: Citizen[] = []
     // baseColor: Color
     sky: Actor
     skyLayers: SkyLayers
@@ -29,6 +31,7 @@ export class Planet extends Actor {
         private onDeviceHover: (d: Device) => any,
         private w: number = 200000,
         private depth: number = 40000,
+        public scene: Scene
     ) {
         super(0, depth / 2, w, depth, world.color)
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
@@ -64,7 +67,8 @@ export class Planet extends Actor {
         this.colony = new Colony(0, -depth / 2)
         this.add(this.colony)
 
-        this.population = new Population(this)
+        console.log("in planet, scene is: ", { scene: this.scene })
+        this.population = new Population(this, scene)
         this.add(this.population)
 
     }
@@ -262,5 +266,32 @@ export class Planet extends Actor {
 
     hasMachineKind(kind: typeof Machine) {
         return this.colony.findPoweredDevices().find(d => d.machine instanceof kind);
+    }
+
+    sendRaidingParty() {
+        let partySize =1+sample(range(3))
+        for (let times in range(partySize)) {
+            this.sendRaider()
+        }
+        console.warn(`Sent ${partySize} raiders!`)
+    }
+
+    private async sendRaider() {
+        let origin = this.colony.origin.clone() //add(new Vector(200,0))
+        // origin.addEqual(new Vector(500, 0))
+        origin.y = this.getTop() + 5
+
+        let xOff = Math.random() * 50
+        let hostile = 
+            new Citizen('Hostile', origin.add(new Vector(2000 + xOff,0)), this, false, true)
+
+        this.hostiles.push(
+            hostile
+        )
+
+        this.scene.add(hostile)
+        await hostile.glideTo(origin.add(new Vector(1500,0))) //.add(new Vector(300,0)))
+        this.population.citizens.forEach(c => c.engageHostile(hostile))
+        hostile.engageHostile(sample(this.population.citizens))
     }
 }

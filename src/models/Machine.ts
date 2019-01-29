@@ -130,10 +130,10 @@ export class CommandCenter extends Machine {
     economy = {
         ...emptyMarket(),
         Power: { supply: 1, demand: 0 },
-        Oxygen: { supply: 10, demand: 0 },
-        Water: { supply: 1, demand: 0 },
+        Oxygen: { supply: 20, demand: 0 },
+        Water: { supply: 3, demand: 0 },
         Hope: { supply: 1, demand: 0 },
-        Shelter: { supply: 1, demand: 0}
+        Shelter: { supply: 3, demand: 0}
     }
 
     onPlacement(device: Device) {
@@ -143,6 +143,8 @@ export class CommandCenter extends Machine {
         }
         let { building } = device
         building.populate(device.pos.add(building.pos), true)
+        building.populate(device.pos.add(building.pos), false)
+        building.populate(device.pos.add(building.pos), false)
     }
 }
 

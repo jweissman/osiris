@@ -11,6 +11,7 @@ class CitizenLine {
     private button: HTMLButtonElement
     private sleepy: HTMLSpanElement
     private hunger: HTMLSpanElement
+    private fighting: HTMLSpanElement
     private followed: boolean = false
     // ...
     constructor(private citizen: Citizen, private onSelect: (Citizen) => any) {
@@ -32,9 +33,11 @@ class CitizenLine {
 
 
         this.sleepy.style.display = tired ? 'inline' : 'none'
-        this.sleepy.textContent = `tired (${this.citizen.energy.toFixed()})`
+        // this.sleepy.textContent = `tired (${this.citizen.energy.toFixed()})`
         this.hunger.style.display = hungry ? 'inline' : 'none'
-        this.hunger.textContent = `hungry (${this.citizen.hunger.toFixed()})`
+        // this.hunger.textContent = `hungry (${this.citizen.hunger.toFixed()})`
+
+        this.fighting.style.display = this.citizen.engagedInCombat ? 'inline' : 'none'
     }
 
     buildLine() {
@@ -56,7 +59,7 @@ class CitizenLine {
 
         this.hunger = document.createElement('span')
         this.hunger.textContent = 'hungry'
-        this.hunger.style.color = 'red'
+        this.hunger.style.color = 'yellow'
         this.hunger.style.padding = '2px'
         this._line.appendChild(this.hunger)
 
@@ -65,6 +68,13 @@ class CitizenLine {
         this.sleepy.style.color = 'blue'
         this.sleepy.style.padding = '2px'
         this._line.appendChild(this.sleepy)
+
+        this.fighting = document.createElement('span')
+        this.fighting.textContent = 'fighting'
+        this.fighting.style.color = 'red'
+        this.fighting.style.padding = '2px'
+        this._line.appendChild(this.fighting)
+
 
         this.button = this.makeButton()
         this._line.appendChild(this.button)
@@ -99,7 +109,8 @@ export class CitizenList extends Pane {
 
     updateRoster(citizens: Citizen[], following: Citizen): any {
         let missingCitizens = citizens.some(c => !this.doesRosterInclude(c))
-        if (missingCitizens) { // rebuild
+        let lostCitizens = this.citizens.some(c => !citizens.includes(c))
+        if (missingCitizens || lostCitizens) { // rebuild
             this.citizens = citizens
             this.makeRoster()
         }

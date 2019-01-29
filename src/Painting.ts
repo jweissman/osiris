@@ -209,7 +209,7 @@ export function drawEllipse(ctx: CanvasRenderingContext2D, cx, cy, radiusX: numb
 }
 
 export function drawText(ctx: CanvasRenderingContext2D, msg: string, tx: number, ty: number) {
-  ctx.font = `7pt ${Game.font}`
+  ctx.font = `6pt ${Game.font}`
   ctx.fillStyle = Color.White.toRGBA()
   ctx.fillText(msg, tx, ty)
 }

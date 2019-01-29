@@ -156,7 +156,7 @@ export class Hud extends UIActor {
         // let missingCitizens = planet.population.citizens.some(c => !this.citizenList.doesRosterInclude(c))
         // let followedChanged = following !== this.citizenList.following
         // if (missingCitizens || followedChanged) {
-        this.citizenList.updateRoster(planet.population.citizens, following)
+        this.citizenList.updateRoster(planet.population.citizens.filter(c => c.alive), following)
         // }
 
         if (!this.showCitizenList && planet.hasMachineKind(PersonnelRegistry)) {

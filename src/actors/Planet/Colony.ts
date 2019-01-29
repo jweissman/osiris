@@ -107,6 +107,8 @@ export class Colony extends Actor {
         }
     }
 
+    get origin() { return this.buildings[0].pos }
+
     private buildNavTree() {
         let ctrl = this.buildings[0] //.find(building => building.structure instanceof MissionControl);
         if (ctrl) {

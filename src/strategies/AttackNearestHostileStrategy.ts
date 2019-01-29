@@ -2,6 +2,7 @@ import { CombatStrategy } from "./CombatStrategy";
 
 export class AttackNearestHostileStrategy extends CombatStrategy {
     protected async apply() {
+        if (this)
         if (this.pawn.distanceToHostile() > this.pawn.idealCombatRange) {
             await this.pawn.followHostile()
         } else {

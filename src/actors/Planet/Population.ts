@@ -1,4 +1,4 @@
-import { Actor, Traits } from 'excalibur';
+import { Actor, Traits, Scene } from 'excalibur';
 import { Citizen } from '../Citizen';
 import { Planet } from './Planet';
 import { Device } from '../Device';
@@ -6,9 +6,10 @@ import { World } from '../../models/World';
 
 export class Population extends Actor {
     citizens: Citizen[] = [];
-    constructor(private planet: Planet) {
+    constructor(private planet: Planet, public scene: Scene) {
         super(0, -planet.getHeight() / 2, 0, 0);
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling));
+        console.log("in pop ctor, scene is: ", { scene: this.scene })
     }
 
     increase(pos, elite: boolean = false) {
@@ -16,6 +17,10 @@ export class Population extends Actor {
         citizen.work();
         this.citizens.push(citizen);
         // scene.add?
-        this.add(citizen);
+        if (this.scene) {
+            this.scene.add(citizen);
+        } else {
+            console.warn("no scene to add citizen to!?!?")
+        }
     }
 }
