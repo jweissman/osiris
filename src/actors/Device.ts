@@ -222,28 +222,17 @@ export class Device extends Actor {
             this.inUse = false
         } else if (op.type === 'explore') {
             this.inUse = true
-            // this.add(citizen)
-            // if (this.product.length < this.getEffectiveOperationalCapacity(op)) {
             let origX = this.pos.x
             let groundSpeed = Game.citizenSpeed * 3
-            citizen.driving = this
-            // let oldAnchor = citizen.anchor
-            // citizen.anchor = this.anchor
-            let xOff = 5000 * (Math.random() > 0.5 ? -1 : 1)
+            citizen.drive(this)
+            let xOff = 25000 * (Math.random() > 0.5 ? -1 : 1)
             await this.actions.moveTo(this.pos.x + xOff, this.pos.y, groundSpeed).asPromise()
-            // for (let times in range(op.capacity)) {
+            await citizen.progressBar(5000)
             this.produceResource(op.gathers)
-            // }
             await this.actions.moveTo(origX, this.pos.y, groundSpeed).asPromise()
             worked = true
-            citizen.driving = null
-            // citizen.anchor = oldAnchor
-
+            citizen.stopDriving()
             this.inUse = false
-
-            //await this.interact(citizen, retrieveResource(op.gathers))
-            // }
-            // this.remove(citizen)
         }
 
         return worked
@@ -320,10 +309,10 @@ export class Device extends Actor {
             )
 
             let snapped = false
+            let halfSize = getVisibleDeviceSize(this.size) / 2
             if (bldg) {
                 // console.log("we have a building!", { bldg })
                 let spot = bldg.getCenter()
-                let halfSize = getVisibleDeviceSize(this.size)/2
                 let d = spot.distance(pos)
                 snapped = d < (bldg.getWidth()/2 - halfSize) && (Math.abs(spot.y - pos.y) < 80)
             } else {
@@ -333,10 +322,18 @@ export class Device extends Actor {
             if (snapped) {
                 this.building = bldg;
                 this.pos = pos //.x //this.building.nextDevicePlace().position
-                let gridGrain = 20
+                let gridGrain = halfSize
                 this.pos.x += bldg.x
                 this.pos.x = Math.floor(this.pos.x / gridGrain) * gridGrain
                 this.pos.x -= bldg.x
+                this.pos.x = Math.max(
+                    bldg.x,
+                    this.pos.x
+                )
+                this.pos.x = Math.min(
+                    bldg.x + bldg.getWidth() - halfSize,
+                    this.pos.x
+                )
                 this.pos.y = bldg.floorY - getVisibleDeviceSize(this.size)/2 //getCenter().y + (bldg.getHeight()/8)
             } else {
                 this.pos = pos

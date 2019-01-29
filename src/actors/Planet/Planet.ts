@@ -57,7 +57,7 @@ export class Planet extends Actor {
            this.getWidth(),
            this.color.lighten(0.04),
            world.skyColor,
-           20
+           6
         )
         this.add(this.skyLayers)
 
@@ -94,7 +94,7 @@ export class Planet extends Actor {
     private assignColors(skyColor: Color) {
         this.sky.color = skyColor
 
-        let inc = 0.04
+        let inc = 0.08
 
         let c = mixColors(
             this.sky.color.lighten(5 * inc), //.lighten(3*inc).saturate(5*inc),

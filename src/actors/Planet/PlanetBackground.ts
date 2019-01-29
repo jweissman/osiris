@@ -16,9 +16,9 @@ export class MountainLayers extends PlanetBackground {
     }[] = []
 
     skyColor: Color = Color.Blue.clone()
-    layerHeight: number = 100
+    layerHeight: number = 80
     layerCount = 1
-    peakCount = 100
+    peakCount = 1000
 
     get peakWidth() {
         return Math.floor(this.getWidth() / this.peakCount)
@@ -94,7 +94,7 @@ export class Mountains extends PlanetBackground {
         height: number;
     }[] = [];
     onInitialize() {
-        let peakCount = 3
+        let peakCount = 9
         let peakHeight = 800
         let xOff = this.getWidth() / 2
         let peakDistance = this.getWidth() / peakCount

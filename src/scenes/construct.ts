@@ -14,29 +14,23 @@ import { DeviceSize } from "../values/DeviceSize";
 import { Orientation } from "../values/Orientation";
 import { TechnologyRank } from "../models/TechnologyRank";
 import { TechTree } from "../models/TechTree";
+import { Citizen } from "../actors/Citizen";
 
 
 export class Construct extends Scene {
-    game: Game
-    planet: Planet
-    hud: Hud
-    player: Player
-
-    dragging: boolean = false
-    dragOrigin: Vector
-
-    defaultMessage: string = 'Welcome to the Colony, Commander.'
-
-    placingFunction: RoomRecipe = null
-
-    time: number = Game.startHour*60
-
-    hasActiveModal: boolean = false
-
-    techTree: TechTree = new TechTree()
-
-    firstBuilding: boolean = true
-
+    private game: Game
+    private planet: Planet
+    private hud: Hud
+    private player: Player
+    private dragging: boolean = false
+    private dragOrigin: Vector
+    private defaultMessage: string = 'Welcome to the Colony, Commander.'
+    private placingFunction: RoomRecipe = null
+    private time: number = Game.startHour*60
+    private hasActiveModal: boolean = false
+    private techTree: TechTree = new TechTree()
+    private firstBuilding: boolean = true
+    private followedCitizen: Citizen = null
 
     static requiredStructuresAndFunctions: (typeof RoomRecipe | typeof Structure)[] = [
         MissionControl,
@@ -61,7 +55,7 @@ export class Construct extends Scene {
         }
 
         // hmm!
-        this.hud.updateDetails(this.planet, this.techTree, true, this.time)
+        this.hud.updateDetails(this.planet, this.techTree, this.followedCitizen, true, this.time)
 
     }
 
@@ -69,7 +63,7 @@ export class Construct extends Scene {
         this.game = game
 
         let buildIt = (e) => this.startConstructing(e)
-        let followIt = (c) => this.startFollowing(c)
+        let followIt = (c) => this.toggleFollowing(c)
 
         this.hud = new Hud(game, buildIt, buildIt, buildIt, followIt)
         this.add(this.hud)
@@ -109,12 +103,7 @@ export class Construct extends Scene {
         this.hasActiveModal = true
         this.hud.systemMessage(message, "", {
             continue: () => { this.closeSystemMessage() },
-            //stopTutorial: () => {
-            //    this.closeSystemMessage()
-            //    this.tuto
-            //}
-
-        })
+         })
     }
 
     private tutorialMessage(message: string) {
@@ -268,6 +257,8 @@ export class Construct extends Scene {
 
         let { Up, Down, Left, Right } = Orientation;
         let moveCam = (direction: Orientation) => {
+            this.stopFollowing()
+
             let camMoveSpeed = 10 * (1/this.camera.getZoom())
             let dv = new Vector(0,0)
             switch(direction) {
@@ -283,13 +274,14 @@ export class Construct extends Scene {
         this.game.input.keyboard.on('press', (e: Input.KeyEvent) => {
             if (e.key === Input.Keys.H) {
                 if (this.buildings && this.buildings[0]) {
+                    this.stopFollowing()
                     this.camera.move(this.buildings[0].pos, 500)
                     this.camera.zoom(0.5, 1000)
                 }
             } else if (e.key === Input.Keys.Esc) {
                 this.planet.colony.currentlyConstructing = null
                 this.placingFunction = null
-                this.stopFollowing()
+                this.stopFollowing(true)
                 this.hud.setStatus(this.defaultMessage)
             } else if (e.key === Input.Keys.Up || e.key === Input.Keys.W) {
                 moveCam(Up)
@@ -350,18 +342,31 @@ export class Construct extends Scene {
         }
     }
 
+    toggleFollowing(citizen) {
+        if (this.followedCitizen === citizen) {
+            this.stopFollowing(true)
+        } else {
+            this.startFollowing(citizen)
+        }
+    }
+
     cameraStrategy: LockCameraToActorStrategy
     startFollowing(citizen) {
         this.stopFollowing()
         this.cameraStrategy = new LockCameraToActorStrategy(citizen)
-        this.camera.zoom(2, 1000)
+        this.camera.zoom(1.2, 1000)
         this.camera.addStrategy(this.cameraStrategy)
+        this.followedCitizen = citizen
+
     }
 
-    stopFollowing() {
+    stopFollowing(resetZoom=false) {
         if (this.cameraStrategy) {
             this.camera.removeStrategy(this.cameraStrategy)
-            this.camera.zoom(1, 1000)
+            if (resetZoom) { 
+                this.camera.zoom(0.5, 1000)
+            }
+            this.followedCitizen = null
         }
     }
 

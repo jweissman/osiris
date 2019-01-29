@@ -4,14 +4,14 @@ import { Resources } from './Resources';
 
 export class Game extends Engine {
   // static showTutorial: boolean = true
-  static citizenSpeed: number = 130
+  static citizenSpeed: number = 150
   static debugPath: boolean = false
   static startHour: number = 9
 
   // 10000 = 1 min / 10 sec
   // 1000 = 1 min / second
   // 100 = 10 min / second
-  static minuteTickMillis: number = 1e3
+  static minuteTickMillis: number = 500
 
   static font = 'Helvetica'
   static title: string = 'ASTRA';

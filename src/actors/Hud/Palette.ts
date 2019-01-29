@@ -2,6 +2,7 @@ import { Color } from "excalibur";
 import { EntityKind } from "../../values/Entity";
 import { onlyUnique } from "../../Util";
 import { Pane } from "./Pane";
+import { assembleButton } from "../../Elemental";
 
 export class Palette extends Pane {
     built: EntityKind[] = [];
@@ -57,7 +58,7 @@ export class Palette extends Pane {
                     label += ' *';
                 }
                 let clr = elem.color;
-                let btn = this.buttonFactory(label, clr);
+                let btn = assembleButton(label, clr);
                 this._element.appendChild(btn);
                 if (this.onButtonEnter) {
                     btn.onmouseenter = () => { this.onButtonEnter(elem); };

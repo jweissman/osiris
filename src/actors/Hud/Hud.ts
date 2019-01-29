@@ -15,6 +15,7 @@ import { Building } from "../Building";
 import { Modal } from "./Modal";
 import { TechTree } from "../../models/TechTree";
 import { CitizenList } from "./CitizenList";
+import { Citizen } from "../Citizen";
 
 export class Hud extends UIActor {
     private hidePalettes: boolean = true
@@ -22,7 +23,7 @@ export class Hud extends UIActor {
     private machinePalette: Palette
     private functionPalette: Palette
 
-    private showCitizenList: boolean = false
+    private showCitizenList: boolean = true
     private citizenList: CitizenList
 
 
@@ -142,7 +143,7 @@ export class Hud extends UIActor {
         this.status.decrementResource(resource)
     }
 
-    updateDetails(planet: Planet, techTree: TechTree, rebuildPalettes: boolean = true, time: number = 0) {
+    updateDetails(planet: Planet, techTree: TechTree, following: Citizen, rebuildPalettes: boolean = true, time: number = 0) {
         if (!planet) { return }
         if (rebuildPalettes) {
             this.updatePalettes(planet.colony, techTree)
@@ -152,11 +153,12 @@ export class Hud extends UIActor {
 
         this.status.setClock(time)
 
-        if (planet.population.citizens.some(c => !this.citizenList.citizens.includes(c))) { 
-            this.citizenList.updateRoster(planet.population.citizens)
-        }
+        // let missingCitizens = planet.population.citizens.some(c => !this.citizenList.doesRosterInclude(c))
+        // let followedChanged = following !== this.citizenList.following
+        // if (missingCitizens || followedChanged) {
+        this.citizenList.updateRoster(planet.population.citizens, following)
+        // }
 
-        // custom unlocks?
         if (!this.showCitizenList && planet.hasMachineKind(PersonnelRegistry)) {
             this.showCitizenList = true
         }

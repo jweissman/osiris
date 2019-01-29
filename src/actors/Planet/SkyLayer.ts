@@ -8,7 +8,7 @@ export class SkyLayer extends Actor {
     constructor(y: number, width: number, lo: Color, hi: Color) {
         super(0, y, width, 1500); //width,1500) //height)
         let mid = mixColors(lo, hi);
-        this.backMountainLayers = new MountainLayers(-80, width, mid);
+        this.backMountainLayers = new MountainLayers(-60, width, mid);
         this.backMountainLayers.skyColor = hi;
         this.add(this.backMountainLayers);
         this.mountains = new Mountains(0, width, mid);

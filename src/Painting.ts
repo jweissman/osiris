@@ -1,6 +1,7 @@
 import { Vector, Color } from "excalibur";
 import { Rectangle } from "./values/Rectangle";
 import { BackgroundPattern, getBackgroundPattern } from "./actors/Building/BackgroundPatterns";
+import { Game } from "./Game";
 
 type PaintingPath = { x: number, y: number }[]
 
@@ -187,7 +188,7 @@ export function drawCircle(ctx, cx, cy: number, radius: number, color: Color, he
   ctx.fill()
 }
 
-export function drawEllipse(ctx, cx, cy, radiusX: number, radiusY: number, color: Color, hemi=false) {
+export function drawEllipse(ctx: CanvasRenderingContext2D, cx, cy, radiusX: number, radiusY: number, color: Color, hemi=false) {
   let theta = hemi ? Math.PI : (2 * Math.PI)
   ctx.beginPath()
 
@@ -197,11 +198,18 @@ export function drawEllipse(ctx, cx, cy, radiusX: number, radiusY: number, color
     radiusX,
     radiusY,
     0,
+    0,
     theta,
-    true
+    // true
   )
   ctx.closePath()
 
   ctx.fillStyle = color.toRGBA()
   ctx.fill()
+}
+
+export function drawText(ctx: CanvasRenderingContext2D, msg: string, tx: number, ty: number) {
+  ctx.font = `7pt ${Game.font}`
+  ctx.fillStyle = Color.White.toRGBA()
+  ctx.fillText(msg, tx, ty)
 }
