@@ -3,10 +3,13 @@ import { World } from './models/World';
 import { Resources } from './Resources';
 
 export class Game extends Engine {
-  // static showTutorial: boolean = true
-  static citizenSpeed: number = 150
+  static citizenSpeed: number = 50
   static debugPath: boolean = false
   static startHour: number = 9
+
+  // combat knobs
+  static bulletSpeed: number = 800
+  static raidingPartyFrequency: number = 30000
 
   // 10000 = 1 min / 10 sec
   // 1000 = 1 min / second

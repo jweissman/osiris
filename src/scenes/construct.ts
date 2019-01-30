@@ -168,7 +168,7 @@ export class Construct extends Scene {
             new Timer(() => {
                 // this.systemMessage("raiding party incoming -- perimeter alert")
                 this.planet.sendRaidingParty()
-            }, 120000, true)
+            }, Game.raidingPartyFrequency, true)
         )
 
         this.controller = new GameController(this.game, this.camera)
@@ -284,7 +284,7 @@ export class Construct extends Scene {
         if (nextMissing) { structure = nextMissing; }
         if (structure) {
             let congrats = sample([ 'Alright!', 'Perfect.', 'Great work!', 'Excellent!', 'Good.', 'That works.', 'Cool.', 'Fantastic!', 'Now we are cooking.', 'It looks good!' ])
-            let nextUp = sample([ 'Now we need to pick a location for a', 'Next we will build a', 'Okay, time to make a', 'Get ready to place a'])
+            let nextUp = sample([ "Let's pick a location for a", 'Next we will build a', 'Okay, time to make a', 'Get ready to place a'])
             this.tutorialMessage(`${congrats} ${nextUp} ${structure.name}...`)
             this.startConstructing(structure, pos)
         } else {

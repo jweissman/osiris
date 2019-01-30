@@ -24,4 +24,16 @@ export class NavigationTree {
        }
        return false
    }
+
+   closestNodeAtSameYCoordinate(testNode: Vector, tol: number = 50) {
+       let nodes = this.graph.dfs()
+       let closest = minBy(
+           nodes.filter((node: Vector) => Math.abs(node.y - testNode.y) < tol),
+           (node: Vector) => Math.abs(testNode.distance(node)),
+       )
+       if (closest) {
+           return closest
+       }
+       return false
+   }
 }

@@ -8,7 +8,7 @@ import { Device } from "./Device";
 import { Scale } from "../values/Scale";
 import { ProductionStrategy } from "../strategies/ProductionStrategy";
 import { CapacityBasedProduction } from "../strategies/CapacityBasedProduction";
-import { drawStar, drawRect, drawCircle, drawEllipse, drawText } from "../Painting";
+import { drawStar, drawRect, drawCircle, drawEllipse, drawText, drawLine } from "../Painting";
 import { ConstructionStrategy } from "../strategies/ConstructionStrategy";
 import { ProxmityBasedConstruction } from "../strategies/ProximityBasedConstruction";
 import { SleepingStrategy } from "../strategies/SleepingStrategy";
@@ -19,6 +19,7 @@ import { DeviceSize, getVisibleDeviceSize } from "../values/DeviceSize";
 import { CombatStrategy } from "../strategies/CombatStrategy";
 import { AttackNearestHostileStrategy } from "../strategies/AttackNearestHostileStrategy";
 import { randomBytes } from "crypto";
+import { LaserBeam } from "./LaserBeam";
 
 export class Citizen extends Actor {
     alive: boolean = true
@@ -89,7 +90,7 @@ export class Citizen extends Actor {
             Color.Orange.lighten(0.8),
         ])
 
-        this.weight = sample([ 5, 6, 7, 8, 9, 10 ])
+        this.weight = sample(range(7).map(w => w + 4)) //[ 5, 6, 7, 8, 9, 10 ])
 
         // this.nameLabel = new Label(name, this.pos.x, this.pos.y, Game.font)
         // this.add(this.nameLabel)
@@ -139,6 +140,8 @@ export class Citizen extends Actor {
         return Game.citizenSpeed * speedMultiplier
     }
 
+    get isEvil(): boolean { return !!this.evil }
+
     update(engine, delta) {
         super.update(engine, delta)
 
@@ -166,22 +169,44 @@ export class Citizen extends Actor {
         }
 
         if (this.combatting && !this.combatting.alive) { //isKilled()) {
-            // console.log("enemy was killed?", this.combatting)
+            console.warn("enemy was killed?", this.combatting)
             this.combatting = null
+        }
+
+        if (this.sleeping) {
+            // heal during sleep
+            this.health = Math.min(100, this.health+0.1)
+            this.energy = Math.min(100, this.energy+0.1)
+            if (this.health === 100 && !this.isTired) { //} && this.planet.hour > 6) {
+                this.sleeping = false
+                this.abortProgressBar()
+            }
         }
     }
 
-    private fatigue() {
-        let unit = 1e-4;
-        this.energy -= unit;
-        this.hunger += unit;
-    }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
 
         let { x, y } = this
         ctx.save()
         ctx.translate(x, y - this.getHeight()/2) // - 5)
+
+        if (this.alive) {
+            drawText(ctx, this.name, -14, -22)
+
+            if (this.health < 100) {
+                let healthColor = this.health > 60 ? Color.Green : Color.Yellow
+                if (this.health < 10) { healthColor = Color.Red }
+                this.drawBar(ctx, -13, -18, 32, 4, (this.health / 100), healthColor)
+            }
+
+            if (this.guarding) {
+                let c = Color.Cyan.clone()
+                c.a = 0.3
+                drawCircle(ctx, 2, 2, 24, c) //Color.Cyan)
+            }
+        }
+
         if (this.sleeping || !this.alive) {
             ctx.rotate(-Math.PI / 2);
             if (this.sleeping) {
@@ -220,6 +245,11 @@ export class Citizen extends Actor {
             })
         }
 
+        if (this.combatting) {
+            // drawLine(ctx, this.combatting.pos, this.pos, Color.Red, 4)
+        }
+
+
         super.draw(ctx, delta)
     }
 
@@ -243,15 +273,7 @@ export class Citizen extends Actor {
         if (this.elite) {
             drawStar(ctx, 12, -8)
         }
-        if (this.alive) {
-            drawText(ctx, this.name, -14, -22)
 
-            if (this.health < 100) {
-                let healthColor = this.health > 60 ? Color.Green : Color.Yellow
-                if (this.health < 10) { healthColor = Color.Red }
-                this.drawBar(ctx, -13, -18, 32, 4, (this.health / 100), healthColor)
-            }
-        }
     }
 
     async progressBar(duration: number) {
@@ -259,6 +281,11 @@ export class Citizen extends Actor {
         this.workStarted = (new Date()).getTime()
         this.workDuration = duration
         await new Promise((resolve, reject) => setTimeout(resolve, duration));
+        this.workInProgress = false
+    }
+
+    abortProgressBar() {
+        this.log("work in progress aborted...!")
         this.workInProgress = false
     }
 
@@ -292,9 +319,9 @@ export class Citizen extends Actor {
     currentBuilding: Building = null
     async visit(device: Device) {
         let target = this.targetForDevice(device)
-        if (this.currentBuilding != device.building) {
+        // if (this.currentBuilding != device.building) {
             await this.pathTo(target)
-        }
+        // }
         await this.glideTo(target)
         this.currentBuilding = device.building
     }
@@ -327,7 +354,24 @@ export class Citizen extends Actor {
         if (path.length > 0) {
             this.path = path
             await Promise.all(
-                path.map(step => this.glideTo(step))
+                path.map(step => {
+                    // if we are engaged in combat, and enemy is at same level
+
+                    // let engaged = this.engagedInCombat
+
+                    // if (engaged) { 
+                    //     let dy = Math.abs(this.combatting.y - this.y) // < 10
+                    //     if (dy < 40) {
+                    //     // don't try to glide around anymore? (maybe make this action q and we can clear if need be???)
+                    //     // this.path = []
+                    //         this.log("not following path, engaged in combat")
+                    //         return
+                    //     }
+                    // } //else {
+                    this.log("glide to next step")
+                    this.glideTo(step)
+                    // }
+                })
             )
             this.path = []
         }
@@ -348,7 +392,6 @@ export class Citizen extends Actor {
         this.isPlanning = true
         if (this.carrying.length > 0) { this.carrying = [] }
         let choice = this.strategies.find(strat => strat.canApply())
-        console.debug("WORK CHOICE", { choice })
         if (choice) {
             await choice.attempt()
         }
@@ -356,10 +399,13 @@ export class Citizen extends Actor {
     }
 
     async takeRest(duration: number = 8 * 60 * Game.minuteTickMillis) {
+        // this.abortProgressBar()
+        // this.combatting = null
+
         this.sleeping = true
-        await this.progressBar(duration)
-        this.energy = 100
-        this.sleeping = false
+        this.progressBar(duration)
+        // this.energy = 100
+        // this.sleeping = false
     }
 
     async eat() {
@@ -370,15 +416,21 @@ export class Citizen extends Actor {
     }
 
     private combatting: Citizen = null
+
     engageHostile(hostile: Citizen) {
-        if (!this.combatting) {
-            // console.log("ENGAGE HOSTILE", { hostile })
+        this.abortProgressBar()
+        this.actionQueue.clearActions()
+        if (!this.combatting && !this.workInProgress) {
+            // this.log(`ENGAGE HOSTILE ${hostile.name}`)
+            // this.abortProgressBar()
             this.combatting = hostile
-            if (!hostile.engagedInCombat) {
-                hostile.engageHostile(this)
-            }
+            //if (!hostile.engagedInCombat) {
+            //    hostile.engageHostile(this)
+            //}
         }
     }
+
+    get enemyCombatant() { return this.combatting }
 
     get engagedInCombat() {
         // console.log("is engaged in combat", { enemyCombatant: this.combatting })
@@ -393,10 +445,10 @@ export class Citizen extends Actor {
         }
     }
 
-    private paceUnit: number = 24
+    private paceUnit: number = 20
     get idealCombatRange() {
         // let paceUnit = 20
-        let idealDistance = 30 * this.paceUnit
+        let idealDistance = 20 * this.paceUnit
         return idealDistance
     }
 
@@ -414,83 +466,93 @@ export class Citizen extends Actor {
         }
     }
 
-    async followHostile() {
-        if (!this.alive) { return } ////...
-        // let paceUnit = 20
-        let idealDistance = this.idealCombatRange //20 * paceUnit
-        let enemy = this.combatting.getWorldPos().clone()
-        if (!(Math.abs(enemy.y - this.y) < 15)) {
-            // we may need to path to it? [i.e. out from underground]
-            await this.pathTo(enemy)
-        }
+    get enemyPosition() { return this.combatting.getWorldPos().clone() }
+    // get horiistanceToEnemyLine() {}
 
-        let self = this.getWorldPos().clone()
-        let nextGoal = self.clone()
-        let unit = this.paceUnit * 5
-        if (this.distanceToHostile() > idealDistance) {
-            if (enemy.x > self.x) {
-                nextGoal.x += unit
+    combatMovementUnit: number = this.paceUnit * 5
+    firingRangeBuffer: number = this.combatMovementUnit * 2
 
-                // target.x += 5 //= target.x - idealDistance
-            } else if (enemy.x < self.x) {
-                nextGoal.x -= unit
-                // target.x -= 5 //= enemy.x + idealDistance
-            }
+    tooCloseToEnemyLine(): boolean {
+        let dx = Math.abs(this.enemyPosition.x - this.x)
+        return dx < this.idealCombatRange - this.firingRangeBuffer
+    }
 
+    tooFarFromEnemyLine(): boolean {
+        let dx = Math.abs(this.enemyPosition.x - this.x)
+        return dx > this.idealCombatRange + this.firingRangeBuffer
+    }
+
+    withinFiringRange(): boolean {
+        return !(this.tooCloseToEnemyLine() || this.tooFarFromEnemyLine())
+    }
+
+    async advanceTowardsEnemy() {
+        //let idealDistance = this.idealCombatRange //20 * paceUnit
+        //let enemy = this.combatting.getWorldPos().clone()
+        //let self = this.getWorldPos().clone()
+        let nextGoal = this.getWorldPos().clone()
+        let unit = this.combatMovementUnit //paceUnit * 7
+        //let dx = Math.abs(enemy.x - self.x) //this.distanceToHostile()
+        //let buffer = 3 * unit // * this.paceUnit
+        if (this.tooFarFromEnemyLine()) { // dx > idealDistance+buffer) {
+            unit *= this.hostileDirectionSign
+            this.log(`ADVANCE TOWARD ENEMY LINE`)
+            nextGoal.x += unit // enemy.x - (idealDistance * this.hostileDirectionSign)
+            await this.glideTo(nextGoal) //this.combatting.pos)
+        } else if (this.tooCloseToEnemyLine()) { //dx < idealDistance-buffer) {
+            unit *= -this.hostileDirectionSign
+            this.log(`RETREAT FROM ENEMY LINE`)
+            nextGoal.x += unit // enemy.x - (idealDistance * this.hostileDirectionSign)
             await this.glideTo(nextGoal) //this.combatting.pos)
         }
-
-        // if (Math.floor(this.x) !== Math.floor(target.x)) {
-        // }
     }
 
     // bullets: Actor[]
     firing: boolean = false
     async fire() {
         if (!this.firing) {
-            await sleep(Math.random() * 1000)
-            console.log("FIRE!!!")
+            // console.log("FIRE!!!")
             // launch a (few) projectile(s)!!!
-            let numTimes = range(sample(range(5)))
+
+            await sleep(500)
+            let numTimes = range(sample(range(3)))
             for (let times in numTimes) {
+                await this.progressBar(150)
                 if (this.alive && this.combatting && this.combatting.alive) {
-                    await this.progressBar(100)
                     this.firing = true
                     let bullet = this.assembleBullet()
                     this.scene.add(bullet)
-                    this.scene.addTimer(new Timer(() => { bullet.kill() }, 1500))
+                    this.scene.addTimer(new Timer(() => { bullet.kill() }, 2000))
                     this.firing = false
                 }
+            }
+            await sleep(250) //this.progressBar(250)
+        }
+    }
+
+    guarding: boolean = false
+    async guard() {
+        if (!this.guarding) {
+            // this.guarding = true
+            if (this.alive && this.combatting) {
+                // await this.progressBar(100)
+                this.guarding = true
+                await sleep(1500)
+                // await this. //progressBar(5000)
+                this.guarding = false
             }
         }
     }
 
     private assembleBullet() {
         let hostileDir = this.hostileDirectionSign
-        let bullet = new Actor(this.pos.x + 42 * hostileDir, this.pos.y - 10, 14, 0.5)
-        bullet.color = (this.evil ? Color.Green : Color.Cyan).clone().lighten(0.3)
-        bullet.vel.x = 450 * hostileDir //this.hostileDirectionSign
-        bullet.vel.y = (Math.random() * 10) - 5 //750 * hostileDir //this.hostileDirectionSign
-        bullet.on('collisionstart', (collision) => {
-            // console.log("COLLISION", { collision })
-            if (collision.other instanceof Citizen) {
-                if (collision.other.alive && this.evil !== collision.other.evil) {
-                    if (Math.random() > 0.3) {
-                        // console.log("someone got hit!", { person: collision.other.name })
-                        bullet.kill()
-                        collision.other.injure(6 + (Math.random() * 4), this)
-                    }
-                }
-            }
-        })
-        bullet.collisionType = CollisionType.Passive
-        // bullet.isKilled
+        let bullet = new LaserBeam(this, hostileDir)
         return bullet
     }
 
     injure(amt: number, attacker: Citizen) {
         if (this.elite) {
-            amt = amt * 0.6
+            amt = amt * 0.3
         }
         this.health -= amt
         if (this.health <= 0) {
@@ -513,5 +575,15 @@ export class Citizen extends Actor {
         this.bloodEmitter.isEmitting = true
         this.scene.addTimer(new Timer(() => { this.bloodEmitter.isEmitting = false }, 50))
 
+    }
+
+    private fatigue() {
+        let unit = 1e-4;
+        this.energy -= unit;
+        this.hunger += unit;
+    }
+
+    log(msg) {
+        // console.log(`${this.name}: ${msg}`)
     }
 }

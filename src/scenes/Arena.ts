@@ -28,8 +28,8 @@ class SpawnPalette extends Pane {
 // arenaaaaa
 export class Arena extends Scene {
     planet: Planet
-    defenders: Citizen[] = []
-    enemies: Citizen[] = []
+    // defenders: Citizen[] = []
+    // enemies: Citizen[] = []
     spawnPalette: SpawnPalette
     floorY: number
 
@@ -51,7 +51,7 @@ export class Arena extends Scene {
         this.spawnHostile()
 
 
-        this.camera.move(this.defenders[0].pos, 1000)
+        this.camera.move(this.planet.population.citizens[0].pos, 1000)
 
         this.spawnPalette = new SpawnPalette(100,100,
             this.spawnFriendly, 
@@ -65,42 +65,40 @@ export class Arena extends Scene {
         this.spawnPalette.draw(ctx)
     }
 
-    update(engine, delta) {
-        super.update(engine, delta)
+    //update(engine, delta) {
+    //    super.update(engine, delta)
+    //    let notKilled = c => c.alive // && !c.isKilled()
+    //    this.defenders = this.defenders.filter(notKilled)
+    //    this.enemies = this.enemies.filter(notKilled)
 
-        let notKilled = c => c.alive // && !c.isKilled()
-        this.defenders = this.defenders.filter(notKilled)
-        this.enemies = this.enemies.filter(notKilled)
-
-        let defender = this.defenders.find(notKilled)
-        if (defender) {
-            this.enemies.forEach(e => {
-                if (!e.engagedInCombat) {
-                    e.engageHostile(defender)
-                }
-            })
-        }
-
-        let enemy = this.enemies.find(notKilled)
-        if (enemy) {
-            this.defenders.forEach(d => {
-                if (!d.engagedInCombat) {
-                    d.engageHostile(enemy)
-                }
-            })
-        }
-    }
+    //    let defender = this.defenders.find(notKilled)
+    //    if (defender) {
+    //        this.enemies.forEach(e => {
+    //            if (!e.engagedInCombat) {
+    //                e.engageHostile(defender)
+    //            }
+    //        })
+    //    }
+    //    let enemy = this.enemies.find(notKilled)
+    //    if (enemy) {
+    //        this.defenders.forEach(d => {
+    //            if (!d.engagedInCombat) {
+    //                d.engageHostile(enemy)
+    //            }
+    //        })
+    //    }
+    //}
 
     spawnFriendly = () => {
         let friendly = new Citizen('Good Guy', new Vector((Math.random() * 200) + 800, this.floorY), this.planet, true)
-        this.defenders.push(friendly)
+        this.planet.population.citizens.push(friendly)
         this.add(friendly)
 
     }
 
     spawnHostile = () => {
         let hostile = new Citizen('Bad Guy', new Vector((Math.random() * 200) - 100, this.floorY), this.planet, false, true)
-        this.enemies.push(hostile)
+        this.planet.population.raiders.push(hostile)
         this.add(hostile)
 
     }

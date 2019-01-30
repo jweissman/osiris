@@ -1,7 +1,7 @@
 import * as ex from 'excalibur';
 import { Actor, Color, Vector, Scene } from 'excalibur';
 import { Building } from '../Building';
-import { range, flatSingle, mixColors, sample } from '../../Util';
+import { range, flatSingle, mixColors, sample, closest } from '../../Util';
 import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
 import { ResourceBlock, Economy, sumMarkets, emptyMarket, availableCapacity, PureValue } from '../../models/Economy';
@@ -277,21 +277,20 @@ export class Planet extends Actor {
     }
 
     private async sendRaider() {
-        let origin = this.colony.origin.clone() //add(new Vector(200,0))
-        // origin.addEqual(new Vector(500, 0))
+        let origin = this.colony.origin.clone()
         origin.y = this.getTop() + 5
-
         let xOff = Math.random() * 50
-        let hostile = 
-            new Citizen('Hostile', origin.add(new Vector(2000 + xOff,0)), this, false, true)
+        let raider = 
+            new Citizen('Raider', origin.add(new Vector(3000 + xOff,0)), this, false, true)
 
-        this.hostiles.push(
-            hostile
+        this.population.raiders.push(
+            raider
         )
 
-        this.scene.add(hostile)
-        await hostile.glideTo(origin.add(new Vector(1500,0))) //.add(new Vector(300,0)))
-        this.population.citizens.forEach(c => c.engageHostile(hostile))
-        hostile.engageHostile(sample(this.population.citizens))
+        this.scene.add(raider)
+        await raider.glideTo(origin) //.add(new Vector(2400,0))) //.add(new Vector(300,0)))
+        // this.population.citizens.forEach(c => c.engageHostile(raider))
+        // let target = closest(raider.pos, this.population.citizens, (c) => c.pos)
+        // raider.engageHostile(target) //sample(this.population.citizens))
     }
 }

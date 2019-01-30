@@ -34,6 +34,7 @@ export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, cl
   ctx.strokeStyle = c.toRGBA()
   ctx.lineWidth = lineWidth
   ctx.stroke()
+  ctx.lineWidth = 1
 }
 
 export function drawPatternedRect(

@@ -49,7 +49,8 @@ export class Modal {
         this._element.style.border = 'none'; //1px solid black'; //0.5px solid white';
         document.body.appendChild(this._element);
 
-        let bg = Color.Violet.clone().darken(0.92).toRGBA()
+        let bg = Color.Violet.clone().darken(0.92) //.clone..toRGBA()
+        bg.a = 0.3
 
         let title = document.createElement('div');
         title.textContent = this.title;
@@ -60,14 +61,14 @@ export class Modal {
         title.style.textAlign = 'center'
         title.style.width = `${this.width}px`;
         title.style.color = Color.White.toRGBA();
-        title.style.backgroundColor = bg //Color.Violet.darken(0.92).toRGBA();
+        title.style.backgroundColor = bg.toRGBA() //Color.Violet.darken(0.92).toRGBA();
         title.style.padding = '12px';
         title.style.margin = '0px';
         this._element.appendChild(title);
 
         this._header = document.createElement('div')
         this._header.style.width = `${this.width}px`;
-        this._header.style.backgroundColor = bg // Color.Violet.darken(0.92).toRGBA();
+        this._header.style.backgroundColor = bg.toRGBA() // Color.Violet.darken(0.92).toRGBA();
         this._element.appendChild(this._header)
 
         this._body = document.createElement('div');
@@ -77,7 +78,7 @@ export class Modal {
         this._body.style.fontWeight = '400';
         this._body.style.width = `${this.width}px`;
         this._body.style.color = Color.White.toRGBA();
-        this._body.style.backgroundColor = bg //Color.Violet.darken(0.92).toRGBA();
+        this._body.style.backgroundColor = bg.toRGBA() //Color.Violet.darken(0.92).toRGBA();
         this._body.style.padding = '24px';
         this._body.style.paddingBottom = '48px';
         this._body.style.margin = '0px';

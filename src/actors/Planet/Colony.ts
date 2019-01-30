@@ -80,11 +80,11 @@ export class Colony extends Actor {
         return path;
     }
 
-    pathBetweenPoints(origin: Vector, destination: Vector): Vector[] {
+    pathBetweenPoints(origin: Vector, destination: Vector, constrainSourceY: boolean = true): Vector[] {
         if (!this.navTree) {
             this.buildNavTree();
         }
-        let srcNode = this.navTree.closestNode(origin);
+        let srcNode = constrainSourceY ? this.navTree.closestNodeAtSameYCoordinate(origin) : this.navTree.closestNode(origin);
         let dest = destination; //.nodes()[0];
         let destNode = this.navTree.closestNode(dest);
         let path = this.navTree.seekPath(srcNode, destNode);
