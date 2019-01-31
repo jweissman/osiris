@@ -388,6 +388,10 @@ export class Device extends Actor {
             )
         )
 
+        if (!bldg) {
+            return false
+        }
+
         // todo look at all devices? (closest bldg may not house closest device!!)
         let device: Device = closest(
             pos,

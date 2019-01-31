@@ -1,4 +1,4 @@
-import { UIActor, Label } from "excalibur";
+import { UIActor, Label, Engine, Color } from "excalibur";
 import { Structure, Corridor, SurfaceRoad, Ladder, allStructures } from "../../models/Structure";
 import { Game } from "../../Game";
 import { ResourceBlock, emptyMarket, PureValue } from "../../models/Economy";
@@ -16,8 +16,28 @@ import { Modal } from "./Modal";
 import { TechTree } from "../../models/TechTree";
 import { CitizenList } from "./CitizenList";
 import { Citizen } from "../Citizen";
+import { assembleButton } from "../../Elemental";
+import { Pane } from "./Pane";
+
+class ActionList extends Pane {
+
+    setup(btns: { label: string, action: () => any }[]) { //}, engine: Engine) {
+        btns.forEach(btn => {
+            let theButton = assembleButton(btn.label, Color.White)
+            theButton.onclick = () => {
+                btn.action()
+                // engine.goToScene(btn.scene)
+            }
+            this._element.appendChild(theButton)
+        })
+    }
+
+}
+
+
 
 export class Hud extends UIActor {
+
     private hidePalettes: boolean = true
     private structurePalette: Palette
     private machinePalette: Palette
@@ -25,6 +45,8 @@ export class Hud extends UIActor {
 
     private showCitizenList: boolean = true
     private citizenList: CitizenList
+
+    private actionList: ActionList
 
 
     private card: Card
@@ -43,7 +65,7 @@ export class Hud extends UIActor {
 
 
     constructor(
-        private game: Game,
+        private game: Engine,
         private onBuildingSelect = null,
         private onMachineSelect = null,
         private onFunctionSelect = null,
@@ -63,17 +85,37 @@ export class Hud extends UIActor {
 
         this.citizenList = new CitizenList(canvasWidth - 220, 55, onCitizenSelect) //, (citizen) => {})
 
-
         this.card = new Card(null, 20, canvasHeight - 200)
         this.add(this.card)
 
+        this.actionList = new ActionList('Actions', canvasWidth - 220, canvasHeight - 100)
+        this.actionList.setup([
+            { label: 'Main Menu', action: () => {game.goToScene('menu')} },
+            // { label: 'Main Menu', action: () => {game.goToScene('menu')} }
+        ])
+    }
 
+    hide() {
+        this.machinePalette.hide()
+        this.structurePalette.hide()
+        this.functionPalette.hide()
+        this.citizenList.hide()
+        this.actionList.hide()
+
+        this.status.hide()
+    }
+
+    show() {
+        this.machinePalette.show()
+        this.structurePalette.show()
+        this.functionPalette.show()
+        this.citizenList.show()
+        this.actionList.show()
     }
 
     systemMessage(
         message: string,
         title: string = 'Commander...',
-        // subtitle: string = ''
         buttons: { [intent: string]: () => any },
     ): Modal {
 
@@ -82,22 +124,20 @@ export class Hud extends UIActor {
         this.modal = new Modal(
             title,
             message,
-            canvasWidth/2, // - 100,
-            canvasHeight/2, // - 100
+            canvasWidth/2,
+            canvasHeight/2,
         ) 
         this.modal.addButtons(buttons)
         return this.modal
-
-        // this.showModal = true
-        // this.modal = {
-            // message, title
-        // }
     }
+
 
     closeSystemMessage() {
         console.log("hide system message")
-        this.modal.teardown()
-        this.modal = null
+        if (this.modal) {
+            this.modal.teardown()
+            this.modal = null
+        }
     }
 
 
@@ -119,16 +159,14 @@ export class Hud extends UIActor {
         }
 
         if (this.modal) {
-            // console.log("okay, we have modal!!")
             this.modal.draw(ctx)
-        } else {
-            // console.log("no modal")
         }
-        // if (this.showModal)
 
         if (this.showCitizenList) {
             this.citizenList.draw(ctx)
         }
+
+        this.actionList.draw(ctx)
     }
 
     update(game: Game, delta: number) {

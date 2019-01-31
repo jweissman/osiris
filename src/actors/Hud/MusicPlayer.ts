@@ -25,6 +25,10 @@ export class MusicPlayer {
         this.currentTrack = sample(Object.keys(this.playlist)); //[0];
     }
 
+    hide() {
+        this._wrapper.style.display = 'none'
+    }
+
     startMusic() {
         this._titleElem.textContent = `Playing: ${this.currentTrack}`;
         this.playlist[this.currentTrack].play()

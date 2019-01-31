@@ -3,18 +3,18 @@ import { World } from './models/World';
 import { Resources } from './Resources';
 
 export class Game extends Engine {
-  static citizenSpeed: number = 120
+  static citizenSpeed: number = 150
   static debugPath: boolean = false
-  static startHour: number = 9
+  static startHour: number = 10
 
   // combat knobs
-  static bulletSpeed: number = 700
+  static bulletSpeed: number = 650
   static raidingPartyFrequency: number = 120000
 
   // 10000 = 1 min / 10 sec
   // 1000 = 1 min / second
   // 100 = 10 min / second
-  static minuteTickMillis: number = 750
+  static minuteTickMillis: number = 850
 
   static font = 'Helvetica'
   static title: string = 'ASTRA';

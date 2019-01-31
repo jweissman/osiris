@@ -16,6 +16,14 @@ export class Pane {
 
     }
 
+    hide() {
+        this._element.style.display = 'none'
+    }
+
+    show() {
+        this._element.style.display = 'flex'
+    }
+
     protected makeRootElement() {
         if (this._element) {
             this._element.parentElement.removeChild(this._element);

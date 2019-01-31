@@ -44,6 +44,6 @@ export class AnyBedSleepingStrategy extends SleepingStrategy {
 
 
     private get bed() {
-        return shuffle(this.devices).find(d => d.machine instanceof Bed && !d.inUse)
+        return shuffle(this.devices).find(d => d.machine instanceof Bed && !d.inUse )
     }
 }

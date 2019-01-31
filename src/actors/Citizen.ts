@@ -175,9 +175,11 @@ export class Citizen extends Actor {
             this.health = Math.min(100, this.health+0.1)
             this.energy = Math.min(100, this.energy+0.1)
             if (this.health === 100 && !this.isTired) { //} && this.planet.hour > 6) {
+                this.log("Try to awaken early!! (We are healed, not tired...)")
                 this.sleeping = false
                 this.isPlanning = false
                 this.sleepingInBed.inUse = false
+                this.sleepingInBed = null
                 this.abortProgressBar()
                 this.work()
             }
@@ -299,6 +301,8 @@ export class Citizen extends Actor {
         this.driving = null
     }
 
+    get isDriving(): boolean { return !!this.driving }
+
     carry(c: ResourceBlock) {
         this.carrying.push(c);
     }
@@ -381,8 +385,8 @@ export class Citizen extends Actor {
         if (this.carrying.length > 0) { this.carrying = [] }
         let choice = this.strategies.find(strat => strat.canApply())
         if (choice) {
-            await choice.attempt()
             this.lastChoice = choice
+            await choice.attempt()
         }
         this.isPlanning = false
     }
@@ -465,12 +469,12 @@ export class Citizen extends Actor {
         let unit = this.combatMovementUnit
         if (this.tooFarFromEnemyLine()) {
             unit *= this.hostileDirectionSign
-            this.log(`ADVANCE TOWARD ENEMY LINE`)
+            // this.log(`ADVANCE TOWARD ENEMY LINE`)
             nextGoal.x += unit
             await this.glideTo(nextGoal)
         } else if (this.tooCloseToEnemyLine()) {
             unit *= -this.hostileDirectionSign
-            this.log(`RETREAT FROM ENEMY LINE`)
+            // this.log(`RETREAT FROM ENEMY LINE`)
             nextGoal.x += unit
             await this.glideTo(nextGoal)
         }
@@ -495,18 +499,18 @@ export class Citizen extends Actor {
             // console.log("FIRE!!!")
             // launch a (few) projectile(s)!!!
 
-            await sleep(250)
-            let numTimes = range(sample(range(3)))
+            let numTimes = range(sample(range(4)))
             for (let times in numTimes) {
-                await this.progressBar(150)
+                await this.progressBar(350)
                 if (this.alive && this.combatting && this.combatting.alive) {
                     this.firing = true
                     let bullet = this.assembleBullet()
                     this.scene.add(bullet)
-                    this.scene.addTimer(new Timer(() => { bullet.kill() }, 1500))
+                    this.scene.addTimer(new Timer(() => { bullet.kill() }, 2200))
                     this.firing = false
                 }
             }
+            await sleep(800)
             // await sleep(250) //this.progressBar(250)
         }
     }
@@ -548,6 +552,8 @@ export class Citizen extends Actor {
         this.actionQueue.clearActions()
         this.path = []
         this.alive = false
+        this.guarding = false
+        this.sleeping = false
         this.collisionType = CollisionType.Passive
         this.scene.addTimer(new Timer(() => { this.kill() }, 5000))
     }
@@ -566,6 +572,6 @@ export class Citizen extends Actor {
     }
 
     log(msg) {
-        // console.debug(`${this.name}: ${msg}`)
+        console.debug(`${this.name}: ${msg}`)
     }
 }

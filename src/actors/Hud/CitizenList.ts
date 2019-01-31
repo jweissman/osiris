@@ -33,7 +33,13 @@ class CitizenLine {
         }
 
 
-        this.sleepy.style.display = tired ? 'inline' : 'none'
+        this.sleepy.style.display = tired || this.citizen.sleepingInBed ? 'inline' : 'none'
+        if (this.citizen.sleepingInBed) {
+            this.sleepy.textContent = 'SLEEPING'
+        } else {
+            this.sleepy.textContent = 'tired'
+        }
+
         // this.sleepy.textContent = `tired (${this.citizen.energy.toFixed()})`
         this.hunger.style.display = hungry ? 'inline' : 'none'
         // this.hunger.textContent = `hungry (${this.citizen.hunger.toFixed()})`

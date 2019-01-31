@@ -31,4 +31,9 @@ export class Population extends Actor {
             console.warn("no scene to add citizen to!?!?")
         }
     }
+
+    tearDown() {
+        this.citizens.forEach((c) => this.scene.remove(c))
+        this.raiders.forEach((c) => this.scene.remove(c))
+    }
 }

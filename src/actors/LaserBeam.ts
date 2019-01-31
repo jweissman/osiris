@@ -35,11 +35,15 @@ export class LaserBeam extends Actor {
             if (Math.random() > 0.4) {
                 this.vel.x = -this.vel.x
                 this.evil = !this.evil
+                // 10% chance to alter y-vel
+                if (Math.random() > 0.9) {
+                    this.vel.y += (Math.random() * 60) - 30
+                }
             } else if (Math.random() > 0.4) {
                 // if didn't reflect, 60% to absorb
                 this.kill()
             }
-        } else if (Math.random() > 0.3) {
+        } else if (Math.random() > 0.4) {
             this.kill()
             collision.other.injure(5 + (Math.random() * 2), this.source)
         }

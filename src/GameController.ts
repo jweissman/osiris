@@ -1,5 +1,5 @@
 import { Game } from "./Game";
-import { BaseCamera, Vector, Input } from "excalibur";
+import { BaseCamera, Vector, Input, Engine } from "excalibur";
 import { Orientation } from "./values/Orientation";
 
 export class GameController {
@@ -11,7 +11,7 @@ export class GameController {
     cameraPanCallback: () => any = null
     keyPressCallback: (key) => any = null
 
-    constructor(private game: Game, private camera: BaseCamera) {
+    constructor(private game: Engine, private camera: BaseCamera) {
         
     }
 
@@ -120,5 +120,13 @@ export class GameController {
                 moveCam(Right)
             }
         })
+    }
+
+    deactivate(): any {
+        this.game.input.keyboard.off('press')
+        this.game.input.keyboard.off('hold')
+        this.game.input.pointers.primary.off('wheel') //, (e: Input.WheelEvent) => {
+        this.game.input.pointers.primary.off('down') //, (e: Input.WheelEvent) => {
+        this.game.input.pointers.primary.off('up') //, (e: Input.WheelEvent) => {
     }
 }

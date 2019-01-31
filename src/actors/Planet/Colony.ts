@@ -42,6 +42,11 @@ export class Colony extends Actor {
 
     }
 
+    tearDown() {
+        this.navTree = null
+        this.currentlyConstructing = null
+        this.buildings.forEach(b => this.remove(b))
+    }
 
     placeBuilding(building: Building) {
         building.placed = true;
@@ -107,7 +112,9 @@ export class Colony extends Actor {
         }
     }
 
-    get origin() { return this.buildings[0].pos }
+    get origin() {
+        return this.buildings[0] ? this.buildings[0].pos : null
+    }
 
     private buildNavTree() {
         let ctrl = this.buildings[0] //.find(building => building.structure instanceof MissionControl);

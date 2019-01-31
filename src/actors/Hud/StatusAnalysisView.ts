@@ -82,6 +82,10 @@ export class StatusAnalysisView extends Actor {
         // )
     }
 
+    hide() {
+        this.musicPlayer.hide()
+    }
+
     incrementResource(res: ResourceBlock) {
         this.resources.increment(res)
     }

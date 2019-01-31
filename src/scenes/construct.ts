@@ -1,4 +1,4 @@
-import { Input, Scene, Timer, Vector, LockCameraToActorStrategy, Color } from "excalibur";
+import { Input, Scene, Timer, Vector, LockCameraToActorStrategy, Color, Engine } from "excalibur";
 import { Building, structureViews } from "../actors/Building";
 import { DevicePlace } from "../actors/Building/Building";
 import { Device } from "../actors/Device";
@@ -19,17 +19,19 @@ import { GameController } from "../GameController";
 
 
 export class Construct extends Scene {
-    private game: Game
+    private controller: GameController
+    // private game: Engine
     private planet: Planet
     private hud: Hud
     private player: Player
     private defaultMessage: string = 'Welcome to the Colony, Commander.'
-    private placingFunction: RoomRecipe = null
     private time: number = Game.startHour*60
+    private placingFunction: RoomRecipe = null
     private hasActiveModal: boolean = false
     private techTree: TechTree = new TechTree()
     private firstBuilding: boolean = true
     private followedCitizen: Citizen = null
+    private lost: boolean = false
 
     static requiredStructuresAndFunctions: (typeof RoomRecipe | typeof Structure)[] = [
         MissionControl,
@@ -40,7 +42,6 @@ export class Construct extends Scene {
         LivingQuarters,
     ]
 
-    private lost: boolean
 
     update(engine, delta) {
         super.update(engine, delta)
@@ -60,21 +61,22 @@ export class Construct extends Scene {
 
         if (!this.lost && !this.firstBuilding && this.planet.population.citizens.length === 0) {
             this.lost = true
-            this.systemMessage('The colony has perished!', () => this.game.goToScene('menu'))
+            // alert('colony lost!')
+            this.askYesNo('The colony has perished! Try again?',
+                () => this.welcome(),
+                () => engine.goToScene('menu')
+            )
         }
     }
 
-    public onInitialize(game: Game) {
-        this.game = game
+    public onInitialize(engine: Engine) {
 
         let buildIt = (e) => this.startConstructing(e)
         let followIt = (c) => this.toggleFollowing(c)
-
-        this.hud = new Hud(game, buildIt, buildIt, buildIt, followIt)
+        this.hud = new Hud(this.engine, buildIt, buildIt, buildIt, followIt)
         this.add(this.hud)
 
         this.planet = new Planet(
-            game.world,
             this.hud,
             (b) => this.hud.showCard(b),
             (d) => this.hud.showCard(d),
@@ -82,102 +84,58 @@ export class Construct extends Scene {
             40000,
             this
         )
-
         this.add(this.planet)
-  
+
         this.player = new Player()
         this.add(this.player)
-
-        this.prepareNextBuilding()
-        this.camera.pos.y = this.planet.getTop() - 1000
-        this.camera.zoom(0.05)
-        this.camera.zoom(0.5, 10000)
 
         this.addTimer(
             new Timer(() => { this.stepTime() }, this.timeStepIntervalMillis, true)
         )
-
-        this.systemMessage(
-            "Welcome to the Colony, sir... "
-            + "We are what is left of the crew of the Osiris. "
-            + "Can you help us build a functioning society? "
-            + "First, choose a location for the Command post. "
-            + "Then we'll lay out some infrastructure."
-        )
-    }
-
-    showTutorial: boolean = true
-    private systemMessage(message: string, onComplete: () => any = null) {
-        this.hasActiveModal = true
-        this.hud.systemMessage(message, "", {
-            continue: () => { this.closeSystemMessage(); if (onComplete) { onComplete() } },
-         })
-    }
-
-    private tutorialMessage(message: string) {
-        if (this.showTutorial) {
-        this.hasActiveModal = true
-            this.hud.systemMessage(message, "", {
-                continue: () => { this.closeSystemMessage() },
-                'i got this': () => {
-                    this.closeSystemMessage()
-                    this.showTutorial = false
-                }
-            })
-        }
-    }
-
-    private rankUp(rank: TechnologyRank) {
-        if (this.hasActiveModal) {
-            this.closeSystemMessage()
-        }
-
-        this.hasActiveModal = true
-        let rankUpMessage =
-            "Your colony's mastery of a discipline has improved! " +
-            "The following new machines are now available for construction:"
-
-        let okay = sample([ 'excellent!', 'great!', 'perfect', 'good work', 'cool', 'wonderful', 'brilliant', 'that is what i am talking about', 'keep up the good work', 'learning is fun!' ])
-
-        let modal = this.hud.systemMessage(
-            rankUpMessage,
-            "rank up",
-            { [okay]: () => { this.closeSystemMessage() }
-        })
-
-        modal.addHeading(rank.name, 28, Color.Orange)
-        modal.addHeading(rank.description, 12)
-
-        modal.addIconMatrix(
-            rank.unlocks.map(m => new m()).map(machine => { return {
-                image: machine.image,
-                label: machine.name
-            }})
-        )
-    }
-
-    private closeSystemMessage() {
-        this.hud.closeSystemMessage()
-        this.hasActiveModal = false
-    }
-
-
-    timeStepIntervalMillis: number = 50
-    private stepTime() { 
-        this.time += this.timeStepIntervalMillis / Game.minuteTickMillis  /// this.timeStepIntervalMillis //  0.125 //.25
-        this.planet.setTime(this.time) 
-    }
-
-    controller: GameController
-    public onActivate() {
         this.addTimer(
             new Timer(() => {
-                // this.systemMessage("raiding party incoming -- perimeter alert")
+                // this.infoMessage("perimeter alert! raiding party incoming")
                 this.planet.sendRaidingParty()
             }, Game.raidingPartyFrequency, true)
         )
 
-        this.controller = new GameController(this.game, this.camera)
+        this.welcome()
+    }
+
+    welcome() {
+        this.planet.buildColonyAndPopulation()
+        this.lost  = false
+        this.firstBuilding = true
+        this.infoMessage(
+            "Welcome to the Colony, sir... "
+            + "We are what is left of the crew of the Osiris. "
+            + "Can you help us build a functioning society? "
+            + "First, choose a location for the Command post. "
+            + "Then we'll lay out some infrastructure.",
+            () => this.prepareNextBuilding()
+        )
+        this.camera.zoom(0.25)
+    }
+
+    public onActivate() {
+
+        this.setupControls() 
+        // this.prepareNextBuilding()
+        this.camera.zoom(0.25)
+
+        this.hud.show()
+    }
+
+    public onDeactivate() {
+        this.closeSystemMessage()
+        this.stopFollowing()
+        this.controller.deactivate()
+
+        this.hud.hide()
+    }
+
+    private setupControls() {
+        this.controller = new GameController(this.engine, this.camera)
         this.controller.onCameraPan(() => this.stopFollowing())
 
         this.controller.onMove((pos: Vector) => {
@@ -267,13 +225,81 @@ export class Construct extends Scene {
         this.controller.activate()
     }
 
-    public onDeactivate() {
-        this.game.input.pointers.primary.off('move')
-        this.game.input.pointers.primary.off('down')
-        this.game.input.pointers.primary.off('up')
-        this.game.input.pointers.primary.off('wheel')
+
+
+    showTutorial: boolean = true
+    private infoMessage(message: string, onComplete: () => any = null) {
+        this.hasActiveModal = true
+        this.hud.systemMessage(message, "", {
+            continue: () => { this.closeSystemMessage(); if (onComplete) { onComplete() } },
+         })
     }
 
+    private askYesNo(message: string, onYes: () => any, onNo: () => any) {
+        this.hasActiveModal = true
+        this.hud.systemMessage(message, "", {
+            yes: () => { this.closeSystemMessage(); if (onYes) { onYes() } },
+            no: () => { this.closeSystemMessage(); if (onNo) { onNo() } },
+         })
+    }
+
+    private tutorialMessage(message: string) {
+        if (this.showTutorial) {
+            this.hasActiveModal = true
+            this.hud.systemMessage(message, "", {
+                continue: () => { this.closeSystemMessage() },
+                'i got this': () => {
+                    this.closeSystemMessage()
+                    this.showTutorial = false
+                }
+            })
+        }
+    }
+
+    private rankUp(rank: TechnologyRank) {
+        if (this.lost) { return }
+
+        if (this.hasActiveModal) {
+            this.closeSystemMessage()
+        }
+
+        this.hasActiveModal = true
+        let rankUpMessage =
+            "Your colony's mastery of a discipline has improved! " +
+            "The following new machines are now available for construction:"
+
+        let okay = sample([ 'excellent!', 'great!', 'perfect', 'good work', 'cool', 'wonderful', 'brilliant', 'that is what i am talking about', 'keep up the good work', 'learning is fun!' ])
+
+        let modal = this.hud.systemMessage(
+            rankUpMessage,
+            "rank up",
+            { [okay]: () => { this.closeSystemMessage() }
+        })
+
+        modal.addHeading(rank.name, 28, Color.Orange)
+        modal.addHeading(rank.description, 12)
+
+        modal.addIconMatrix(
+            rank.unlocks.map(m => new m()).map(machine => { return {
+                image: machine.image,
+                label: machine.name
+            }})
+        )
+    }
+
+    private closeSystemMessage() {
+        this.hud.closeSystemMessage()
+        this.hasActiveModal = false
+    }
+
+
+    timeStepIntervalMillis: number = 50
+    private stepTime() { 
+        this.time += this.timeStepIntervalMillis / Game.minuteTickMillis  /// this.timeStepIntervalMillis //  0.125 //.25
+        this.planet.setTime(this.time) 
+    }
+
+  
     get buildings() { return this.planet.colony.buildings }
 
 

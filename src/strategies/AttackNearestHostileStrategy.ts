@@ -12,11 +12,11 @@ export class AttackNearestHostileStrategy extends CombatStrategy {
     protected async apply() {
         let target = closest(
             this.pawn.pos,
-            this.hostiles.filter(h => h.alive),
+            this.hostiles.filter(h => h.alive && !h.isDriving),
             (h) => h.pos
         )
         if (target) {
-            this.pawn.log("found new target")
+            // this.pawn.log("found new target")
             this.pawn.engageHostile(target)
         } else {
             this.pawn.log("no new targets?")
@@ -28,13 +28,11 @@ export class AttackNearestHostileStrategy extends CombatStrategy {
             this.pawn.log("head to mission ctrl...")
             if (this.pawn.isEvil) {
                 this.pawn.log("to attack it!")
-                // just keep advancing towards mission control?
                 await this.pawn.advanceTowards(this.planet.colony.origin)
             } else {
                 this.pawn.log("to defend it!")
                 let cmdCenter = this.planet.colony.findAllDevices().find(device => device.machine instanceof CommandCenter)
-                await this.pawn.visit(cmdCenter) //(this.planet.colony.origin)
-                // await this.seek(enemy)
+                await this.pawn.visit(cmdCenter)
             }
         } else { 
             if (this.pawn.withinFiringRange()) {
@@ -43,7 +41,6 @@ export class AttackNearestHostileStrategy extends CombatStrategy {
                 await this.pawn.advanceTowardsEnemy()
             }
         }
-        // }
     }
 
 
@@ -53,8 +50,7 @@ export class AttackNearestHostileStrategy extends CombatStrategy {
             if (this.pawn.isEvil || this.pawn.health > 95) {
                 await this.pawn.fire()
             } else {
-                // two rolls -- one gate at more than a coinflip, and one gate proportional to health remaining
-                if (Math.random() < 0.8 && Math.random() < (100 - this.pawn.health) / 100) {
+                if ((this.pawn.health < 50 && Math.random() < 0.05) || Math.random() < 0.01) {
                     await this.pawn.guard()
                 } else {
                     await this.pawn.fire()
@@ -64,8 +60,10 @@ export class AttackNearestHostileStrategy extends CombatStrategy {
     }
 
     canApply(): boolean {
+        let defensePoint = this.planet.colony.origin ? this.planet.colony.origin : this.pawn.pos
         let timeToPlay = this.hostiles.some(hostile => hostile.alive &&
-            (this.pawn.isEvil ? true : this.pawn.pos.distance(hostile.pos) < this.vigilanceRange)
+            (this.pawn.isEvil ? true : defensePoint.distance(hostile.pos) < this.vigilanceRange) 
+            && !hostile.isDriving
         )
         return timeToPlay
 

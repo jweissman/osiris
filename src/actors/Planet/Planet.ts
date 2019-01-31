@@ -11,7 +11,6 @@ import { Machine } from '../../models/Machine';
 import { Device } from '../Device';
 import { MechanicalOperation } from '../../models/MechanicalOperation';
 import { World } from '../../models/World';
-import { Colorize } from 'excalibur/dist/Drawing/SpriteEffects';
 import { SkyLayers } from './SkyLayers';
 import { Citizen } from '../Citizen';
 
@@ -19,24 +18,24 @@ export class Planet extends Actor {
     colony: Colony
     population: Population
     hostiles: Citizen[] = []
-    // baseColor: Color
+
+    baseSkyColor: Color
     sky: Actor
     skyLayers: SkyLayers
 
     constructor(
-        public world: World,
         public hud: Hud,
-        // public color: Color,
         private onBuildingHover: (b: Building) => any,
         private onDeviceHover: (d: Device) => any,
         private w: number = 200000,
         private depth: number = 40000,
         public scene: Scene
     ) {
-        super(0, depth / 2, w, depth, world.color)
+        super(0, depth / 2, w, depth, World.pickColor())
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
 
-        this.sky = new Actor(0, -depth, w, depth, world.skyColor)
+        this.baseSkyColor = World.pickSkyColor()
+        this.sky = new Actor(0, -depth, w, depth, this.baseSkyColor) //World.pickSkyColor())
         this.add(this.sky)
 
         let yBase = -depth / 2
@@ -59,16 +58,34 @@ export class Planet extends Actor {
            -depth/2, // - 20,
            this.getWidth(),
            this.color.lighten(0.04),
-           world.skyColor,
+           this.baseSkyColor.lighten(0.15),
            6
         )
         this.add(this.skyLayers)
 
-        this.colony = new Colony(0, -depth / 2)
+        // this.depth = depth
+        this.buildColonyAndPopulation()
+    }
+
+    // depth: number
+    buildColonyAndPopulation() {
+        if (this.colony) {
+            this.colony.tearDown()
+            // this.colony.kill()
+            this.remove(this.colony)
+        }
+
+        this.colony = new Colony(0, -this.depth / 2)
         this.add(this.colony)
 
-        console.log("in planet, scene is: ", { scene: this.scene })
-        this.population = new Population(this, scene)
+        if (this.population) {
+            this.population.tearDown()
+            // this.population.kill()
+            this.remove(this.population)
+        }
+
+        // console.log("in planet, scene is: ", { scene: this.scene })
+        this.population = new Population(this, this.scene)
         this.add(this.population)
 
     }
@@ -88,36 +105,23 @@ export class Planet extends Actor {
 
         let oldC = this.skyColorForHour(this.hour),
             newC = this.skyColorForHour(nextHour)
-
         let mixC = mixColors(newC, oldC, inc)
-
-        // this.sky.color = mixC // skyColor
         this.assignColors(mixC)
     }
 
     private assignColors(skyColor: Color) {
         this.sky.color = skyColor
-
-        let inc = 0.08
-
-        let c = mixColors(
-            this.sky.color.lighten(5 * inc), //.lighten(3*inc).saturate(5*inc),
-            this.color.darken(5 * inc), //.lighten(2*inc)
-            0.7
-        )
-
+        // let inc = 0.02
+        let c = //mixColors(
+            this.sky.color.lighten(0.15) //.lighten(5 * inc) //,
+            // this.color.darken(5 * inc),
+            // 0.7
+        // )
         this.skyLayers.setHi(c)
-
-        // this.skyLayer.mountainLayers.color = this.color.lighten(inc) //0.1)
-        // this.skyLayer.mountainLayers.skyColor = c.lighten(inc)
-        // this.skyLayer.mountains.color = c.lighten(inc)
-        // this.skyLayer.backMountainLayers.color = c.lighten(inc)
-        // this.skyLayer.backMountainLayers.skyColor = c.lighten(inc * 3).desaturate(inc)
     }
 
     skyColorForHour(hour: number) {
-        let c = this.world.skyColor.clone().darken(0.2).desaturate(0.1)
-
+        let c = this.baseSkyColor.clone()
         let colorMap = {
             night: c.darken(0.7),
             dawn: c.darken(0.2),
@@ -125,7 +129,6 @@ export class Planet extends Actor {
             afternoon: c.lighten(0.2).desaturate(0.1),
             evening: c,
         }
-
         let result: Color = null
         if (hour >= 5 && hour < 8) { // dawn
             let inc = (hour - 6) / 5
@@ -271,12 +274,11 @@ export class Planet extends Actor {
     threatLevel: number = 0
     async sendRaidingParty() {
         if (this.threatLevel === 0) {
-            await sleep(1000) // wait for game to bootstrap (the first time)...
+            await sleep(10000) // wait for game to bootstrap (the first time)...
         }
-
         this.threatLevel += 1
-        let maxPartySize = 3 + Math.floor(this.threatLevel/3)
-        let partySize =1+sample(range(maxPartySize))
+        let maxPartySize = 1 + Math.floor(this.threatLevel/3)
+        let partySize = 1+sample(range(maxPartySize))
         for (let times in range(partySize)) {
             this.sendRaider()
         }
@@ -295,8 +297,6 @@ export class Planet extends Actor {
         )
 
         this.scene.add(raider)
-        // await raider.glideTo(origin) //.add(new Vector(2400,0))) //.add(new Vector(300,0)))
-        // this.population.citizens.forEach(c => c.engageHostile(raider))
         let target = closest(raider.pos, this.population.citizens, (c) => c.pos)
         raider.engageHostile(target) //sample(this.population.citizens))
     }
