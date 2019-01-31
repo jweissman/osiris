@@ -75,6 +75,9 @@ export class CardBody extends Actor {
                         this.notes.text = 'Decants clones.'
                     }
                 }
+                if (entity instanceof Device && entity.inUse) {
+                    this.notes.text += ' [IN USE]'
+                }
             } else if (entity instanceof RoomRecipe) {
                 let { capacity, workSpeed } = entity.bonuses
                 let bonusMessages = [];

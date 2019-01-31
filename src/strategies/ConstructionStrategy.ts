@@ -3,6 +3,8 @@ import { Device } from "../actors/Device";
 import { containsUniq } from "../Util";
 
 export abstract class ConstructionStrategy extends Strategy {
+    describe() { return 'building' }
+
     canApply(): boolean {
         return !!this.unbuiltDevice
     }

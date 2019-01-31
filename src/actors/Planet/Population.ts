@@ -15,12 +15,9 @@ export class Population extends Actor {
     }
 
     update(engine, delta) {
-        // purge...
         let notKilled = c => c.alive // && !c.isKilled()
         this.citizens = this.citizens.filter(notKilled)
         this.raiders = this.raiders.filter(notKilled)
-
-
     }
 
     increase(pos, elite: boolean = false) {

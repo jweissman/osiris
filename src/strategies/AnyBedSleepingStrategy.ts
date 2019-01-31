@@ -32,6 +32,7 @@ export class AnyBedSleepingStrategy extends SleepingStrategy {
         let bed = this.bed
         if (bed) {
             bed.inUse = true
+            this.pawn.sleepingInBed = bed
             await this.visitDevice(bed)
         // }
             await this.pawn.takeRest() //1000 * 24)

@@ -26,7 +26,7 @@ export class Menu extends Scene {
 
         this.sceneList.setup([
             { label: 'Play', scene: 'construct' },
-            { label: 'Arena', scene: 'arena' }
+            { label: 'Arena', scene: 'arena' },
         ], this.engine)
 
         let emitter = new ParticleEmitter(
@@ -36,16 +36,16 @@ export class Menu extends Scene {
         )
         emitter.endColor = Color.Blue //Cyan.darken(0.36);
         emitter.beginColor = Color.White
-        emitter.radius = 100
+        emitter.radius = 120
         emitter.minVel = 10
-        emitter.maxVel = 150
+        emitter.maxVel = 170
         emitter.minAngle = 0
         emitter.maxAngle = Math.PI * 2;
-        emitter.emitRate = 250 // 300 particles/second
+        emitter.emitRate = 200 // 300 particles/second
         emitter.opacity = 0.5
         emitter.fadeFlag = true // fade particles overtime
-        emitter.particleLife = 6000 // in milliseconds = 1 sec
-        emitter.maxSize = 20 // in pixels
+        emitter.particleLife = 8000 // in milliseconds = 1 sec
+        emitter.maxSize = 24 // in pixels
         emitter.minSize = 1
         // emitter.beginColor = Color.Red.darken(0.12);
         emitter.isEmitting = true;

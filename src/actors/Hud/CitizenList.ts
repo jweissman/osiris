@@ -1,17 +1,18 @@
 import { Color } from "excalibur";
 import { Pane } from "./Pane";
 import { Citizen } from "../Citizen";
-import { spawn } from "child_process";
 import { Game } from "../../Game";
-import { WhenHungryEatingStrategy } from "../../strategies/WhenHungryEatingStrategy";
 import { assembleButton } from "../../Elemental";
+import { CombatStrategy } from "../../strategies/CombatStrategy";
 
 class CitizenLine {
     private _line: HTMLDivElement
     private button: HTMLButtonElement
+    private task: HTMLSpanElement
     private sleepy: HTMLSpanElement
     private hunger: HTMLSpanElement
-    private fighting: HTMLSpanElement
+    // private fighting: HTMLSpanElement
+    private busyRow: HTMLDivElement
     private followed: boolean = false
     // ...
     constructor(private citizen: Citizen, private onSelect: (Citizen) => any) {
@@ -37,7 +38,17 @@ class CitizenLine {
         this.hunger.style.display = hungry ? 'inline' : 'none'
         // this.hunger.textContent = `hungry (${this.citizen.hunger.toFixed()})`
 
-        this.fighting.style.display = this.citizen.engagedInCombat ? 'inline' : 'none'
+        // this.fighting.style.display = this.citizen.engagedInCombat ? 'inline' : 'none'
+
+        this.task.style.display = this.citizen.isPlanning ? 'inline' : 'none'
+        if (this.citizen.lastChoice) {
+            this.task.textContent = this.citizen.lastChoice.describe()
+            if (this.citizen.lastChoice instanceof CombatStrategy) {
+                this.task.style.color = Color.Red.toRGBA()
+            } else {
+                this.task.style.color = Color.LightGray.toRGBA()
+            }
+        }
     }
 
     buildLine() {
@@ -57,24 +68,28 @@ class CitizenLine {
         nameLabel.style.alignSelf = 'center'
         this._line.appendChild(nameLabel)
 
+        this.busyRow = document.createElement('div')
+        this.busyRow.style.display = 'flex'
+        this.busyRow.style.flexDirection = 'column'
+        this._line.appendChild(this.busyRow)
+
+        this.task = document.createElement('span')
+        this.task.textContent = ''
+        this.task.style.color = 'white'
+        this.task.style.padding = '2px'
+        this.busyRow.appendChild(this.task)
+
         this.hunger = document.createElement('span')
         this.hunger.textContent = 'hungry'
         this.hunger.style.color = 'yellow'
         this.hunger.style.padding = '2px'
-        this._line.appendChild(this.hunger)
+        this.busyRow.appendChild(this.hunger)
 
         this.sleepy = document.createElement('span')
         this.sleepy.textContent = 'sleepy'
         this.sleepy.style.color = 'blue'
         this.sleepy.style.padding = '2px'
-        this._line.appendChild(this.sleepy)
-
-        this.fighting = document.createElement('span')
-        this.fighting.textContent = 'fighting'
-        this.fighting.style.color = 'red'
-        this.fighting.style.padding = '2px'
-        this._line.appendChild(this.fighting)
-
+        this.busyRow.appendChild(this.sleepy)
 
         this.button = this.makeButton()
         this._line.appendChild(this.button)

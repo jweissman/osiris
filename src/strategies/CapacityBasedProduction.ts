@@ -6,8 +6,18 @@ import { Resource } from "excalibur";
 
 export class CapacityBasedProduction extends ProductionStrategy {
     canApply(): boolean {
-        let hasOpenStore = !!(this.findStore())
-        return hasOpenStore
+
+        const storeWithCapacity = (d: Device) => d.operation.type === 'store' &&
+            d.product.length < d.getEffectiveOperationalCapacity(d.operation) //&&
+
+        let stores = this.devices.filter(storeWithCapacity)
+        let workable = stores.some((d: Device) => {
+            let recipe = this.findRecipe(d)
+            let explorer = this.findExplorer(d)
+            return !!(recipe || explorer)
+        })
+
+        return workable
     }
 
     async apply() {

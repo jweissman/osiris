@@ -13,15 +13,21 @@ import { GameController } from "../GameController";
 const noop = () => { }
 
 class SpawnPalette extends Pane {
-    constructor(x: number, y: number, spawnFriendly: () => any, spawnEnemy: () => any) {
+    constructor(x: number, y: number, buttons: { label: string, color: Color, cb: () => any }[]) { // spawnFriendly: () => any, spawnEnemy: () => any) {
         super("Spawn", x, y)
         this.makeRootElement()
-        let goodGuy = assembleButton('Good guy', Color.Green)
-        goodGuy.onclick = spawnFriendly
-        this._element.appendChild(goodGuy)
-        let badGuy = assembleButton('Bad guy', Color.Red)
-        badGuy.onclick = spawnEnemy
-        this._element.appendChild(badGuy)
+        buttons.forEach(btn => {
+            let { label, color, cb } = btn
+            let theButton = assembleButton(label, color) //'Citizen', Color.Green)
+            theButton.onclick = cb
+            this._element.appendChild(theButton)
+        })
+        //let goodGuyCmdr = assembleButton('Commander', Color.Green)
+        //goodGuyCmdr.onclick = spawnFriendlyCommander
+        //this._element.appendChild(goodGuyCmdr)
+        //let badGuy = assembleButton('Raider', Color.Red)
+        //badGuy.onclick = spawnEnemy
+        //this._element.appendChild(badGuy)
     }
 }
 
@@ -51,53 +57,37 @@ export class Arena extends Scene {
         this.spawnHostile()
 
 
-        this.camera.move(this.planet.population.citizens[0].pos, 1000)
+        this.camera.move(this.planet.population.citizens[0].pos, 0)
 
-        this.spawnPalette = new SpawnPalette(100,100,
-            this.spawnFriendly, 
-            this.spawnHostile
-        )
+        this.spawnPalette = new SpawnPalette(100,100,[
+            { label: 'Citizen', color: Color.Green, cb: this.spawnFriendly }, 
+            { label: 'Commander', color: Color.Green, cb: this.spawnFriendlyCommander }, 
+            { label: 'Raider', color: Color.Red, cb: this.spawnHostile }, 
+        ])
     }
 
     draw(ctx, delta) {
         super.draw(ctx,delta)
-
         this.spawnPalette.draw(ctx)
     }
 
-    //update(engine, delta) {
-    //    super.update(engine, delta)
-    //    let notKilled = c => c.alive // && !c.isKilled()
-    //    this.defenders = this.defenders.filter(notKilled)
-    //    this.enemies = this.enemies.filter(notKilled)
-
-    //    let defender = this.defenders.find(notKilled)
-    //    if (defender) {
-    //        this.enemies.forEach(e => {
-    //            if (!e.engagedInCombat) {
-    //                e.engageHostile(defender)
-    //            }
-    //        })
-    //    }
-    //    let enemy = this.enemies.find(notKilled)
-    //    if (enemy) {
-    //        this.defenders.forEach(d => {
-    //            if (!d.engagedInCombat) {
-    //                d.engageHostile(enemy)
-    //            }
-    //        })
-    //    }
-    //}
-
-    spawnFriendly = () => {
-        let friendly = new Citizen('Good Guy', new Vector((Math.random() * 200) + 800, this.floorY), this.planet, true)
+    spawnFriendlyCommander = () => {
+        let cmdrName = sample(['Spork', 'Kierkegon', 'Bolnes', 'Pickhard', 'Rilker', 'Krusha', 'Forage'])
+        let friendly = new Citizen(cmdrName, new Vector((Math.random() * 200) + 800, this.floorY), this.planet, true)
         this.planet.population.citizens.push(friendly)
         this.add(friendly)
+    }
 
+
+    spawnFriendly = () => {
+        let pawnName = sample(['Jones', 'Smith', 'Ford', 'Abel', 'Thomas'])
+        let friendly = new Citizen(pawnName, new Vector((Math.random() * 200) + 800, this.floorY), this.planet, false)
+        this.planet.population.citizens.push(friendly)
+        this.add(friendly)
     }
 
     spawnHostile = () => {
-        let hostile = new Citizen('Bad Guy', new Vector((Math.random() * 200) - 100, this.floorY), this.planet, false, true)
+        let hostile = new Citizen('Raider', new Vector((Math.random() * 200) - 100, this.floorY), this.planet, false, true)
         this.planet.population.raiders.push(hostile)
         this.add(hostile)
 

@@ -50,7 +50,7 @@ export class Modal {
         document.body.appendChild(this._element);
 
         let bg = Color.Violet.clone().darken(0.92) //.clone..toRGBA()
-        bg.a = 0.3
+        bg.a = 0.92
 
         let title = document.createElement('div');
         title.textContent = this.title;

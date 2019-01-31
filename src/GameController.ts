@@ -7,7 +7,7 @@ export class GameController {
     private dragging: boolean = false
     private dragOrigin: Vector
     pointerMoveCallback: (pos: Vector) => any = null
-    leftClickCallback: (pos: Vector) => any = null
+    leftClickCallback: (pos: Vector, holdingShift: boolean) => any = null
     cameraPanCallback: () => any = null
     keyPressCallback: (key) => any = null
 
@@ -19,7 +19,7 @@ export class GameController {
         this.pointerMoveCallback = cb
     }
 
-    onLeftClick(cb: (pos: Vector) => any) {
+    onLeftClick(cb: (pos: Vector, holdingShift: boolean) => any) {
         this.leftClickCallback = cb
     }
 
@@ -54,7 +54,10 @@ export class GameController {
         this.game.input.pointers.primary.on('down', (e: Input.PointerDownEvent) => {
             if (e.button == Input.PointerButton.Left) {
                 if (this.leftClickCallback) {
-                    this.leftClickCallback(e.pos)
+                    this.leftClickCallback(
+                        e.pos,
+                        this.game.input.keyboard.isHeld(Input.Keys.Shift)
+                    )
                 }
 
             } else if (e.button === Input.PointerButton.Middle) {

@@ -1,7 +1,7 @@
 import * as ex from 'excalibur';
 import { Actor, Color, Vector, Scene } from 'excalibur';
 import { Building } from '../Building';
-import { range, flatSingle, mixColors, sample, closest } from '../../Util';
+import { range, flatSingle, mixColors, sample, closest, sleep } from '../../Util';
 import { Structure } from '../../models/Structure';
 import { Hud } from '../Hud/Hud';
 import { ResourceBlock, Economy, sumMarkets, emptyMarket, availableCapacity, PureValue } from '../../models/Economy';
@@ -268,8 +268,15 @@ export class Planet extends Actor {
         return this.colony.findPoweredDevices().find(d => d.machine instanceof kind);
     }
 
-    sendRaidingParty() {
-        let partySize =1+sample(range(3))
+    threatLevel: number = 0
+    async sendRaidingParty() {
+        if (this.threatLevel === 0) {
+            await sleep(1000) // wait for game to bootstrap (the first time)...
+        }
+
+        this.threatLevel += 1
+        let maxPartySize = 3 + Math.floor(this.threatLevel/3)
+        let partySize =1+sample(range(maxPartySize))
         for (let times in range(partySize)) {
             this.sendRaider()
         }
@@ -281,16 +288,16 @@ export class Planet extends Actor {
         origin.y = this.getTop() + 5
         let xOff = Math.random() * 50
         let raider = 
-            new Citizen('Raider', origin.add(new Vector(3000 + xOff,0)), this, false, true)
+            new Citizen('Raider', origin.add(new Vector(5000 + xOff,0)), this, false, true)
 
         this.population.raiders.push(
             raider
         )
 
         this.scene.add(raider)
-        await raider.glideTo(origin) //.add(new Vector(2400,0))) //.add(new Vector(300,0)))
+        // await raider.glideTo(origin) //.add(new Vector(2400,0))) //.add(new Vector(300,0)))
         // this.population.citizens.forEach(c => c.engageHostile(raider))
-        // let target = closest(raider.pos, this.population.citizens, (c) => c.pos)
-        // raider.engageHostile(target) //sample(this.population.citizens))
+        let target = closest(raider.pos, this.population.citizens, (c) => c.pos)
+        raider.engageHostile(target) //sample(this.population.citizens))
     }
 }

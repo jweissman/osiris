@@ -5,6 +5,7 @@ import { retrieveResource } from "../values/InteractionRequest";
 import { Strategy } from "./Strategy";
 
 export abstract class ProductionStrategy extends Strategy {
+    describe() { return 'making' }
 
     protected async storeBlock(res: ResourceBlock) {
         let stored = false

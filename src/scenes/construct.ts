@@ -40,6 +40,8 @@ export class Construct extends Scene {
         LivingQuarters,
     ]
 
+    private lost: boolean
+
     update(engine, delta) {
         super.update(engine, delta)
 
@@ -56,6 +58,10 @@ export class Construct extends Scene {
         // hmm!
         this.hud.updateDetails(this.planet, this.techTree, this.followedCitizen, true, this.time)
 
+        if (!this.lost && !this.firstBuilding && this.planet.population.citizens.length === 0) {
+            this.lost = true
+            this.systemMessage('The colony has perished!', () => this.game.goToScene('menu'))
+        }
     }
 
     public onInitialize(game: Game) {
@@ -101,10 +107,10 @@ export class Construct extends Scene {
     }
 
     showTutorial: boolean = true
-    private systemMessage(message: string) {
+    private systemMessage(message: string, onComplete: () => any = null) {
         this.hasActiveModal = true
         this.hud.systemMessage(message, "", {
-            continue: () => { this.closeSystemMessage() },
+            continue: () => { this.closeSystemMessage(); if (onComplete) { onComplete() } },
          })
     }
 
@@ -190,7 +196,7 @@ export class Construct extends Scene {
             }
         })
 
-        this.controller.onLeftClick((pos: Vector) => {
+        this.controller.onLeftClick((pos: Vector, shift: boolean) => {
             if (this.hasActiveModal) { return }
             const currentlyBuilding = this.planet.currentlyConstructing
                 if (currentlyBuilding) {
@@ -232,6 +238,10 @@ export class Construct extends Scene {
                             }
                             this.planet.colony.currentlyConstructing = null
                             this.hud.setStatus(this.defaultMessage)
+
+                            if (shift) {
+                                this.startConstructing(deviceUnderConstruction.machine)
+                            }
                         }
                     }
                 }

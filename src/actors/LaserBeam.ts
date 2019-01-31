@@ -1,4 +1,4 @@
-import { Actor, Color, CollisionType } from "excalibur";
+import { Actor, Color, CollisionType, Traits } from "excalibur";
 import { Game } from "../Game";
 import { Citizen } from "./Citizen";
 
@@ -8,7 +8,7 @@ export class LaserBeam extends Actor {
         super(
             source.pos.x + 42 * targetDirectionSign,
             source.pos.y - 10,
-            18,
+            12,
             1 //0.8
         )
 
@@ -16,26 +16,32 @@ export class LaserBeam extends Actor {
 
         this.color = (this.evil ? Color.Green : Color.Cyan).clone().lighten(0.3)
         this.vel.x = Game.bulletSpeed * targetDirectionSign
-        this.vel.y = (Math.random() * 10) - 5
-        this.on('collisionstart', (collision) => {
-            // console.log("COLLISION", { collision })
-            if (collision.other instanceof Citizen) {
-                if (collision.other.alive && this.evil !== collision.other.isEvil) {
-                    if (collision.other.guarding) { 
-                        this.vel.x = -this.vel.x
-                        this.evil = !this.evil 
-                        // this.
-                        // bullet.kill() // absorb..
-                    } else if (Math.random() > 0.3) {
-                        // console.log("someone got hit!", { person: collision.other.name })
-                        this.kill()
-                        collision.other.injure(6 + (Math.random() * 4), this.source)
-                    }
-                }
-            }
-        })
+
+        let drift = 24
+        this.vel.y = (Math.random() * drift) - (drift/2)
+        this.on('collisionstart', this.handleCollision) 
         this.collisionType = CollisionType.Passive
+        this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
     }
 
-    // private get evil() { return this.source.isEvil }
+    handleCollision = (collision) => {
+        let validTarget = collision.other instanceof Citizen &&
+            collision.other.alive &&
+            this.evil !== collision.other.isEvil
+        if (!validTarget) { return }
+
+        if (collision.other.guarding) {
+            // 60% chance to reflect
+            if (Math.random() > 0.4) {
+                this.vel.x = -this.vel.x
+                this.evil = !this.evil
+            } else if (Math.random() > 0.4) {
+                // if didn't reflect, 60% to absorb
+                this.kill()
+            }
+        } else if (Math.random() > 0.3) {
+            this.kill()
+            collision.other.injure(5 + (Math.random() * 2), this.source)
+        }
+    }
 }

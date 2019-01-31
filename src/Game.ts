@@ -3,26 +3,26 @@ import { World } from './models/World';
 import { Resources } from './Resources';
 
 export class Game extends Engine {
-  static citizenSpeed: number = 50
+  static citizenSpeed: number = 120
   static debugPath: boolean = false
   static startHour: number = 9
 
   // combat knobs
-  static bulletSpeed: number = 800
-  static raidingPartyFrequency: number = 30000
+  static bulletSpeed: number = 700
+  static raidingPartyFrequency: number = 120000
 
   // 10000 = 1 min / 10 sec
   // 1000 = 1 min / second
   // 100 = 10 min / second
-  static minuteTickMillis: number = 500
+  static minuteTickMillis: number = 750
 
   static font = 'Helvetica'
   static title: string = 'ASTRA';
 
   constructor(public world: World) {
     super({
-      width: 800,
-      height: 600,
+      // width: 800,
+      // height: 600,
       displayMode: DisplayMode.FullScreen,
       backgroundColor: Color.Black //world.skyColor
     });
