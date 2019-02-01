@@ -1,12 +1,9 @@
-import { Scene, Vector, LockCameraToActorStrategy, Color } from "excalibur";
+import { Scene, Vector, Color } from "excalibur";
 import { Citizen } from "../actors/Citizen";
 import { Game } from "../Game";
 import { Planet } from "../actors/Planet/Planet";
-import { World } from "../models/World";
-import { Hud } from "../actors/Hud/Hud";
 import { Pane } from "../actors/Hud/Pane";
 import { assembleButton } from "../Elemental";
-import { ENOTEMPTY } from "constants";
 import { sample } from "../Util";
 import { GameController } from "../GameController";
 
@@ -33,8 +30,7 @@ export class Arena extends Scene {
     controller: GameController
 
     public onInitialize(game: Game) {
-        let hud = new Hud(game)
-        this.planet = new Planet(hud, noop, noop, 200000, 40000, this)
+        this.planet = new Planet(this)
         this.add(this.planet)
         this.floorY = this.planet.getTop()
         this.spawnPalette = new SpawnPalette(100,100,[

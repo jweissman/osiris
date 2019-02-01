@@ -4,9 +4,9 @@ import { SkyLayer } from "./SkyLayer";
 import { MountainLayers } from './MountainLayers';
 export class SkyLayers extends Actor {
     layers: SkyLayer[] = [];
-    constructor(y: number, width: number, private lo: Color, hi: Color, private layerCount: number = 4) {
+    constructor(y: number, width: number, private lo: Color, hi: Color, private layerCount: number = 3) {
         super(0, y, width, 1500);
-        let h = MountainLayers.layerHeight * MountainLayers.layerCount
+        let h = (MountainLayers.layerHeight * MountainLayers.layerCount) + (MountainLayers.layerHeight / 2)
         for (let i of range(layerCount)) {
             let c0 = mixColors(lo, hi, (i / (layerCount + 1)));
             let c1 = mixColors(lo, hi, ((i + 1) / (layerCount + 1)));

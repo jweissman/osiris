@@ -24,12 +24,9 @@ export class Planet extends Actor {
     skyLayers: SkyLayers
 
     constructor(
-        public hud: Hud,
-        private onBuildingHover: (b: Building) => any,
-        private onDeviceHover: (d: Device) => any,
+        public scene: Scene,
         private w: number = 200000,
         private depth: number = 40000,
-        public scene: Scene
     ) {
         super(0, depth / 2, w, depth, World.pickColor())
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
@@ -66,6 +63,9 @@ export class Planet extends Actor {
         // this.depth = depth
         this.buildColonyAndPopulation()
     }
+
+    private hud: Hud
+    wireHud(hud: Hud) { this.hud = hud}
 
     // depth: number
     buildColonyAndPopulation() {
@@ -159,10 +159,14 @@ export class Planet extends Actor {
     set currentlyViewing(buildingOrDevice: Building | Device) {
         if (buildingOrDevice instanceof Building) {
             let b: Building = buildingOrDevice
-            this.onBuildingHover(b)
+            if (this.hud) {
+                this.hud.showCard(b)
+            }
         } else if (buildingOrDevice instanceof Device) {
             let d: Device = buildingOrDevice
-            this.onDeviceHover(d)
+            if (this.hud) {
+                this.hud.showCard(d)
+            }
         }
     }
 
@@ -206,11 +210,15 @@ export class Planet extends Actor {
     }
 
     gather(resource: ResourceBlock): any {
-        this.hud.resourceGathered(resource)
+        if (this.hud) {
+            this.hud.resourceGathered(resource)
+        }
     }
 
     spend(resource: ResourceBlock): any {
-        this.hud.resourceExpended(resource)
+        if (this.hud) {
+            this.hud.resourceExpended(resource)
+        }
     }
 
     placeBuilding(building: Building) {

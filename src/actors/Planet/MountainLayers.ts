@@ -7,9 +7,9 @@ export class MountainLayers extends PlanetBackground {
         deltas: number[];
     }[] = [];
     skyColor: Color = Color.Blue.clone();
-    static layerHeight: number = 14;
+    static layerHeight: number = 32;
     static layerCount = 1;
-    peakCount = 560;
+    peakCount = 2760;
     get peakWidth() {
         return Math.floor(this.getWidth() / this.peakCount);
     }
@@ -54,11 +54,11 @@ export class MountainLayers extends PlanetBackground {
     }
     private genPeaks(n) {
         let h = MountainLayers.layerHeight
-        let dMax = 1 * (h / 3);
+        let dMax = 1 * (h / 2);
         let deltas = [];
         let randomDelta = () => (Math.random() * (dMax)) - (dMax / 2);
         let last = 0;
-        let maxDiff = (h/5);
+        let maxDiff = (h/3);
         for (let times in range(this.peakCount)) {
             let curr = randomDelta();
             let pick = Math.max(last - maxDiff, Math.min(curr, last + maxDiff));

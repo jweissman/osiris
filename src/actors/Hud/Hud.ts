@@ -110,6 +110,14 @@ export class Hud extends UIActor {
         this.functionPalette.show()
         this.citizenList.show()
         this.actionList.show()
+
+        this.status.show()
+    }
+
+    restrictionsOff() {
+        this.machinePalette.restrictionsOff()
+        this.structurePalette.restrictionsOff()
+        this.functionPalette.restrictionsOff()
     }
 
     systemMessage(

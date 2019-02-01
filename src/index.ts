@@ -1,23 +1,24 @@
 import { Game } from './Game';
 import { World } from './models/World';
-import { Construct } from './scenes/Construct';
-import { Resources } from './Resources';
-import { Sound } from 'excalibur';
+import { Play } from './scenes/Play';
 import { Arena } from './scenes/Arena';
 import { Menu } from './scenes/Menu';
+import { Sandbox } from './scenes/Sandbox';
 
 const theWorld = new World();
 const game = new Game(theWorld);
 
-const construct = new Construct(game);
-game.add('construct', construct);
+const menu = new Menu(game)
+game.add('menu', menu)
+
+const play = new Play(game);
+game.add('play', play);
 
 const arena = new Arena(game)
 game.add('arena', arena)
 
-const menu = new Menu(game)
-game.add('menu', menu)
-
+const sandbox = new Sandbox(game)
+game.add('sandbox', sandbox)
 
 game.start().then(() => {
   game.goToScene('menu')

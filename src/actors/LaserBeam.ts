@@ -6,7 +6,7 @@ export class LaserBeam extends Actor {
     private evil: boolean
     constructor(private source: Citizen, private targetDirectionSign: number) {
         super(
-            source.pos.x + 42 * targetDirectionSign,
+            source.pos.x + 4 * targetDirectionSign,
             source.pos.y - 10,
             12,
             1 //0.8

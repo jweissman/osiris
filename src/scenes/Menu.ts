@@ -38,8 +38,9 @@ export class Menu extends Scene {
             halfHeight - 50,
         )
         this.sceneList.setup([
-            { label: 'Play', scene: 'construct' },
+            { label: 'Play', scene: 'play' },
             { label: 'Arena', scene: 'arena' },
+            { label: 'Sandbox', scene: 'sandbox' },
         ], this.engine)
 
         this.emitter = this.makeBigBangEmitter(

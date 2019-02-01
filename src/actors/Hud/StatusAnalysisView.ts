@@ -82,7 +82,12 @@ export class StatusAnalysisView extends Actor {
         // )
     }
 
+    show() {
+        this.musicPlayer.show()
+    }
+
     hide() {
+        this.musicPlayer.stop()
         this.musicPlayer.hide()
     }
 

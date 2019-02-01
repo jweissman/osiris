@@ -6,8 +6,8 @@ export class Mountains extends PlanetBackground {
         height: number;
     }[] = [];
     onInitialize() {
-        let peakCount = 14;
-        let peakHeight = 1500;
+        let peakCount = 10
+        let peakHeight = 1500
         let xOff = this.getWidth() / 2;
         let peakDistance = this.getWidth() / peakCount;
         // for (let times of range(2)) {

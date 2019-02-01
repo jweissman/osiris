@@ -29,6 +29,8 @@ export class Citizen extends Actor {
     carrying: ResourceBlock[] = []
     path: Vector[] = []
 
+    private shouldAwaken: boolean = false
+
     private workInProgress: boolean = false
     private workStarted: number
     private workDuration: number
@@ -167,14 +169,16 @@ export class Citizen extends Actor {
             this.energy = Math.min(100, this.energy+0.1)
             if (this.health === 100 && !this.isTired) {
                 // this.log("Try to awaken early!! (We are healed, not tired...)")
-                this.sleeping = false
-                this.isPlanning = false
-                this.sleepingInBed.inUse = false
-                this.sleepingInBed = null
-                this.workInProgress = false
-                // this.actionQueue.clearActions()
-                // this.abortProgressBar()
-                this.work()
+                this.shouldAwaken = true
+                this.log("should wake up now!!")
+                // this.sleeping = false
+                // this.isPlanning = false
+                // this.sleepingInBed.inUse = false
+                // this.sleepingInBed = null
+                // this.workInProgress = false
+                // // this.actionQueue.clearActions()
+                // // this.abortProgressBar()
+                // this.work()
             }
         }
 

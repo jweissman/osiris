@@ -4,9 +4,9 @@ import { Game } from "../../Game";
 
 interface MusicPlayerPlay { type: 'play'}
 interface MusicPlayerPause { type: 'pause'}
-interface MusicPlayerStop { type: 'stop'}
+// interface MusicPlayerStop { type: 'stop'}
 interface MusicPlayerNext { type: 'next'}
-type MusicPlayerAction = MusicPlayerPlay | MusicPlayerPause | MusicPlayerStop | MusicPlayerNext
+type MusicPlayerAction = MusicPlayerPlay | MusicPlayerPause | MusicPlayerNext
 
 export class MusicPlayer {
     private _wrapper: HTMLDivElement;
@@ -29,12 +29,21 @@ export class MusicPlayer {
         this._wrapper.style.display = 'none'
     }
 
-    startMusic() {
+    show() {
+        this._wrapper.style.display = 'block'
+    }
+
+    private startMusic() {
         this._titleElem.textContent = `Playing: ${this.currentTrack}`;
         this.playlist[this.currentTrack].play()
         .then(() => {
                 this.advancePlaylist()
         })
+    }
+
+    stop() {
+        this.handleAction({type: 'pause'})
+        // this.playlist[this.curr]
     }
 
     draw(ctx: CanvasRenderingContext2D) {

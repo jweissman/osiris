@@ -9,7 +9,7 @@ export class SkyLayer extends Actor {
     constructor(y: number, width: number, lo: Color, hi: Color) {
         super(0, y, width, 1500); //width,1500) //height)
         let mid = mixColors(lo, hi);
-        let buffer = MountainLayers.layerHeight / 3
+        let buffer = MountainLayers.layerHeight / 4
         let ht = (MountainLayers.layerHeight - buffer) * MountainLayers.layerCount
         this.backMountainLayers = new MountainLayers(-ht, width, mid);
         this.backMountainLayers.skyColor = hi;

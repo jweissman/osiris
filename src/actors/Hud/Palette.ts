@@ -7,6 +7,7 @@ import { assembleButton } from "../../Elemental";
 export class Palette extends Pane {
     built: EntityKind[] = [];
     comprehended: EntityKind[] = [];
+    omniscient: boolean = false
 
     constructor(
         name: string,
@@ -21,10 +22,15 @@ export class Palette extends Pane {
         this.makePalette();
     }
 
+    restrictionsOff() {
+        this.omniscient = true
+    }
 
     updateBuilt(built: (EntityKind)[], unlocked: (EntityKind)[] = []) {
         this.built = built;
-        if (this.comprehend) {
+        if (this.omniscient) {
+            this.comprehended = this.all
+        } else if (this.comprehend) {
             let nowComprehended = this.all.filter((e: EntityKind) => {
                 let s = new e();
                 let prereqs: (EntityKind)[] = s.prereqs;
