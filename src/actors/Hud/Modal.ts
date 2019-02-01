@@ -114,6 +114,8 @@ export class Modal {
         matrix.style.padding = '15px'
         matrix.style.width = `100%` //${this.width}px`
 
+        matrix.style.justifyContent = 'space-evenly'
+
         iconSet.forEach(({ label, image }) => {
             let img = new Image()
             img.width = 64

@@ -6,15 +6,16 @@ export class Mountains extends PlanetBackground {
         height: number;
     }[] = [];
     onInitialize() {
-        let peakCount = 9;
-        let peakHeight = 800;
+        let peakCount = 14;
+        let peakHeight = 1500;
         let xOff = this.getWidth() / 2;
         let peakDistance = this.getWidth() / peakCount;
         // for (let times of range(2)) {
         let heightRange = 100;
         let drift = 3 * (peakDistance / 2);
         for (let i of range(peakCount)) {
-            let h = Math.max(400, 200 + (Math.random() * peakHeight) + ((Math.random() * heightRange) - (heightRange / 2))); //(Util.randomIntInRange(-160,160))
+            let h = 
+                (Math.random() * peakHeight) + ((Math.random() * heightRange) - (heightRange / 2))
             this.peaks.push({
                 x: Math.min(this.getWidth() / 2 - h / 2, -xOff + i * peakDistance + ((Math.random() * drift))),
                 height: h

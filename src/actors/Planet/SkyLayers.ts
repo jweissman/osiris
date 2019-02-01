@@ -1,14 +1,16 @@
 import { Actor, Color } from 'excalibur';
 import { range, mixColors } from '../../Util';
 import { SkyLayer } from "./SkyLayer";
+import { MountainLayers } from './MountainLayers';
 export class SkyLayers extends Actor {
     layers: SkyLayer[] = [];
-    constructor(y: number, width: number, private lo: Color, hi: Color, private layerCount: number = 5) {
+    constructor(y: number, width: number, private lo: Color, hi: Color, private layerCount: number = 4) {
         super(0, y, width, 1500);
+        let h = MountainLayers.layerHeight * MountainLayers.layerCount
         for (let i of range(layerCount)) {
             let c0 = mixColors(lo, hi, (i / (layerCount + 1)));
             let c1 = mixColors(lo, hi, ((i + 1) / (layerCount + 1)));
-            let layer = new SkyLayer(-20 - (50 * (layerCount - i - 1)), this.getWidth(), c1, c0);
+            let layer = new SkyLayer(-20 - ((h) * (layerCount - i - 1)), this.getWidth(), c1, c0);
             this.layers.push(layer);
             this.add(layer);
         }

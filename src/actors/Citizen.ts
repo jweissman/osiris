@@ -61,9 +61,9 @@ export class Citizen extends Actor {
         super(
             home.x, home.y,
             18,20,
-            // Scale.minor.first, Scale.minor.fourth,
             Color.White.clone()
-            )
+        )
+
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
         this.productionStrategy = new CapacityBasedProduction(this)
@@ -139,8 +139,6 @@ export class Citizen extends Actor {
     update(engine, delta) {
         super.update(engine, delta)
 
-
-        // check wip
         if (this.workInProgress) {
             let now = (new Date()).getTime()
             this.progress = 
@@ -151,10 +149,8 @@ export class Citizen extends Actor {
 
             this.fatigue()
         } else if (this.path.length > 0) {
-            // we have a non-empty path
+            // we have a non-empty path (so just follow it!)
         } else {
-
-            // we aren't working or walking -- make sure we are busy!
             this.work()
         }
 
@@ -162,25 +158,22 @@ export class Citizen extends Actor {
             this.pos = this.driving.pos.add(this.driving.building.pos)
         }
 
-        if (this.combatting && !this.combatting.alive) { //isKilled()) {
-            // console.warn("enemy was killed?", this.combatting)
+        if (this.combatting && !this.combatting.alive) {
             this.combatting = null
-
-            // let cmdCenter = this.planet.colony.findAllDevices().find(device => device.machine instanceof CommandCenter)
-            // this.visit(cmdCenter)
         }
 
         if (this.sleeping) {
-            // heal during sleep
             this.health = Math.min(100, this.health+0.1)
             this.energy = Math.min(100, this.energy+0.1)
-            if (this.health === 100 && !this.isTired) { //} && this.planet.hour > 6) {
-                this.log("Try to awaken early!! (We are healed, not tired...)")
+            if (this.health === 100 && !this.isTired) {
+                // this.log("Try to awaken early!! (We are healed, not tired...)")
                 this.sleeping = false
                 this.isPlanning = false
                 this.sleepingInBed.inUse = false
                 this.sleepingInBed = null
-                this.abortProgressBar()
+                this.workInProgress = false
+                // this.actionQueue.clearActions()
+                // this.abortProgressBar()
                 this.work()
             }
         }
@@ -288,10 +281,10 @@ export class Citizen extends Actor {
         this.workInProgress = false
     }
 
-    abortProgressBar() {
-        this.log("work in progress aborted...!")
-        this.workInProgress = false
-    }
+    // abortProgressBar() {
+    //     this.log("work in progress aborted...!")
+    //     this.workInProgress = false
+    // }
 
     drive(d: Device) {
         this.driving = d

@@ -1,4 +1,4 @@
-import { Actor, Label, Color, Vector } from "excalibur";
+import { Actor, Label, Color, Vector, CollisionType } from "excalibur";
 import { Machine } from "../models/Machine";
 import { Building } from "./Building";
 import { ResourceBlock, blockColor, emptyMarket, sumMarkets } from "../models/Economy";
@@ -66,6 +66,8 @@ export class Device extends Actor {
                 this.building.planet.currentlyViewing = null
             }
         })
+
+        this.collisionType = CollisionType.Active
     }
 
     get imageX() { return this.pos.x - this.getWidth() / 2 }

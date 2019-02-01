@@ -59,7 +59,7 @@ export class Planet extends Actor {
            this.getWidth(),
            this.color.lighten(0.04),
            this.baseSkyColor.lighten(0.15),
-           6
+        //    3
         )
         this.add(this.skyLayers)
 
@@ -113,7 +113,7 @@ export class Planet extends Actor {
         this.sky.color = skyColor
         // let inc = 0.02
         let c = //mixColors(
-            this.sky.color.lighten(0.15) //.lighten(5 * inc) //,
+            this.sky.color.lighten(0.05) //.lighten(5 * inc) //,
             // this.color.darken(5 * inc),
             // 0.7
         // )
@@ -276,21 +276,23 @@ export class Planet extends Actor {
         if (this.threatLevel === 0) {
             await sleep(10000) // wait for game to bootstrap (the first time)...
         }
-        this.threatLevel += 1
-        let maxPartySize = 1 + Math.floor(this.threatLevel/3)
-        let partySize = 1+sample(range(maxPartySize))
-        for (let times in range(partySize)) {
-            this.sendRaider()
+        if (this.population && this.population.citizens && this.population.citizens.length > 0) {
+            this.threatLevel += 1
+            let maxPartySize = 1 + Math.floor(this.threatLevel / 3)
+            let partySize = 1 + sample(range(maxPartySize))
+            for (let times in range(partySize)) {
+                this.sendRaider()
+            }
+            console.warn(`Sent ${partySize} raiders!`)
         }
-        console.warn(`Sent ${partySize} raiders!`)
     }
 
     private async sendRaider() {
         let origin = this.colony.origin.clone()
         origin.y = this.getTop() + 5
         let xOff = Math.random() * 50
-        let raider = 
-            new Citizen('Raider', origin.add(new Vector(5000 + xOff,0)), this, false, true)
+        let raider =
+            new Citizen('Raider', origin.add(new Vector(5000 + xOff, 0)), this, false, true)
 
         this.population.raiders.push(
             raider

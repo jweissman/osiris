@@ -7,16 +7,17 @@ export class MountainLayers extends PlanetBackground {
         deltas: number[];
     }[] = [];
     skyColor: Color = Color.Blue.clone();
-    layerHeight: number = 70;
-    layerCount = 1;
-    peakCount = 300;
+    static layerHeight: number = 14;
+    static layerCount = 1;
+    peakCount = 560;
     get peakWidth() {
         return Math.floor(this.getWidth() / this.peakCount);
     }
     onInitialize() {
-        for (let layerIndex of range(this.layerCount)) {
+        let c = MountainLayers.layerCount
+        for (let layerIndex of range(c)) {
             this.layers.unshift({
-                baseY: (layerIndex + 1) * -this.layerHeight,
+                baseY: (layerIndex + 1) * (-MountainLayers.layerHeight+4),
                 deltas: this.genPeaks(layerIndex)
             });
         }
@@ -43,19 +44,21 @@ export class MountainLayers extends PlanetBackground {
             ndx += 1;
         }
         ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy);
-        ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy + this.layerHeight);
-        ctx.lineTo(ox, oy + this.layerHeight);
+        let h = MountainLayers.layerHeight
+        ctx.lineTo(ox + (this.peakCount * this.peakWidth), oy + h) //this.layerHeight);
+        ctx.lineTo(ox, oy + h) //this.layerHeight);
         ctx.closePath();
         c.a = 1;
         ctx.fillStyle = c.toRGBA();
         ctx.fill();
     }
     private genPeaks(n) {
-        let dMax = 2 * (this.layerHeight / 3);
+        let h = MountainLayers.layerHeight
+        let dMax = 1 * (h / 3);
         let deltas = [];
         let randomDelta = () => (Math.random() * (dMax)) - (dMax / 2);
         let last = 0;
-        let maxDiff = 15;
+        let maxDiff = (h/5);
         for (let times in range(this.peakCount)) {
             let curr = randomDelta();
             let pick = Math.max(last - maxDiff, Math.min(curr, last + maxDiff));

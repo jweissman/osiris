@@ -45,7 +45,6 @@ export class Hud extends UIActor {
 
     private showCitizenList: boolean = true
     private citizenList: CitizenList
-
     private actionList: ActionList
 
 

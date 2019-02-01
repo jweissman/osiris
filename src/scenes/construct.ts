@@ -17,21 +17,32 @@ import { TechTree } from "../models/TechTree";
 import { Citizen } from "../actors/Citizen";
 import { GameController } from "../GameController";
 
+class ConstructionEngine {
+    // i.e. have we placed the first building yet
+    firstBuilding: boolean = true
+    placingFunction: RoomRecipe = null
+    // currentlyConstructing: Building | Device = null;
+
+    constructor() {}
+    activate(controller: GameController) {
+    }
+}
+
 
 export class Construct extends Scene {
     private controller: GameController
+    private techTree: TechTree = new TechTree()
     // private game: Engine
     private planet: Planet
     private hud: Hud
     private player: Player
     private defaultMessage: string = 'Welcome to the Colony, Commander.'
     private time: number = Game.startHour*60
-    private placingFunction: RoomRecipe = null
     private hasActiveModal: boolean = false
-    private techTree: TechTree = new TechTree()
-    private firstBuilding: boolean = true
     private followedCitizen: Citizen = null
     private lost: boolean = false
+
+    private construction: ConstructionEngine
 
     static requiredStructuresAndFunctions: (typeof RoomRecipe | typeof Structure)[] = [
         MissionControl,
@@ -59,7 +70,7 @@ export class Construct extends Scene {
         // hmm!
         this.hud.updateDetails(this.planet, this.techTree, this.followedCitizen, true, this.time)
 
-        if (!this.lost && !this.firstBuilding && this.planet.population.citizens.length === 0) {
+        if (!this.lost && !this.construction.firstBuilding && this.planet.population.citizens.length === 0) {
             this.lost = true
             // alert('colony lost!')
             this.askYesNo('The colony has perished! Try again?',
@@ -70,6 +81,7 @@ export class Construct extends Scene {
     }
 
     public onInitialize(engine: Engine) {
+        this.construction = new ConstructionEngine()
 
         let buildIt = (e) => this.startConstructing(e)
         let followIt = (c) => this.toggleFollowing(c)
@@ -105,7 +117,7 @@ export class Construct extends Scene {
     welcome() {
         this.planet.buildColonyAndPopulation()
         this.lost  = false
-        this.firstBuilding = true
+        this.construction.firstBuilding = true
         this.infoMessage(
             "Welcome to the Colony, sir... "
             + "We are what is left of the crew of the Osiris. "
@@ -124,6 +136,8 @@ export class Construct extends Scene {
         this.camera.zoom(0.25)
 
         this.hud.show()
+
+        if (this.lost) { this.welcome() }
     }
 
     public onDeactivate() {
@@ -163,18 +177,18 @@ export class Construct extends Scene {
                         let placementValid = !buildingUnderConstruction.overlapsAny()
                         if (buildingUnderConstruction && placementValid && buildingUnderConstruction.handleClick(pos)) {
                             this.planet.placeBuilding(buildingUnderConstruction)
-                            if (this.firstBuilding){
+                            if (this.construction.firstBuilding){
                                 this.planet.sendRaidingParty()
                             }
 
-                            if (this.placingFunction) {
-                                let fn = this.placingFunction
+                            if (this.construction.placingFunction) {
+                                let fn = this.construction.placingFunction
                                 zip(fn.machines, buildingUnderConstruction.devicePlaces()).forEach(([machine, place]: [typeof Machine, DevicePlace]) => {
                                     let m = (new machine()).concretize()
                                     let device = new Device(m, place.position)
                                     buildingUnderConstruction.addDevice(device)
                                 })
-                                this.placingFunction = null
+                                this.construction.placingFunction = null
                             }
 
                             this.hud.setStatus(this.defaultMessage)
@@ -214,11 +228,10 @@ export class Construct extends Scene {
                     this.camera.zoom(0.5, 1000)
                 }
             } else if (key === Input.Keys.Esc) {
-
-                    this.planet.colony.currentlyConstructing = null
-                    this.placingFunction = null
-                    this.stopFollowing(true)
-                    this.hud.setStatus(this.defaultMessage)
+                this.planet.colony.currentlyConstructing = null
+                this.construction.placingFunction = null
+                this.stopFollowing(true)
+                this.hud.setStatus(this.defaultMessage)
             }
         })
 
@@ -364,10 +377,10 @@ export class Construct extends Scene {
             let structure = structureOrMachine
             this.hud.setStatus(`Place ${structure.name} (${structure.description})`)
             theNextOne = this.spawnBuilding(structure, pos)
-            if (this.firstBuilding) {
+            if (this.construction.firstBuilding) {
                 this.camera.zoom(structure.zoom, 250)
                 this.camera.pos = theNextOne.pos
-                this.firstBuilding = false
+                this.construction.firstBuilding = false
             } 
         } else if (structureOrMachine instanceof Machine) {
             let machine = structureOrMachine
@@ -378,7 +391,7 @@ export class Construct extends Scene {
             let fn: RoomRecipe = structureOrMachine
             this.hud.setStatus(`Place ${fn.name} (${fn.description})`)
             theNextOne = this.spawnFunction(fn, pos)
-            this.placingFunction = fn
+            this.construction.placingFunction = fn
 
         }
 
