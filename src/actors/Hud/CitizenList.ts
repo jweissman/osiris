@@ -63,10 +63,11 @@ class CitizenLine {
         this._line.style.color = 'white'
         this._line.style.backgroundColor = '#6a6a6a'
         this._line.style.display = 'flex'
-        this._line.style.width = '100%'
+        // this._line.style.width = '100%'
+        // this._line.style.height = '40px'
         this._line.style.justifyContent = 'space-between'
         this._line.style.paddingLeft = '5px'
-        this._line.style.fontSize = '7pt'
+        this._line.style.fontSize = '6pt'
 
         let nameLabel = document.createElement('span')
 
@@ -116,6 +117,7 @@ class CitizenLine {
 }
 
 export class CitizenList extends Pane {
+    private _wrapper: HTMLDivElement
     private citizens: Citizen[] = []
     following: Citizen = null
     private citizenLines: Map<Citizen, CitizenLine> = new Map()
@@ -153,6 +155,13 @@ export class CitizenList extends Pane {
 
     private makeRoster() {
         this.makeRootElement();
+        this._element.style.height = '260px'
+        this._wrapper = document.createElement('div')
+        this._wrapper.style.overflow = 'auto'
+        // this._wrapper.style.maxHeight = '480px'
+        this._wrapper.style.height = '250px'
+        this._wrapper.style.width = '100%'
+        this._element.appendChild(this._wrapper)
         this.citizens.forEach(c => this.makeCitizenLine(c))
         // citizen => 
         // });
@@ -161,6 +170,6 @@ export class CitizenList extends Pane {
     private makeCitizenLine(citizen: Citizen) {
         let line = new CitizenLine(citizen, this.onCitizenSelect)
         this.citizenLines.set(citizen, line)
-        this._element.appendChild(line.root);
+        this._wrapper.appendChild(line.root);
     }
 }

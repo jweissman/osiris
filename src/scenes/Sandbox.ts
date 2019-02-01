@@ -13,7 +13,8 @@ export class Sandbox extends Scene {
         this.add(this.planet)
         this.construction = new Construction(this.planet, engine,
             "Welcome to the Ad Astra sandbox. " +
-            "Build whatever you are dreaming of! "
+            "All structures and devices are permitted here. " +
+            "Go build whatever you are dreaming of! "
             )
         this.construction.restrictionsOff()
     }

@@ -93,7 +93,7 @@ export class Arena extends Scene {
     }
 
     spawnHostileCommander = () => {
-        let cmdrName = sample([ 'Conn', 'Drak', 'Tanoz', 'Queue', 'Morgoth'])
+        let cmdrName = sample([ 'Conn', 'Drak', 'Tanoz', 'Queue', 'Morgosh', 'Umph'])
         let hostile = new Citizen(cmdrName, new Vector((Math.random() * this.spawnDrift) + this.hostileSpawnY, this.floorY), this.planet, true, true)
         this.planet.population.raiders.push(hostile)
         this.add(hostile)

@@ -78,16 +78,16 @@ export class Hud extends UIActor {
         this.add(this.status)
 
         let displayInfo = (e) => this.showCard(e)
-        this.machinePalette = new Palette('Machine', 20, 55, allMachines, onMachineSelect, displayInfo) // (e) => this.showCard(e))
+        this.machinePalette = new Palette('Machine', canvasWidth - 220, 55, allMachines, onMachineSelect, displayInfo) // (e) => this.showCard(e))
         this.structurePalette = new Palette('Structure', 20, 300, Hud.structuresForPalette, onBuildingSelect, displayInfo)
-        this.functionPalette = new Palette('Room Recipe', 20, 435, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
+        this.functionPalette = new Palette('Room Recipe', 20, 55, Hud.functionsForPalette, onFunctionSelect, displayInfo, false)
 
-        this.citizenList = new CitizenList(canvasWidth - 220, 55, onCitizenSelect) //, (citizen) => {})
+        this.citizenList = new CitizenList(canvasWidth - 220, canvasHeight-300, onCitizenSelect) //, (citizen) => {})
 
         this.card = new Card(null, 20, canvasHeight - 200)
         this.add(this.card)
 
-        this.actionList = new ActionList('Actions', canvasWidth - 220, canvasHeight - 100)
+        this.actionList = new ActionList('Actions', canvasWidth/2 - 100, canvasHeight - 100)
         this.actionList.setup([
             { label: 'Main Menu', action: () => {game.goToScene('menu')} },
             // { label: 'Main Menu', action: () => {game.goToScene('menu')} }

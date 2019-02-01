@@ -23,7 +23,8 @@ export class Menu extends Scene {
     controller: GameController
 
     sceneList: SceneList
-    emitter: ParticleEmitter
+    blueEmitter: ParticleEmitter
+    redEmitter: ParticleEmitter
 
     onInitialize() {
         let canvasHeight = this.engine.canvasHeight / window.devicePixelRatio;
@@ -43,11 +44,20 @@ export class Menu extends Scene {
             { label: 'Sandbox', scene: 'sandbox' },
         ], this.engine)
 
-        this.emitter = this.makeBigBangEmitter(
-            halfWidth + (halfWidth/2),
-            halfHeight - 50
+        this.blueEmitter = this.makeBigBangEmitter(
+            canvasWidth + 50,
+            // halfWidth + (halfWidth/2),
+            halfHeight - 50,
+            Color.Blue.lighten(0.3)
         )
-        this.add(this.emitter)
+        this.add(this.blueEmitter)
+        this.redEmitter = this.makeBigBangEmitter(
+            canvasWidth + 50,
+            // halfWidth + (halfWidth/2),
+            halfHeight - 50,
+            Color.Red.darken(0.3)
+        )
+        this.add(this.redEmitter)
 
         this.controller = new GameController(this.engine, this.camera)
     }
@@ -56,17 +66,19 @@ export class Menu extends Scene {
 
         this.sceneList.show()
 
-        let canvasHeight = this.engine.canvasHeight / window.devicePixelRatio;
+        // let canvasHeight = this.engine.canvasHeight / window.devicePixelRatio;
 
-        this.camera.zoom(2.25)
-        this.emitter.isEmitting = true
+        this.camera.zoom(1.25) //2.5)
+        this.blueEmitter.isEmitting = true
+        this.redEmitter.isEmitting = true
 
         this.controller = new GameController(this.engine, this.camera)
         this.controller.activate()
     }
 
     onDeactivate() {
-        this.emitter.isEmitting = false
+        this.blueEmitter.isEmitting = false
+        this.redEmitter.isEmitting = false
         this.controller.deactivate()
         this.sceneList.hide()
     }
@@ -77,30 +89,30 @@ export class Menu extends Scene {
         super.draw(ctx, delta)
         this.sceneList.draw(ctx)
         drawText(ctx,
-            `${Game.title} (prealpha build.)`,
+            `${Game.title} v0.0.1 (pre-alpha)`,
             canvasWidth - 100, canvasHeight - 20)
         drawText(ctx,
             `Zoom: ${this.camera.getZoom()} / Pos: ${this.camera.pos.x}, ${this.camera.pos.y}`,
             1000, 1000)
     }
 
-    private makeBigBangEmitter(x,y) {
+    private makeBigBangEmitter(x,y,c) {
         let emitter = new ParticleEmitter(
             x,
             y
         )
-        emitter.endColor = Color.Blue
+        emitter.endColor = c.clone() //Color.Blue
         emitter.beginColor = Color.White.darken(0.18)
         emitter.radius = 10
         emitter.minVel = 10
-        emitter.maxVel = 160
+        emitter.maxVel = 250
         emitter.minAngle = 0 //3 * (Math.PI / 2) //0
         emitter.maxAngle = Math.PI * 2
-        emitter.emitRate = 200 // 300 particles/second
-        emitter.opacity = 0.5
+        emitter.emitRate = 36 // 300 particles/second
+        emitter.opacity = 0.54
         emitter.fadeFlag = true
-        emitter.particleLife = 4500 // in milliseconds = 1 sec
-        emitter.maxSize = 50 // in pixels
+        emitter.particleLife = 5600 // in milliseconds = 1 sec
+        emitter.maxSize = 180 // in pixels
         emitter.minSize = 2
         // emitter.beginColor = Color.Red.darken(0.12);
         emitter.isEmitting = false;
