@@ -1,7 +1,6 @@
 import { Actor, Color, CollisionType, Traits } from "excalibur";
 import { Game } from "../Game";
 import { Citizen } from "./Citizen";
-import { Combatant } from "./Combatant";
 import { Device } from "./Device";
 
 export class LaserBeam extends Actor {
