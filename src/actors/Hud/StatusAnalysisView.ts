@@ -40,11 +40,11 @@ export class StatusAnalysisView extends Actor {
         this.economy = new EconomyView(market, 280, ty)
         this.add(this.economy)
 
-        this.clock = new Label('current time', 600, ty, Game.font) // 'Verdana')
+        this.clock = new Label('current time', 660, ty, Game.font) // 'Verdana')
         this.clock.color = Color.White // 'white'
         this.add(this.clock)
 
-        this.popLabel = new Label("", 600, ty + 14, Game.font) // 'Verdana')
+        this.popLabel = new Label("", 660, ty + 14, Game.font) // 'Verdana')
         this.popLabel.fontSize = 10
         this.popLabel.color = Color.White
         this.add(this.popLabel)

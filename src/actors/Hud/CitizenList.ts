@@ -67,7 +67,7 @@ class CitizenLine {
         // this._line.style.height = '40px'
         this._line.style.justifyContent = 'space-between'
         this._line.style.paddingLeft = '5px'
-        this._line.style.fontSize = '6pt'
+        this._line.style.fontSize = '8pt'
 
         let nameLabel = document.createElement('span')
 

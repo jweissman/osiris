@@ -1,5 +1,7 @@
-const majorUnit = 16
-const minorUnit = 4
+import { Game } from "../Game";
+
+const majorUnit = Game.mansheight * 2
+const minorUnit = Math.floor(Game.mansheight / 4)
 
 const majorScale = {
     first: majorUnit,

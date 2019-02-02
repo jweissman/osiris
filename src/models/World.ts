@@ -15,10 +15,15 @@ export class World {
         "Noman", "Nohbdy", "Elseone", "Othera", "Selene", "Maytrix", "Damsehl", "Allegore", "Samilie", "Phonolia", "Philia", "Dippides", "Euripimus",
         "D'arcy", "Noname", "Sig", "Gil", "Felix",  "Ertrude", "Imitos", "Exitos", "Xenia", "Corelia", "Lineament", "Fundament", "Hyperion", "Nonce",
         "Eris", "Nael", "Gronthax", "Sparerib", "Carhorn", "Doorknot", "Careful", "Sadusee", "Alright", "Kevim", "Elador", "Elabor", "Elgar", "Elbow",
-        "Nell", "Kell", "Tell", "Pell", "Jell", "Xell", "Zell", "Zil", "Zok", "Zog", "Mog", "Moog", "Mogue", "Rogue", "Boog", "Dude", "Aesthyr", "Kerax",
+        "Nell", "Kell", "Tell", "Pell", "Jell", "Xell", "Zell", "Zil", "Zok", "Nog", "Yog", "Moog", "Mogue", "Rogue", "Boog", "Dude", "Aesthyr", "Kerax",
         "Norman", "Gordon", "Gordax", "Gornoth", "Torgon", "Zorgax", "Zarnath", "Sarnox", "Porkath", "Esperil", "Ythr", "Dream", "Fever", "Spite", "Coreheart",
         "Darkfire", "Lost", "Found", "Norm", "Korm", "Dorm", "Lorm", "Form", "Sorm", "Roam", "Nome", "Tome", "Bore", "Nore", "Kore", "Dorling", "Norlath",
         "Natling", "Dathron", "Dathlax", "Kargill", "Nomandy", "Exactlee", "Terminax", "Exlith", "Lisztia", "Zed", "Alphus", "Quatlewis", "Serenado", "Imma", 
+
+        // third-gen
+        "Splender", "Airline", "Phax", "Index", "Tolerable", "Expert", "Tonsil", "Deerhoof", "Coldrain", "Darkwater",
+        "Interzone", "Neverwhen", "Dream", "Really", "Artefax", "Maniple", "Anseb", "Target", "Novim", "Evim", "Lisem", "Nancem",
+        "Orligot", "Nolifun", "Deriduh", "Flandor", "Lamplife", "Coldwave", "Oncetold", "Oncebit", "Twiceshy", "Niceguy", "Okay",
 
 
         // very long names
@@ -29,8 +34,25 @@ export class World {
       ])
     }
 
-  static colors = [Color.Orange] // Color.Azure], // Color.Red, Color.Blue, Color.Green, Color.Magenta]
-  static skyColors = [Color.Cyan] //b, Color.Vermillion], // Color.Violet, Color.Chartreuse, Color.Orange, Color.Rose]
+  static colors = [
+    Color.Orange,
+    Color.Blue,
+    Color.Red,
+    Color.Green,
+    Color.Violet,
+    Color.Azure,
+    Color.Magenta.darken(0.2),
+    Color.Cyan.darken(0.2),
+  ] 
+
+  static skyColors = [
+    Color.Cyan.lighten(0.1),
+    Color.Green.lighten(0.2),
+    Color.Orange.lighten(0.2),
+    Color.Rose.lighten(0.1),
+    Color.Violet.lighten(0.2),
+    Color.Chartreuse.lighten(0.1),
+  ] //b, Color.Vermillion], // Color.Violet, Color.Chartreuse, Color.Orange, Color.Rose]
 
   static pickColor() {
     return sample(World.colors).
@@ -43,7 +65,7 @@ export class World {
     return sample(World.skyColors).
       clone().
       desaturate(0.74).
-      lighten(0.18)
+      lighten(0.08)
   }
 
 }

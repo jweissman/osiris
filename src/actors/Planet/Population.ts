@@ -21,7 +21,7 @@ export class Population extends Actor {
     }
 
     increase(pos, elite: boolean = false) {
-        let citizen = new Citizen(World.nameCitizen(), pos, this.planet, elite);
+        let citizen = new Citizen(World.nameCitizen(), pos, this.planet, { elite });
         citizen.work();
         this.citizens.push(citizen);
         // scene.add?

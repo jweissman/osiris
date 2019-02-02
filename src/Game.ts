@@ -18,6 +18,7 @@ export class Game extends Engine {
 
   static font = 'Helvetica'
   static title: string = 'ASTRA';
+  static mansheight: number = 28
 
   constructor(public world: World) {
     super({

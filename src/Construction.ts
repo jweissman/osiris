@@ -75,7 +75,7 @@ export class Construction extends UIActor {
             this.rankUp(rank);
         }
         // hmm!
-        this.hud.updateDetails(this.planet, this.techTree, this.followedCitizen, true, 0); //, this.scene.currentTime)
+        this.hud.updateDetails(this.planet, this.techTree, this.followedCitizen, true, this.planet.time); //, this.scene.currentTime)
         if (!this.lost && !this.firstBuilding && this.planet.population.citizens.length === 0) {
             this.lost = true;
             // alert('colony lost!')

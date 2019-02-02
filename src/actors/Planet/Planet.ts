@@ -13,6 +13,7 @@ import { MechanicalOperation } from '../../models/MechanicalOperation';
 import { World } from '../../models/World';
 import { SkyLayers } from './SkyLayers';
 import { Citizen } from '../Citizen';
+import { Game } from '../../Game';
 
 export class Planet extends Actor {
     colony: Colony
@@ -36,7 +37,7 @@ export class Planet extends Actor {
         this.add(this.sky)
 
         let yBase = -depth / 2
-        let crustHeight = 40
+        let crustHeight = Game.mansheight * 4
         this.createLayer(yBase, crustHeight, this.color.lighten(0.45))
 
 
@@ -67,22 +68,29 @@ export class Planet extends Actor {
     private hud: Hud
     wireHud(hud: Hud) { this.hud = hud}
 
-    // depth: number
-    buildColonyAndPopulation() {
+    teardown() {
         if (this.colony) {
             this.colony.tearDown()
             // this.colony.kill()
             this.remove(this.colony)
         }
 
-        this.colony = new Colony(0, -this.depth / 2)
-        this.add(this.colony)
-
         if (this.population) {
             this.population.tearDown()
             // this.population.kill()
             this.remove(this.population)
         }
+    }
+
+    // depth: number
+    buildColonyAndPopulation() {
+        this.teardown()
+        
+
+        this.colony = new Colony(0, -this.depth / 2)
+        this.add(this.colony)
+
+        
 
         // console.log("in planet, scene is: ", { scene: this.scene })
         this.population = new Population(this, this.scene)
@@ -91,11 +99,14 @@ export class Planet extends Actor {
     }
 
 
+    private currentTime: number
     private currentHour: number
     get hour() { return this.currentHour }
+    get time() { return this.currentTime }
 
     setTime(time: number) {
-        this.hour = (Math.floor(time / 60)) % 24
+        this.currentTime = time
+        this.currentHour = (Math.floor(time / 60)) % 24
 
         let nextHour = this.hour + 1
 
@@ -152,9 +163,9 @@ export class Planet extends Actor {
         return result
     }
 
-    set hour(hour: number) {
-        this.currentHour = hour
-    }
+    //set hour(hour: number) {
+    //    this.currentHour = hour
+    //}
 
     set currentlyViewing(buildingOrDevice: Building | Device) {
         if (buildingOrDevice instanceof Building) {
@@ -296,11 +307,16 @@ export class Planet extends Actor {
     }
 
     private async sendRaider() {
+        let evil = true
+        let elite = Math.random() > 0.03
+        let large = this.threatLevel > 3 ? Math.random() > 0.1 : Math.random() > 0.03
+        let options = { evil, elite, large }
+
         let origin = this.colony.origin.clone()
         origin.y = this.getTop() + 5
         let xOff = Math.random() * 50
         let raider =
-            new Citizen('Raider', origin.add(new Vector(5000 + xOff, 0)), this, false, true)
+            new Citizen('Raider', origin.add(new Vector(5000 + xOff, 0)), this, options)
 
         this.population.raiders.push(
             raider

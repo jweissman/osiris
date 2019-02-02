@@ -54,7 +54,7 @@ export class MainTunnel extends Structure {
     name: string = 'Main Tunnel';
     description: string = 'Elevating';
     view: string = 'TunnelView';
-    width: number = major.fifth
+    width: number = major.third
     height: number = major.eighth
     zoom = 0.25
     connections: { [key in Orientation]: (typeof Structure)[] } = {
@@ -87,7 +87,7 @@ export class Corridor extends Structure {
     description: string = 'in the hallway'
     view: string = 'CorridorView'
     width: number = minor.fifth
-    height: number = minor.seventh
+    height: number = major.second
     zoom = 0.5
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [
@@ -130,8 +130,8 @@ class Dome extends Structure {
     description: string = 'Biome sweet biome';
 
     view: string = 'DomeView';
-    width: number  = 2 * major.sixth
-    height: number = major.fifth
+    width: number  = major.sixth
+    height: number = major.fourth
     zoom = 0.2
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [ SurfaceRoad ],
@@ -151,8 +151,8 @@ class CommonArea extends Structure {
     name: string = 'Commons'
     description: string = 'hallway cap'
     view: string = 'CommonAreaView'
-    width: number = major.eighth
-    height: number = major.fifth
+    width: number = major.eighth //2 * major.eighth
+    height: number = major.third
 
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [
@@ -173,9 +173,10 @@ class CommonArea extends Structure {
 }
 
 export class SmallRoomTwo extends CommonArea {
-    name = 'Sm. Room (2)'
-    width = major.eighth
-    height = major.fifth
+    name = 'Side Room'
+    // width = major.eighth
+    height = major.second - 8
+    width = major.fifth
     prereqs = [ SmallDome ]
     machines = smallBelow
 }
@@ -184,9 +185,13 @@ export class SmallRoomThree extends CommonArea {
     name = 'Sm. Room (3)'
     prereqs = [SmallRoomTwo]
     view = 'SmallRoomThreeView'
-    width = 2 * major.eighth
-    height = major.eighth
-    machines = smallBelow
+    // width = 2 * major.eighth
+    // height = major.eighth
+
+    // width: number = major.seventh
+    height: number = major.third
+
+    machines = [ ...smallBelow, ...midBelow ]
 }
 
 export class MediumRoom extends CommonArea {
@@ -240,8 +245,8 @@ export class MediumSurfaceRoom extends Dome {
 
     view: string = 'MediumSurfaceRoomView';
 
-    width: number = 4 * major.eighth
-    height: number = major.seventh
+    width: number =  major.eighth
+    height: number = major.second
 
     zoom = 0.1
 
@@ -254,7 +259,10 @@ export class MediumSurfaceRoom extends Dome {
         [Orientation.Down]: [ MainTunnel, MediumSurfaceRoom ],
     }
 
-    machines = [ ...midBelow, ...smallBelow ]
+    machines = [ 
+        // ...midBelow,
+        ...smallBelow
+    ]
 
     // hide = false // need another one which cares about connecting to roads...
 }
@@ -319,16 +327,16 @@ export const allStructures =
         SmallDome,
         SmallDomeThree,
         MidDome,
-        LargeDome,
-        Arcology,
+        // LargeDome,
+        // Arcology,
         MediumSurfaceRoom,
 
         SmallRoomTwo,
         SmallRoomThree,
-        MediumRoom,
-        MediumRoomThree,
-        LargeRoom,
-        HugeRoom,
+        // MediumRoom,
+        // MediumRoomThree,
+        // LargeRoom,
+        // HugeRoom,
 
         GroundVehiclePool,
     ]

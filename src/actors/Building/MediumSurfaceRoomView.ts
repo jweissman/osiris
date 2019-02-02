@@ -24,7 +24,7 @@ export class MediumSurfaceRoomView extends Building {
 
    nodes(): Vector[] {
         let x = this.pos.x + this.getWidth()/2;
-        let y = this.pos.y + this.getHeight() - 16
+        let y = this.pos.y + this.getHeight() - this.floorHeight
         return [
             new Vector(Math.floor(x), Math.floor(y))
         ];

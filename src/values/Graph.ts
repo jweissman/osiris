@@ -1,4 +1,6 @@
 import { minBy } from "../Util";
+import { Game } from "../Game";
+import { Scale } from "./Scale";
 
 export class Graph<T> {
     private empty: boolean = true
@@ -23,7 +25,7 @@ export class Graph<T> {
         return this.nodes.includes(testNode)
     }
 
-    public findOrCreate(testNode: T, measure: (a: T, b: T) => number, tolerance: number = 5): T {
+    public findOrCreate(testNode: T, measure: (a: T, b: T) => number, tolerance: number = Scale.minor.second): T {
         let nodes = this.dfs();
         let closest = minBy(nodes, (node: T) => measure(testNode, node))
         if (closest && measure(closest, testNode) < tolerance) {

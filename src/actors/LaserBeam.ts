@@ -1,10 +1,12 @@
 import { Actor, Color, CollisionType, Traits } from "excalibur";
 import { Game } from "../Game";
 import { Citizen } from "./Citizen";
+import { Combatant } from "./Combatant";
+import { Device } from "./Device";
 
 export class LaserBeam extends Actor {
     private evil: boolean
-    constructor(private source: Citizen, private targetDirectionSign: number) {
+    constructor(private source: Citizen | Device, private targetDirectionSign: number) {
         super(
             source.pos.x + 4 * targetDirectionSign,
             source.pos.y - 10,
@@ -17,7 +19,7 @@ export class LaserBeam extends Actor {
         this.color = (this.evil ? Color.Green : Color.Cyan).clone().lighten(0.3)
         this.vel.x = Game.bulletSpeed * targetDirectionSign
 
-        let drift = 24
+        let drift = 12
         this.vel.y = (Math.random() * drift) - (drift/2)
         this.on('collisionstart', this.handleCollision) 
         this.collisionType = CollisionType.Passive
@@ -25,12 +27,23 @@ export class LaserBeam extends Actor {
     }
 
     handleCollision = (collision) => {
-        let validTarget = collision.other instanceof Citizen &&
-            collision.other.alive &&
-            this.evil !== collision.other.isEvil
+        let rightKindOfThing = 
+            (collision.other instanceof Citizen && collision.other.alive) // ||
+            // (collision.other instanceof Device && collision.other.defender)
+        if (!rightKindOfThing) { return }
+
+        let validTarget = this.evil !== collision.other.isEvil
         if (!validTarget) { return }
 
-        if (collision.other.guarding) {
+        if (collision.other instanceof Citizen) {
+            this.hitPerson(collision.other)
+        } // else if (collision.other instanceof Device) {
+            // this.hitThing(collision.other)
+        // }
+    }
+
+    private hitPerson(citizen: Citizen) {
+        if (citizen.guarding) {
             // 60% chance to reflect
             if (Math.random() > 0.4) {
                 this.vel.x = -this.vel.x
@@ -45,7 +58,12 @@ export class LaserBeam extends Actor {
             }
         } else if (Math.random() > 0.4) {
             this.kill()
-            collision.other.injure(5 + (Math.random() * 2), this.source)
+            let damage = 5 + (Math.random() * 2)
+            citizen.injure(damage, this.source)
         }
     }
+
+    // private hitThing(device: Device) {
+        // console.debug("a defensive device was struck!")
+    // }
 }

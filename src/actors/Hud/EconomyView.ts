@@ -22,8 +22,8 @@ export class EconomyView extends Actor {
 
         let index = 0
         for (let [val1, val2] of eachChunk(allValues, 2)) {
-            this.addValue(index * 32, 0, val1)
-            this.addValue(index * 32, 7, val2)
+            this.addValue(index * 38, 0, val1)
+            this.addValue(index * 38, 7, val2)
             index += 1
         }
 

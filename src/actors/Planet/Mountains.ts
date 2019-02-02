@@ -1,5 +1,6 @@
 import { range } from '../../Util';
 import { PlanetBackground } from './PlanetBackground';
+import { Game } from '../../Game';
 export class Mountains extends PlanetBackground {
     peaks: {
         x: number;
@@ -7,7 +8,7 @@ export class Mountains extends PlanetBackground {
     }[] = [];
     onInitialize() {
         let peakCount = 10
-        let peakHeight = 1500
+        let peakHeight = 100 * Game.mansheight
         let xOff = this.getWidth() / 2;
         let peakDistance = this.getWidth() / peakCount;
         // for (let times of range(2)) {

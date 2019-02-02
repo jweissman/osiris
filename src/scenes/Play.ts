@@ -50,5 +50,6 @@ export class Play extends Scene {
     private stepTime() { 
         this.time += this.timeStepIntervalMillis / Game.minuteTickMillis
         this.planet.setTime(this.time) 
+        // this.construction.setT
     }
 } 

@@ -11,7 +11,7 @@ export class CorridorView extends Building {
 
    nodes(): Vector[] {
         let x = this.pos.x + this.getWidth()/2;
-        let y = this.pos.y + this.getHeight()/2
+        let y = this.pos.y + 3*this.getHeight()/4
         return [
             new Vector(Math.floor(x), Math.floor(y))
         ];
@@ -20,7 +20,7 @@ export class CorridorView extends Building {
 
     slots() {
         let theSlots: Slot[] = [];
-        let slotY = this.getHeight() / 2;
+        let slotY = 3 * this.getHeight() / 4;
 
         theSlots.push(
             this.buildSlot(

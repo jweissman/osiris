@@ -44,6 +44,8 @@ const h20 = require('../images/water-condenser-plain.svg')
 
 const minProcessor = require('../images/mineral-processor-plain.svg')
 
+const laser = require('../images/laser-turret-plain.svg')
+
 const images = {
     bookshelf: bookshelfSvg,
     vat: vatSvg,
@@ -81,6 +83,7 @@ const images = {
     h20,
 
     minProcessor,
+    laser,
 
 }
 
@@ -110,6 +113,10 @@ export class Machine {
 
     tinySlots: boolean = false
     isEatingSurface: boolean = false
+
+    powerEffect: boolean = false
+
+    defender: boolean = false
 
     concretize(): Machine { return this; } 
 
@@ -546,7 +553,25 @@ export class LifeSciencesConsole extends Machine {
     }
 }
 
-// medium
+
+
+
+//
+// medium machines 
+//
+
+export class Laser extends Machine {
+    name = 'Laser (Defender)'
+    description = 'laser weapons system'
+    color = Red
+    size = DeviceSize.Medium
+    image = images.laser
+    defender = true
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: 0, demand: 2 },
+    }
+}
 
 export class Miner extends Machine {
     name = 'Miner (Rover)'
@@ -748,6 +773,21 @@ export class AtomicCompiler extends Machine {
         ...emptyMarket(),
         Power: { supply: 0, demand: 3 },
     }
+}
+
+export class ExtropyFountain extends Machine {
+    name = 'Extropy Fountain'
+    description = 'absolute extension'
+    // operation = 
+    cost = [ ResourceBlock.Mineral ]
+    prereqs = [ AtomicCompiler ]
+    economy = {
+        ...emptyMarket(),
+        Power: { supply: Infinity, demand: 0 },
+        Wonder: { supply: 1000, demand: 0 },
+    }
+
+    powerEffect = true
 }
 
 
@@ -955,4 +995,8 @@ export const allMachines: (typeof Machine)[] = [
     Orrery,
     Telescope,
     Books,
+
+    ExtropyFountain,
+
+    Laser,
 ]

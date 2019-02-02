@@ -1,4 +1,4 @@
-import { Actor, Label, Color, Vector, CollisionType } from "excalibur";
+import { Actor, Label, Color, Vector, CollisionType, ParticleEmitter, Traits, Timer } from "excalibur";
 import { Machine } from "../models/Machine";
 import { Building } from "./Building";
 import { ResourceBlock, blockColor, emptyMarket, sumMarkets } from "../models/Economy";
@@ -7,11 +7,15 @@ import { Planet } from "./Planet/Planet";
 import { allStructures } from "../models/Structure";
 import { getVisibleDeviceSize, DeviceSize } from "../values/DeviceSize";
 import { Recipe, ResourceStorage, MechanicalOperation, ResourceGenerator, ExploreForResource } from "../models/MechanicalOperation";
-import { range, deleteByValueOnce, closest } from "../Util";
+import { range, deleteByValueOnce, closest, sample, sleep } from "../Util";
 import { drawRect } from "../Painting";
 import { InteractionRequest, retrieveResource } from "../values/InteractionRequest";
 import { Game } from "../Game";
 import { Rectangle } from "../values/Rectangle";
+import { makeEmitter } from "./EmitterFactory";
+import { Orientation } from "../values/Orientation";
+import { LaserBeam } from "./LaserBeam";
+import { Scale } from "../values/Scale";
 
 export class Device extends Actor {
     // constructionMaterials: ResourceBlock[] = []
@@ -29,6 +33,10 @@ export class Device extends Actor {
     built: boolean = false
     reserved: boolean = false
 
+    private emitter: ParticleEmitter = null
+
+    orientation: Orientation = Orientation.Right
+
     constructor(
         public machine: Machine,
         initialPos: Vector
@@ -41,6 +49,8 @@ export class Device extends Actor {
             Color.Transparent
             // machine.color
         )
+
+        this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
         this.nameLabel = new Label(this.machine.name, 0, 0, Game.font) // 'Helvetica')
         this.nameLabel.fontSize = this.machine.size === DeviceSize.Tiny ? 2 : 6
@@ -68,7 +78,16 @@ export class Device extends Actor {
         })
 
         this.collisionType = CollisionType.Active
+
+        if (this.machine.powerEffect) {
+            this.emitter = makeEmitter(Color.White, Color.Blue)
+            this.emitter.isEmitting = true
+            this.add(this.emitter)
+        }
+
     }
+
+    get isEvil() { return false }
 
     get imageX() { return this.pos.x - this.getWidth() / 2 }
     get imageY() { return this.pos.y - this.getHeight() / 2 } //- 10 }
@@ -78,6 +97,19 @@ export class Device extends Actor {
     private computeEconomy() {
         let econs = [ this.machine.economy, ...this.tinyDevices.map(d => d.economy) ]
         return econs.reduce(sumMarkets, emptyMarket())
+    }
+
+    update(engine, delta) {
+        super.update(engine, delta)
+        if (this.machine.defender) {
+            // the algo should try to be simple as possible: enemy within 500 yards? fire away
+            let hostiles = this.building.planet.population.raiders
+            let withinRange = hostiles.some(hostile => Math.abs(hostile.pos.y - this.pos.y) < 500)
+            if (withinRange) {
+                this.fire()
+                // console.debug('would defend!')
+            }
+        }
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
@@ -90,14 +122,30 @@ export class Device extends Actor {
                 ctx.translate(this.getWidth(), 0)
                 ctx.scale(-1,1)
             }
-            ctx.drawImage(
-                this.image,
-                0,
-                0, //this.imageY,
+            let ix = 0, iy = 0
+            if (this.orientation === Orientation.Left) {
+                ctx.scale(-1,1)
+                ix = -this.getWidth()
+                ctx.drawImage(
+                    this.image,
+                    ix, iy,
+                    // -this.getWidth(),
+                    // 0, //this.imageY,
 
-                this.getWidth(),
-                this.getHeight()
-            )
+                    this.getWidth(),
+                    this.getHeight()
+                )
+            } else {
+                ctx.drawImage(
+                    this.image,
+                    ix, iy,
+                    // 0,
+                    // 0, //this.imageY,
+
+                    this.getWidth(),
+                    this.getHeight()
+                )
+            }
             // if (!this.built) { ctx.globalAlpha = 1.0 }
 
             let c = Color.Transparent.clone()
@@ -110,16 +158,12 @@ export class Device extends Actor {
                 c.a = 0.3
             }
 
-            // if (this.hover || this.overlapsAny()) {
-                // let c = Color.White.clone()
-                // c.a = 0.6
-                drawRect(
-                    ctx,
-                    { x: 0, y: 0, width: this.getWidth(), height: this.getHeight() },
-                    0,
-                    c
-                )
-            // }
+            drawRect(
+                ctx,
+                { x: ix, y: iy, width: this.getWidth(), height: this.getHeight() },
+                0,
+                c
+            )
             ctx.restore()
         }
 
@@ -316,7 +360,7 @@ export class Device extends Actor {
                 // console.log("we have a building!", { bldg })
                 let spot = bldg.getCenter()
                 let d = spot.distance(pos)
-                snapped = d < (bldg.getWidth()/2 - halfSize) && (Math.abs(spot.y - pos.y) < 80)
+                snapped = d < 4 * bldg.getWidth() && (Math.abs(spot.y - pos.y) < 2*bldg.getWidth()) //Scale.major.fifth)
             } else {
                 // console.log("no bldg found")
             }
@@ -329,7 +373,7 @@ export class Device extends Actor {
                 this.pos.x = Math.floor(this.pos.x / gridGrain) * gridGrain
                 this.pos.x -= bldg.x
                 this.pos.x = Math.max(
-                    bldg.x,
+                    bldg.x + 2*halfSize,
                     this.pos.x
                 )
                 this.pos.x = Math.min(
@@ -406,7 +450,7 @@ export class Device extends Actor {
         if (device) {
             let spot = device.nextTinyPlace().add(device.pos).add(device.building.pos)
             let d = spot.distance(pos)
-            snapped = d < 50
+            snapped = d < Scale.minor.fifth //Game.mansheight*4
 
             if (snapped) {
                 this.building = device.building
@@ -440,5 +484,30 @@ export class Device extends Actor {
         // device.pos.addEqual(this.pos.add(this.nextTinyPlace()))
         this.tinyDevices.push(device)
         this.add(device)
+    }
+    
+    firing: boolean = false
+    private async fire() {
+        // attack in the direction our orientation is facing!
+        if (!this.firing) {
+            this.firing = true
+            let numTimes = range(sample(range(5)))
+            for (let times in numTimes) {
+                await sleep(450)
+                let bullet = new LaserBeam(this, this.orientation === Orientation.Left ? -1 : 1) //this.assembleBullet()
+                bullet.color = Color.Red
+                bullet.setHeight(2)
+                bullet.setWidth(24)
+                bullet.x -= 22
+                bullet.vel.x *= 1.2
+                bullet.y += 10
+                // bullet.vel.y += 6
+                this.scene.add(bullet)
+                bullet.z = 4
+                this.scene.addTimer(new Timer(() => { bullet.kill() }, 2200))
+            }
+            await sleep(2800)
+            this.firing = false
+        }
     }
 }

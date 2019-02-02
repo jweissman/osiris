@@ -2,6 +2,7 @@ import { Graph } from "../../values/Graph";
 import { Vector } from "excalibur";
 import { Building } from "../Building";
 import { minBy } from "../../Util";
+import { Scale } from "../../values/Scale";
 
 export class NavigationTree {
    graph: Graph<Vector>
@@ -25,7 +26,7 @@ export class NavigationTree {
        return false
    }
 
-   closestNodeAtSameYCoordinate(testNode: Vector, tol: number = 50) {
+   closestNodeAtSameYCoordinate(testNode: Vector, tol: number = Scale.major.fourth) {
        let nodes = this.graph.dfs()
        let closest = minBy(
            nodes.filter((node: Vector) => Math.abs(node.y - testNode.y) < tol),

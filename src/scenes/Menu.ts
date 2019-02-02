@@ -4,14 +4,22 @@ import { assembleButton } from "../Elemental";
 import { GameController } from "../GameController";
 import { drawText } from "../Painting";
 import { Game } from "../Game";
+import { sleep } from "../Util";
 
 class SceneList extends Pane {
 
+    travelling: boolean = false
     setup(btns: { label: string, scene: string }[], engine: Engine) {
         btns.forEach(btn => {
             let theButton = assembleButton(btn.label, Color.Blue)
-            theButton.onclick = () => {
-                engine.goToScene(btn.scene)
+            theButton.onclick = async () => {
+                if (!this.travelling) {
+                    this.travelling = true
+                    engine.currentScene.camera.zoom(0.0125, 450)
+                    await sleep(500)
+                    engine.goToScene(btn.scene)
+                    this.travelling = false
+                }
             }
             this._element.appendChild(theButton)
         })
@@ -48,14 +56,14 @@ export class Menu extends Scene {
             canvasWidth + 50,
             // halfWidth + (halfWidth/2),
             halfHeight - 50,
-            Color.Blue.lighten(0.3)
+            Color.Cyan.lighten(0.3)
         )
         this.add(this.blueEmitter)
         this.redEmitter = this.makeBigBangEmitter(
             canvasWidth + 50,
             // halfWidth + (halfWidth/2),
             halfHeight - 50,
-            Color.Red.darken(0.3)
+            Color.Orange.darken(0.3)
         )
         this.add(this.redEmitter)
 
@@ -68,7 +76,7 @@ export class Menu extends Scene {
 
         // let canvasHeight = this.engine.canvasHeight / window.devicePixelRatio;
 
-        this.camera.zoom(1.25) //2.5)
+        this.camera.zoom(1.5, 3800) //2.5)
         this.blueEmitter.isEmitting = true
         this.redEmitter.isEmitting = true
 

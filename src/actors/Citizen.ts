@@ -1,4 +1,4 @@
-import { Actor, Color, Traits, Vector, VisibleEvent, Label, CollisionType, Timer, EmitterType, ParticleEmitter } from "excalibur";
+import { Actor, Color, Traits, Vector, VisibleEvent, Label, CollisionType, Timer, EmitterType, ParticleEmitter, GlobalCoordinates } from "excalibur";
 import { Building } from "./Building";
 import { Planet } from "./Planet/Planet";
 import { ResourceBlock, blockColor } from "../models/Economy";
@@ -22,6 +22,14 @@ import { randomBytes } from "crypto";
 import { LaserBeam } from "./LaserBeam";
 import { CommandCenter } from "../models/Machine";
 import { Strategy } from "../strategies/Strategy";
+import { makeEmitter } from "./EmitterFactory";
+import { isIPv4 } from "net";
+
+interface CitizenAspects {
+    evil?: boolean // = false
+    elite?: boolean
+    large?: boolean
+}
 
 export class Citizen extends Actor {
     alive: boolean = true
@@ -46,6 +54,7 @@ export class Citizen extends Actor {
     hunger: number = 0.0;
     energy: number = 100
     health: number = 100
+    maxHealth: number = 100
 
     private driving: Device = null
 
@@ -59,12 +68,20 @@ export class Citizen extends Actor {
 
     hover: boolean = false
 
-    constructor(public name: string, private home: Vector, protected planet: Planet, private elite: boolean = false, private evil: boolean = false) {
+    constructor(
+        public name: string,
+        home: Vector,
+        protected planet: Planet,
+        private aspects: CitizenAspects = {}
+    ) {
         super(
             home.x, home.y,
-            18,20,
-            Color.White.clone()
+            aspects.large ? (3 * (2 * Game.mansheight / 4)) : (2 * Game.mansheight / 4),
+            aspects.large ? (3 * Game.mansheight) : Game.mansheight,
         )
+
+        this.maxHealth = aspects.large ? 250 : 100
+        this.health = this.maxHealth
 
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
@@ -74,69 +91,50 @@ export class Citizen extends Actor {
         this.eatingStrategy = new WhenHungryEatingStrategy(this)
         this.fightingStrategy = new AttackNearestHostileStrategy(this)
 
-        this.shirtColor = (this.elite ? Color.Red : sample([
+        this.shirtColor = (this.aspects.elite ? Color.Red : sample([
             Color.Green,
             Color.Blue,
             Color.Orange,
             Color.Yellow,
-        ])).clone()
+        ])).clone().desaturate(0.18).lighten(0.3)
 
-        if (this.evil) {
-            this.shirtColor = Color.Black.clone()
+        if (this.isEvil) {
+            this.shirtColor = Color.DarkGray.clone().darken(0.84) // + (0.1 * Math.random()) )
         }
 
         this.skinColor = sample([
+            Color.Orange.lighten(0.3),
+            Color.Orange.lighten(0.4),
             Color.Orange.lighten(0.5),
             Color.Orange.lighten(0.6),
             Color.Orange.lighten(0.7),
             Color.Orange.lighten(0.8),
         ])
 
-        this.weight = sample(range(7).map(w => w + 4))
+        this.weight = sample(range(4)) //.map(w => w + 2))
 
         this.collisionType = CollisionType.Passive
-        this.bloodEmitter = this.makeBloodEmitter()
+        let bloodColor = Math.random() > 0.2 ? Color.Red : Color.Green
+        this.bloodEmitter = makeEmitter(bloodColor, bloodColor.darken(0.6))
         this.add(this.bloodEmitter)
     }
 
-
-    private makeBloodEmitter() {
-        let bloodEmitter = new ParticleEmitter()
-        bloodEmitter.emitterType = EmitterType.Circle
-        bloodEmitter.radius = 7
-        bloodEmitter.minVel = 10
-        bloodEmitter.maxVel = 30
-        bloodEmitter.minAngle = 0
-        bloodEmitter.maxAngle = Math.PI * 2
-        bloodEmitter.emitRate = 350
-        bloodEmitter.opacity = 0.5
-        bloodEmitter.fadeFlag = true
-        bloodEmitter.particleLife = 500
-        bloodEmitter.maxSize = 2
-        bloodEmitter.minSize = 1
-        bloodEmitter.beginColor = Color.Red.darken(0.12)
-        bloodEmitter.endColor = Color.Red.darken(0.36)
-        bloodEmitter.isEmitting = false
-        return bloodEmitter
-    }
-
     get title() {
-        let title = this.elite ? 'Cmdr. ' : ''
+        let title = this.aspects.elite ? 'Cmdr. ' : ''
         return title
     }
 
     get isHungry() { return this.hunger > 60 }
     get isTired()  { return this.energy < 90 }
 
-    // get isWorking() { return this.isWorking }
     get currentPlanet() { return this.planet }
 
     get walkSpeed() {
-        let speedMultiplier = this.planet.timeFactor * (this.elite ? 1.6 : 1)
+        let speedMultiplier = this.planet.timeFactor * (this.aspects.elite ? 1.4 : 1)
         return Game.citizenSpeed * speedMultiplier
     }
 
-    get isEvil(): boolean { return !!this.evil }
+    get isEvil(): boolean { return !!this.aspects.evil }
 
     update(engine, delta) {
         super.update(engine, delta)
@@ -165,26 +163,20 @@ export class Citizen extends Actor {
         }
 
         if (this.sleeping) {
-            this.health = Math.min(100, this.health+0.1)
+            this.health = Math.min(this.maxHealth, this.health+0.1)
             this.energy = Math.min(100, this.energy+0.1)
-            if (this.health === 100 && !this.isTired) {
+            // if (this.health === this.maxHealth && !this.isTired) {
                 // this.log("Try to awaken early!! (We are healed, not tired...)")
-                this.shouldAwaken = true
-                this.log("should wake up now!!")
-                // this.sleeping = false
-                // this.isPlanning = false
-                // this.sleepingInBed.inUse = false
-                // this.sleepingInBed = null
-                // this.workInProgress = false
-                // // this.actionQueue.clearActions()
-                // // this.abortProgressBar()
-                // this.work()
-            }
+                // this.shouldAwaken = true
+                // this.log("should wake up now!!")
+            // }
         }
 
         if (this.hover) {
             this.log(`working? ${this.isPlanning ? 'yes' : 'no'}`)
         }
+
+        // this.z = 1000 + this.y - this.getHeight()/2
     }
 
 
@@ -192,15 +184,19 @@ export class Citizen extends Actor {
 
         let { x, y } = this
         ctx.save()
-        ctx.translate(x, y - this.getHeight()/2) // - 5)
 
+        ctx.translate(x, y) // - this.getHeight()/2) // - this.getHeight()) // - 5)
         if (this.alive) {
-            drawText(ctx, this.name, -14, -22)
+            let ix = -this.getWidth()/2, iy = -this.getHeight()/2 - 6 //-15, iy = 10 - (this.getHeight() * 0.9)
+            drawText(ctx, this.name, ix, iy - 5) //-14, -20 - this.getHeight())
 
-            if (this.health < 100) {
-                let healthColor = this.health > 60 ? Color.Green : Color.Yellow
-                if (this.health < 10) { healthColor = Color.Red }
-                this.drawBar(ctx, -13, -18, 32, 4, (this.health / 100), healthColor)
+            if (this.health < this.maxHealth) {
+                let ratio = this.health / this.maxHealth
+                let healthColor = ratio > 0.74 ? Color.Green : Color.Yellow
+                if (ratio < 0.34) {
+                    healthColor = ratio < 0.1 ? Color.Red : Color.Orange
+                }
+                this.drawBar(ctx, ix+1, iy, 32, 4, ratio, healthColor)
             }
 
             if (this.guarding) {
@@ -215,7 +211,7 @@ export class Citizen extends Actor {
             if (this.sleeping) {
                 ctx.translate(5, -10)
             } else {
-                ctx.translate(-5, 0)
+                ctx.translate(-15, 0)
             }
         }
         this.drawSelf(ctx)
@@ -250,7 +246,8 @@ export class Citizen extends Actor {
         }
 
 
-        this.color = this.hover ? Color.White : Color.Transparent
+        // this.color = Color.Transparent.clone() //this.hover ? Color.White : Color.Transparent
+        // this.color.a = 0.2
         super.draw(ctx, delta)
     }
 
@@ -266,15 +263,32 @@ export class Citizen extends Actor {
 
 
     private drawSelf(ctx: CanvasRenderingContext2D) {
-        drawEllipse(ctx, 2, 8,
-            this.weight, 9,
-            this.shirtColor.desaturate(0.1).lighten(0.1))
-        drawCircle(ctx, 2, -3,
-            4.5, this.skinColor.desaturate(0.2))
-        if (this.elite) {
-            drawStar(ctx, 12, -8)
-        }
+        let halfWidth = this.getWidth()/2
+        let halfHeight = this.getHeight()/2
+        // body
+        let shirt = this.shirtColor.clone()
+        drawEllipse(
+            ctx,
+            0, (halfHeight * 0.15), // this.getHeight()/2,
+            halfWidth + this.weight,
+            (halfHeight * 0.85), // - 5,
+            shirt
+        )
 
+        // head
+        let head = this.skinColor.clone()
+        let headRadius = halfWidth * 0.74
+        drawCircle(
+            ctx, 
+            0, -halfHeight + headRadius/2, /// - 3,
+            headRadius,
+            // this.getWidth() * 0.7,
+            head
+        ) 
+
+        if (this.aspects.elite) {
+            drawStar(ctx, 12, -8)
+        } 
     }
 
     async progressBar(duration: number) {
@@ -284,11 +298,6 @@ export class Citizen extends Actor {
         await new Promise((resolve, reject) => setTimeout(resolve, duration));
         this.workInProgress = false
     }
-
-    // abortProgressBar() {
-    //     this.log("work in progress aborted...!")
-    //     this.workInProgress = false
-    // }
 
     drive(d: Device) {
         this.driving = d
@@ -366,12 +375,13 @@ export class Citizen extends Actor {
     }
     
     protected get strategies() {
+        let { evil } = this.aspects
         return [
             this.fightingStrategy,
-            ...(this.evil ? [] : [this.sleepingStrategy]),
-            ...(this.evil ? [] : [this.eatingStrategy]),
-            ...(this.evil ? [] : [this.constructionStrategy]),
-            ...(this.evil ? [] : [this.productionStrategy])
+            ...(evil ? [] : [this.sleepingStrategy]),
+            ...(evil ? [] : [this.eatingStrategy]),
+            ...(evil ? [] : [this.constructionStrategy]),
+            ...(evil ? [] : [this.productionStrategy])
         ]
     }
 
@@ -422,9 +432,9 @@ export class Citizen extends Actor {
         }
     }
 
-    private paceUnit: number = 20
+    private paceUnit: number = Math.floor(Game.mansheight * 0.6)
     get idealCombatRange() {
-        let idealDistance = 20 * this.paceUnit
+        let idealDistance = 10 * this.paceUnit
         return idealDistance
     }
 
@@ -496,18 +506,18 @@ export class Citizen extends Actor {
             // console.log("FIRE!!!")
             // launch a (few) projectile(s)!!!
 
+                    this.firing = true
             let numTimes = range(sample(range(4)))
             for (let times in numTimes) {
                 await this.progressBar(350)
                 if (this.alive && this.combatting && this.combatting.alive) {
-                    this.firing = true
                     let bullet = this.assembleBullet()
                     this.scene.add(bullet)
                     this.scene.addTimer(new Timer(() => { bullet.kill() }, 2200))
-                    this.firing = false
                 }
             }
             await sleep(800)
+                    this.firing = false
             // await sleep(250) //this.progressBar(250)
         }
     }
@@ -532,8 +542,9 @@ export class Citizen extends Actor {
         return bullet
     }
 
-    injure(amt: number, attacker: Citizen) {
-        if (this.elite) {
+    injure(amt: number, attacker: Citizen | Device) {
+        if (this.aspects.elite) {
+            // commanders take only 30% of incoming damage
             amt = amt * 0.3
         }
         this.health -= amt
@@ -541,8 +552,10 @@ export class Citizen extends Actor {
             this.die()
         }
         this.bleed()
-        // await sleep(150)
-        this.engageHostile(attacker)
+        // await sleep(150) // stun?
+        if (attacker instanceof Citizen) {
+            this.engageHostile(attacker)
+        }
     }
 
     die() {
