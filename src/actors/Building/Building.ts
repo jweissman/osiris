@@ -16,6 +16,7 @@ import { Machine, allMachines, CommandCenter, MissionLog, StudyMachine } from ".
 import { BackgroundPattern } from "./BackgroundPatterns";
 import { EconomicValue } from "../Hud/EconomicValue";
 import { drawRect, pathFromRect } from "../../Painting";
+import { Scale } from "../../values/Scale";
 
 export class DevicePlace {
     constructor(private pos: Vector, private size: DeviceSize) {}
@@ -59,76 +60,72 @@ export class Building extends Actor {
         this.setup();
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling))
 
-        this.on('pointerenter', () => {
-            this.hover = true
-            if (!this.devices.some(d => d.hover)) {
-                this.planet.currentlyViewing = this
-            }
-        })
+        // this.on('pointerenter', () => {
+        //     this.hover = true
+        //     if (!this.devices.some(d => d.hover)) {
+        //         this.planet.currentlyViewing = this
+        //     }
+        // })
 
 
-        this.on('pointerdown', () => {
-            // console.log("CLICKED BUILDING", { building: this })
-            this.toggleActive();
-        })
+        // this.on('pointerdown', () => {
+        //     // console.log("CLICKED BUILDING", { building: this })
+        //     this.toggleActive();
+        // })
 
-        this.on('pointerleave', () => {
-            this.hover = false
-        })
+        // this.on('pointerleave', () => {
+        //     this.hover = false
+        // })
 
-        this.collisionType = CollisionType.PreventCollision
+        this.collisionType = CollisionType.Passive
 
         this.nameLabel = new Label(this.structure.name, 0, 0, Game.font) // 'Helvetica')
         this.nameLabel.fontSize = 9
         // this.nameLabel.fontStyle = FontStyle.Italic
         this.nameLabel.color = Color.White
 
+
         if (this.structure.infra) { this.active = true }
     }
 
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         if (!this.hideBox) {
-            drawRect(ctx, this.aabb(), this.edgeWidth, this.processedColor())
+            drawRect(ctx, this.aabb(), this.processedColor())
         }
-        // this.devices.forEach(device => device.draw(ctx, delta))
         super.draw(ctx, delta)
 
         if (this.showLabel && this.spaceFunction) {
-            this.nameLabel.pos = this.pos.add(new Vector(28, 24)) //get getCenter().
-            // this.nameLabel.color = Color.White
-            // this.nameLabel.pos.x = this.getCenter().x //ctx.measureText(this.structure.name).width / 2
-            // this.nameLabel.pos.x -= ctx.measureText(this.structure.name).width / 2
+            this.nameLabel.pos = this.pos.add(
+                new Vector(this.getWidth()/2 - this.nameLabel.getTextWidth(ctx)/2, 0)
+            )
             this.nameLabel.draw(ctx, delta)
-
         }
 
-        // let debug = true;
-        if (Game.debugPath) {
+        if (this.debugGraph) {
             if (this.slots().length > 0) {
                 // draw slots
                 this.slots().forEach((slot: Slot) => {
                     let rect: Rectangle = { x: slot.pos.x, y: slot.pos.y, width: 3, height: 3 }
-                    drawRect(ctx, rect, 1, Color.Gray.lighten(0.5))
+                    drawRect(ctx, rect, Color.Gray.lighten(0.5))
                 })
             }
-         if (this.nodes().length > 0) {
+            if (this.nodes().length > 0) {
                 // draw nodes
                 this.nodes().forEach((node: Vector) => {
                     let rect: Rectangle = { x: node.x, y: node.y, width: 4, height: 4 }
-                    drawRect(ctx, rect, 1, Color.Yellow.lighten(0.5))
+                    drawRect(ctx, rect, Color.Yellow.lighten(0.5))
                 })
             }
-
         }
 
-        let showDevicePlaces = false
+        let showDevicePlaces = this.debugGraph
         if (showDevicePlaces && this.devicePlaces().length > 0 && this.devices.length < this.devicePlaces().length) {
             this.devicePlaces().forEach(p => {
                 let place = p.position
                 let sz = p.visibleSize
                 drawRect(ctx,
                     { x: place.x - sz/2, y: place.y - sz/2, width: sz, height: sz },
-                    0.1,
+                    // 0.1,
                     Color.White,
                     false,
                     true
@@ -138,6 +135,7 @@ export class Building extends Actor {
     }
 
 
+    debugGraph: boolean = false
     step: number = 0
     update(engine: Game, delta: number) {
         super.update(engine, delta)
@@ -153,9 +151,13 @@ export class Building extends Actor {
 
         }
 
-        // this.devices.forEach(d => d.update(engine, delta))
-
         this.step += 1
+
+        if (engine.debugMode) {
+            this.debugGraph = true
+        } else {
+            this.debugGraph = false
+        }
     }
 
 
@@ -202,44 +204,44 @@ export class Building extends Actor {
         }
     }
 
-    private toggleActive() {
-        if (!this.structure.infra) {
-            if (this.active) {
-                if (this.devices.some(d => d.inUse)) { return }
-                let wasEquil = equilibrium(this.planet.economy)
-                this.active = false
-                if (wasEquil) {
-                    if (!equilibrium(this.planet.economy)) {
-                        this.active = true
-                        // return
-                    }
-                    // this.active = true
-                } else {
-                    // we weren't at equilibrium previously
-                    // permit it, if we don't have any supply that would go negative without us?
-                    // console.log("can we toggle?")
-                    for (let value of allValues) {
-                        let localCap = availableCapacity(this.economy(false), value)
-                        let globalCap = availableCapacity(this.planet.economy, value)
-                        // console.log("value", { value, localCap, globalCap})
-                        if (localCap > 0 && globalCap < 0) {
-                            // don't permit it to be turned off
-                            this.active = true
-                        }
-                    }
-                }
-            } else { // this.active is false now
-                let agg = [
-                    this.planet.economy,
-                    this.economy(false)
-                ].reduce(sumMarkets, emptyMarket())
+    // private toggleActive() {
+    //     if (!this.structure.infra) {
+    //         if (this.active) {
+    //             if (this.devices.some(d => d.inUse)) { return }
+    //             let wasEquil = equilibrium(this.planet.economy)
+    //             this.active = false
+    //             if (wasEquil) {
+    //                 if (!equilibrium(this.planet.economy)) {
+    //                     this.active = true
+    //                     // return
+    //                 }
+    //                 // this.active = true
+    //             } else {
+    //                 // we weren't at equilibrium previously
+    //                 // permit it, if we don't have any supply that would go negative without us?
+    //                 // console.log("can we toggle?")
+    //                 for (let value of allValues) {
+    //                     let localCap = availableCapacity(this.economy(false), value)
+    //                     let globalCap = availableCapacity(this.planet.economy, value)
+    //                     // console.log("value", { value, localCap, globalCap})
+    //                     if (localCap > 0 && globalCap < 0) {
+    //                         // don't permit it to be turned off
+    //                         this.active = true
+    //                     }
+    //                 }
+    //             }
+    //         } else { // this.active is false now
+    //             let agg = [
+    //                 this.planet.economy,
+    //                 this.economy(false)
+    //             ].reduce(sumMarkets, emptyMarket())
 
-                if (equilibrium(agg)) {
-                    this.active = true
-                }
-            }
-        }
-    }
+    //             if (equilibrium(agg)) {
+    //                 this.active = true
+    //             }
+    //         }
+    //     }
+    // }
 
     get isActive() { return !!this.active }
 
@@ -327,7 +329,7 @@ export class Building extends Actor {
 
     protected angledRoofPoly(): {x: number, y: number}[] {
         let angleStartY = 1 * (this.getHeight() / 3) - 3
-        let angleStartX = 20 // 1 * (this.getWidth() / 10)
+        let angleStartX = (Scale.major.first) // 1 * (this.getWidth() / 10)
         return [
             // bottom-left
             { x: this.pos.x, y: this.pos.y + this.getHeight() },
@@ -460,7 +462,7 @@ export class Building extends Actor {
         this.add(device)
         this.updateFunction()
         device.machine.onPlacement(device)
-        this.toggleActive()
+        // this.toggleActive()
 
         device.placed = true
     }

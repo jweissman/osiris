@@ -8,7 +8,7 @@ import { drawRect } from "../../Painting";
 import { Scale } from "../../values/Scale";
 
 export class TunnelView extends Building {
-    slotSize: number = Scale.major.eighth + 10
+    slotSize: number = Scale.major.third // + 10
     pickingOrigin: boolean = true
     hideBox = true
 
@@ -16,12 +16,12 @@ export class TunnelView extends Building {
 
     draw(ctx, delta) {
         let rect = this.aabb()
-        drawRect(ctx, rect, 0, this.color.darken(0.1)) 
+        drawRect(ctx, rect, this.color.darken(0.1)) 
 
         let n = 5
         rect.x = rect.x + this.getWidth() / n
         rect.width -= (2) * (this.getWidth() / n)
-        drawRect(ctx, rect, 0, this.color.darken(0.2)) 
+        drawRect(ctx, rect, this.color.darken(0.2)) 
         // super.draw(ctx, delta)
     }
 

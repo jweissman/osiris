@@ -13,10 +13,10 @@ export class Play extends Scene {
     private time: number = Game.startHour*60
     private construction: Construction
 
-    public onInitialize(engine: Engine) {
+    public onInitialize(game: Game) {
         this.planet = new Planet(this)
         this.add(this.planet)
-        this.construction = new Construction(this.planet, engine,
+        this.construction = new Construction(this.planet, game,
             "Welcome to the Colony, sir... "
             + "We are what is left of the crew of the Osiris. "
             + "Can you help us build a functioning society? "

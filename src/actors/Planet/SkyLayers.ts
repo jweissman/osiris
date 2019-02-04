@@ -4,7 +4,7 @@ import { SkyLayer } from "./SkyLayer";
 import { MountainLayers } from './MountainLayers';
 export class SkyLayers extends Actor {
     layers: SkyLayer[] = [];
-    constructor(y: number, width: number, private lo: Color, hi: Color, private layerCount: number = 3) {
+    constructor(y: number, width: number, private lo: Color, hi: Color, private layerCount: number = 5) {
         super(0, y, width, 1500);
         let h = (MountainLayers.layerHeight * MountainLayers.layerCount) + (MountainLayers.layerHeight / 2)
         for (let i of range(layerCount)) {

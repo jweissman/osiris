@@ -16,17 +16,21 @@ import { Modal } from "./Modal";
 import { TechTree } from "../../models/TechTree";
 import { CitizenList } from "./CitizenList";
 import { Citizen } from "../Citizen";
-import { assembleButton } from "../../Elemental";
+import { assembleButton, assembleToggle } from "../../Elemental";
 import { Pane } from "./Pane";
 
 class ActionList extends Pane {
 
-    setup(btns: { label: string, action: () => any }[]) { //}, engine: Engine) {
+    setup(btns: { label: string, action: () => any, colorize?: () => Color }[]) {
         btns.forEach(btn => {
-            let theButton = assembleButton(btn.label, Color.White)
+            let theButton = btn.colorize
+                ? assembleToggle(btn.label, btn.colorize)
+                : assembleButton(btn.label, Color.White)
             theButton.onclick = () => {
                 btn.action()
-                // engine.goToScene(btn.scene)
+                if (btn.colorize) {
+                    theButton.style.backgroundColor = btn.colorize().toRGBA()
+                }
             }
             this._element.appendChild(theButton)
         })
@@ -64,7 +68,7 @@ export class Hud extends UIActor {
 
 
     constructor(
-        private game: Engine,
+        private game: Game,
         private onBuildingSelect = null,
         private onMachineSelect = null,
         private onFunctionSelect = null,
@@ -90,6 +94,9 @@ export class Hud extends UIActor {
         this.actionList = new ActionList('Actions', canvasWidth/2 - 100, canvasHeight - 100)
         this.actionList.setup([
             { label: 'Main Menu', action: () => {game.goToScene('menu')} },
+            { label: 'Debug Mode', action: () => {
+                game.toggleDebugMode() //goToScene('menu')
+            }, colorize: () => game.debugMode ? Color.Violet : Color.LightGray },
             // { label: 'Main Menu', action: () => {game.goToScene('menu')} }
         ])
     }
@@ -209,7 +216,7 @@ export class Hud extends UIActor {
         }
     }
 
-    showCard(entity: Machine | Structure | RoomRecipe | Building | Device) {
+    showCard(entity: Machine | Structure | RoomRecipe | Building | Device | Citizen) {
         this.card.present(entity)
     }
 

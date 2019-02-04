@@ -7,6 +7,7 @@ import { Building } from "../Building";
 import { Device } from "../Device";
 import { countOccurrences, flatSingle } from "../../Util";
 import { Game } from "../../Game";
+import { Citizen } from "../Citizen";
 
 export class CardBody extends Actor {
     description: Label
@@ -14,7 +15,10 @@ export class CardBody extends Actor {
     notes: Label
     footer: Label
 
-    constructor(private entity: Machine | Structure | RoomRecipe | Building | Device, x: number, y: number) {
+    constructor(
+        private entity: Machine | Structure | RoomRecipe | Building | Device | Citizen,
+        x: number, y: number
+    ) {
         super(x, y, 0, 0)
         // resources / recipes
 
@@ -47,7 +51,7 @@ export class CardBody extends Actor {
             .join(' + ')
     }
 
-    show(entity: Machine | Structure | RoomRecipe | Building | Device) {
+    show(entity: Machine | Structure | RoomRecipe | Building | Device | Citizen) {
         if (entity) {
             this.description.text = entity.description;
 

@@ -2,13 +2,19 @@ import { Engine, DisplayMode, Loader, Timer, Color } from 'excalibur';
 import { World } from './models/World';
 import { Resources } from './Resources';
 
+const mu = 9
+
 export class Game extends Engine {
-  static citizenSpeed: number = 150
-  static debugPath: boolean = false
+  static font = 'Helvetica'
+  static title: string = 'ASTRA';
+  // static debugPath: boolean = false
   static startHour: number = 10
 
+  static mansheight: number = 3 * mu
+  static citizenSpeed: number = 5 * Game.mansheight
+
   // combat knobs
-  static bulletSpeed: number = 650
+  static bulletSpeed: number = 8 * Game.citizenSpeed
   static raidingPartyFrequency: number = 120000
 
   // 10000 = 1 min / 10 sec
@@ -16,9 +22,7 @@ export class Game extends Engine {
   // 100 = 10 min / second
   static minuteTickMillis: number = 850
 
-  static font = 'Helvetica'
-  static title: string = 'ASTRA';
-  static mansheight: number = 28
+
 
   constructor(public world: World) {
     super({
@@ -28,6 +32,7 @@ export class Game extends Engine {
       backgroundColor: Color.Black //world.skyColor
     });
   }
+
 
   public start() {
     let loader = new Loader();
@@ -67,5 +72,10 @@ export class Game extends Engine {
     return super.start(loader).then(() => {
       console.log("Osiris running.")
     });
+  }
+
+  debugMode: boolean = false
+  public toggleDebugMode() {
+    this.debugMode = !this.debugMode
   }
 }

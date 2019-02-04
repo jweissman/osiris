@@ -7,16 +7,16 @@ export class Mountains extends PlanetBackground {
         height: number;
     }[] = [];
     onInitialize() {
-        let peakCount = 10
-        let peakHeight = 100 * Game.mansheight
+        let peakCount = 4
+        let peakHeight = 10 * Game.mansheight
         let xOff = this.getWidth() / 2;
         let peakDistance = this.getWidth() / peakCount;
         // for (let times of range(2)) {
-        let heightRange = 100;
+        let heightRange = 4 * Game.mansheight
         let drift = 3 * (peakDistance / 2);
         for (let i of range(peakCount)) {
             let h = 
-                (Math.random() * peakHeight) + ((Math.random() * heightRange) - (heightRange / 2))
+                (peakHeight) + (Math.random() * heightRange)
             this.peaks.push({
                 x: Math.min(this.getWidth() / 2 - h / 2, -xOff + i * peakDistance + ((Math.random() * drift))),
                 height: h

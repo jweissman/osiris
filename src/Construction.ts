@@ -7,17 +7,18 @@ import { Planet } from "./actors/Planet/Planet";
 import { Machine, allMachines } from "./models/Machine";
 import { LivingQuarters, MissionControl, SolarArray, RoomRecipe } from "./models/RoomRecipe";
 import { Corridor, HugeRoom, LargeRoom, MainTunnel, MediumRoomThree, SmallDome, SmallRoomThree, Structure, SurfaceRoad } from "./models/Structure";
-import { flatSingle, zip, sample } from "./Util";
+import { flatSingle, zip, sample, closest } from "./Util";
 import { DeviceSize } from "./values/DeviceSize";
 import { TechnologyRank } from "./models/TechnologyRank";
 import { TechTree } from "./models/TechTree";
 import { Citizen } from "./actors/Citizen";
 import { GameController } from "./GameController";
+import { Game } from "./Game";
+import { Player } from "./actors/player";
+import { Scale } from "./values/Scale";
 // handle ui for construction (also includes following stuff?)
 export class Construction extends UIActor {
     private restricted: boolean = true
-    // private restrictAvailbleStructures: boolean = true
-
     static requiredStructuresAndFunctions: (typeof RoomRecipe | typeof Structure)[] = [
         MissionControl,
         SurfaceRoad,
@@ -27,30 +28,24 @@ export class Construction extends UIActor {
         LivingQuarters,
     ];
     private lost: boolean = true;
-    private techTree: TechTree = new TechTree();
-    // private player: Player
-    private followedCitizen: Citizen = null;
-    private hasActiveModal: boolean = false;
+    private techTree: TechTree = new TechTree()
+    private followedCitizen: Citizen = null
+    private hasActiveModal: boolean = false
     private defaultMessage: string = 'Welcome to the Colony, Commander.';
-    // i.e. have we placed the first building yet
-    firstBuilding: boolean = true;
-    placingFunction: RoomRecipe = null;
-    // currentlyConstructing: Building | Device = null;
-    private hud: Hud;
-    constructor(private planet: Planet, private engine: Engine, private introMessage: string) {
-        super(0, 0, 0, 0);
-        // }
-        // onInitialize(engine: Engine) {
-        // this.player = new Player()
+    firstBuilding: boolean = true
+    placingFunction: RoomRecipe = null
+    private hud: Hud
+
+    constructor(private planet: Planet, private game: Game, private introMessage: string) {
+        super() //0, 0, 0, 0)
         let buildIt = (e) => this.startConstructing(e);
         let followIt = (c) => this.toggleFollowing(c);
-        this.hud = new Hud(this.engine, buildIt, buildIt, buildIt, followIt);
+        this.hud = new Hud(this.game, buildIt, buildIt, buildIt, followIt);
         this.planet.wireHud(this.hud);
     }
 
     standup(ctrl: GameController) {
-        // this.add(this.player)
-        this.add(this.hud);
+        this.scene.add(this.hud);
         this.hud.show();
         if (this.lost) {
             this.welcome();
@@ -59,14 +54,13 @@ export class Construction extends UIActor {
     }
 
     teardown() {
-        // this.remove(this.player)
-        this.remove(this.hud);
+        this.scene.remove(this.hud);
         this.hud.hide();
         this.closeSystemMessage();
         this.stopFollowing();
     }
 
-    update(engine, delta) {
+    update(engine: Engine, delta) {
         let devices = this.planet.colony.findPoweredDevices();
         let machines = allMachines.filter(machine => devices.some(device => device.machine instanceof machine));
         let discipline = this.techTree.findDisciplineToRankUp(machines);
@@ -74,31 +68,57 @@ export class Construction extends UIActor {
             let rank = this.techTree.rankUp(discipline);
             this.rankUp(rank);
         }
-        // hmm!
         this.hud.updateDetails(this.planet, this.techTree, this.followedCitizen, true, this.planet.time); //, this.scene.currentTime)
         if (!this.lost && !this.firstBuilding && this.planet.population.citizens.length === 0) {
             this.lost = true;
-            // alert('colony lost!')
             this.askYesNo('The colony has perished! Try again?', () => this.welcome(), () => engine.goToScene('menu'));
+        }
+
+        let pos = engine.input.pointers.primary.lastWorldPos
+        let hoverables: (Device | Building)[] = [
+            ...this.planet.colony.findAllDevices(),
+            ...this.planet.colony.buildings,
+            // ...this.planet.population.citizens
+        ]
+        if (hoverables.length > 0) {
+            hoverables.forEach(h => h.hover = false)
+            let center = (d: Device | Building) => {
+                let pos = d.getWorldPos()
+                if (d instanceof Building) {
+                    pos.addEqual(new Vector(d.getWidth()/2, d.getHeight()/2))
+                }
+                return pos
+            }
+            // .add( new Vector(d.getWidth() / 2, d.getHeight() / 2))
+            let hoverable: Device | Building = closest(
+                pos,
+                hoverables,
+                center
+            )
+            if (hoverable && center(hoverable).distance(pos) < hoverable.getWidth()) {
+                // console.log("HOVER ON", { hoverable })
+                hoverable.hover = true
+                // hoverable.z = 1000
+                this.hud.showCard(hoverable)
+            }
         }
     }
 
-    get camera() { return this.engine.currentScene.camera; }
+
+    get camera() { return this.game.currentScene.camera; }
     controlWith(controller: GameController) {
         controller.onCameraPan(() => this.stopFollowing());
         controller.onMove((pos: Vector) => {
             if (this.hasActiveModal) {
                 return;
             }
-            // this.player.pos = pos
             let currentlyBuilding = this.planet.currentlyConstructing;
             if (currentlyBuilding instanceof Building) {
-                let constrained = currentlyBuilding.constrainCursor(pos); //this.player.pos)
-                // this.player.pos = constrained
-                currentlyBuilding.reshape(constrained); //this.player.pos)
+                let constrained = currentlyBuilding.constrainCursor(pos);
+                currentlyBuilding.reshape(constrained)
             }
             else if (currentlyBuilding instanceof Device) {
-                currentlyBuilding.snap(this.planet, pos); //this.player.pos)
+                currentlyBuilding.snap(this.planet, pos)
             }
         });
         controller.onLeftClick((pos: Vector, shift: boolean) => {
@@ -112,9 +132,6 @@ export class Construction extends UIActor {
                     let placementValid = !buildingUnderConstruction.overlapsAny();
                     if (buildingUnderConstruction && placementValid && buildingUnderConstruction.handleClick(pos)) {
                         this.planet.placeBuilding(buildingUnderConstruction);
-                        // if (this.firstBuilding) {
-                            // this.planet.sendRaidingParty();
-                        // }
                         if (this.placingFunction) {
                             let fn = this.placingFunction;
                             zip(fn.machines, buildingUnderConstruction.devicePlaces()).forEach(([machine, place]: [typeof Machine, DevicePlace]) => {
@@ -175,13 +192,10 @@ export class Construction extends UIActor {
     restrictionsOff() {
         this.restricted = false
         this.hud.restrictionsOff()
-        // this.restrictAvailableMachines = false
-        // this.restrictAvailableStructures = false
     }
 
     get buildings() { return this.planet.colony.buildings; }
     welcome() {
-        console.debug("WELCOME TO THE COLONY");
         this.planet.buildColonyAndPopulation();
         this.lost = false;
         this.firstBuilding = true;
@@ -222,7 +236,6 @@ export class Construction extends UIActor {
             let machine = structureOrMachine;
             this.hud.setStatus(`Install ${machine.name} (${machine.description})`);
             theNextOne = this.spawnDevice(machine, pos);
-            // this.camera.zoom(1.5, 250)
         }
         else if (structureOrMachine instanceof RoomRecipe) {
             let fn: RoomRecipe = structureOrMachine;
@@ -233,7 +246,6 @@ export class Construction extends UIActor {
         this.planet.colony.currentlyConstructing = null;
         if (theNextOne) {
             this.planet.colony.currentlyConstructing = theNextOne;
-            // this.camera.pos = theNextOne.pos
         }
     }
     protected spawnDevice(machine: Machine, pos: Vector): Device {
@@ -271,7 +283,6 @@ export class Construction extends UIActor {
                 theStructure = new SmallDome();
             }
         }
-        // console.log("SPAWN FUNCTION", { fn, structure: theStructure })
         let building = this.assembleBuildingFromStructure(theStructure, pos);
         building.reshape(building.constrainCursor(building.pos));
         return building;
@@ -337,11 +348,11 @@ export class Construction extends UIActor {
         if (this.showTutorial) {
             this.hasActiveModal = true;
             this.hud.systemMessage(message, "", {
-                continue: () => { this.closeSystemMessage(); },
                 'i got this': () => {
                     this.closeSystemMessage();
                     this.showTutorial = false;
-                }
+                },
+                continue: () => { this.closeSystemMessage(); },
             });
         }
     }

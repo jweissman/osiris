@@ -1,15 +1,16 @@
 import { Color } from 'excalibur';
 import { range, mixColors } from '../../Util';
 import { PlanetBackground } from './PlanetBackground';
+import { Scale } from '../../values/Scale';
 export class MountainLayers extends PlanetBackground {
     layers: {
         baseY: number;
         deltas: number[];
     }[] = [];
     skyColor: Color = Color.Blue.clone();
-    static layerHeight: number = 32;
+    static layerHeight: number = Scale.minor.third;
     static layerCount = 1;
-    peakCount = 2760;
+    peakCount = 460;
     get peakWidth() {
         return Math.floor(this.getWidth() / this.peakCount);
     }

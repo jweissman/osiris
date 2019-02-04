@@ -119,9 +119,9 @@ export class Menu extends Scene {
         emitter.emitRate = 36 // 300 particles/second
         emitter.opacity = 0.54
         emitter.fadeFlag = true
-        emitter.particleLife = 5600 // in milliseconds = 1 sec
-        emitter.maxSize = 180 // in pixels
-        emitter.minSize = 2
+        emitter.particleLife = 4600 // in milliseconds = 1 sec
+        emitter.maxSize = 100 // in pixels
+        emitter.minSize = 1
         // emitter.beginColor = Color.Red.darken(0.12);
         emitter.isEmitting = false;
         return emitter

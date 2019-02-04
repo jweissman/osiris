@@ -24,6 +24,7 @@ import { CommandCenter } from "../models/Machine";
 import { Strategy } from "../strategies/Strategy";
 import { makeEmitter } from "./EmitterFactory";
 import { isIPv4 } from "net";
+import { Colors } from "../models/World";
 
 interface CitizenAspects {
     evil?: boolean // = false
@@ -68,6 +69,8 @@ export class Citizen extends Actor {
 
     hover: boolean = false
 
+    private debugPath: boolean = false
+
     constructor(
         public name: string,
         home: Vector,
@@ -78,6 +81,7 @@ export class Citizen extends Actor {
             home.x, home.y,
             aspects.large ? (3 * (2 * Game.mansheight / 4)) : (2 * Game.mansheight / 4),
             aspects.large ? (3 * Game.mansheight) : Game.mansheight,
+            // Color.White
         )
 
         this.maxHealth = aspects.large ? 250 : 100
@@ -91,32 +95,49 @@ export class Citizen extends Actor {
         this.eatingStrategy = new WhenHungryEatingStrategy(this)
         this.fightingStrategy = new AttackNearestHostileStrategy(this)
 
-        this.shirtColor = (this.aspects.elite ? Color.Red : sample([
-            Color.Green,
-            Color.Blue,
-            Color.Orange,
-            Color.Yellow,
-        ])).clone().desaturate(0.18).lighten(0.3)
+        let shirtColors = this.aspects.elite ? Colors.primary : Colors.secondary
 
         if (this.isEvil) {
-            this.shirtColor = Color.DarkGray.clone().darken(0.84) // + (0.1 * Math.random()) )
+            shirtColors = Colors.tertiary.map(c => c.clone().darken(0.82))
         }
 
-        this.skinColor = sample([
-            Color.Orange.lighten(0.3),
-            Color.Orange.lighten(0.4),
-            Color.Orange.lighten(0.5),
-            Color.Orange.lighten(0.6),
-            Color.Orange.lighten(0.7),
-            Color.Orange.lighten(0.8),
-        ])
+        this.shirtColor = sample(shirtColors).clone().desaturate(0.18).lighten(0.24)
+
+        let alien = Math.random() < 0.02
+
+        let skinColors  = alien ?  [Color.Green.desaturate(0.4), Color.Blue.desaturate(0.4).lighten(0.2)] : [Color.Orange]
+
+        this.skinColor = sample(skinColors).lighten(0.4) //range(5).map((inc, i) => sample(skinColors).clone().lighten(0.2 + (inc/10))))
+        //     [
+        //    Color.Orange.lighten(0.3),
+        //    Color.Orange.lighten(0.4),
+        //    Color.Orange.lighten(0.5),
+        //    Color.Orange.lighten(0.6),
+        //    Color.Orange.lighten(0.7),
+        //    Color.Orange.lighten(0.8),
+
+        //    Color.Green.lighten(0.5),
+        //    Color.Blue.lighten(0.5),
+        //])
 
         this.weight = sample(range(4)) //.map(w => w + 2))
 
         this.collisionType = CollisionType.Passive
-        let bloodColor = Math.random() > 0.2 ? Color.Red : Color.Green
+        let bloodColor = alien ? Color.Green : Color.Red
         this.bloodEmitter = makeEmitter(bloodColor, bloodColor.darken(0.6))
         this.add(this.bloodEmitter)
+
+        // this.on('pointerenter', () => {
+        //     this.log("HOVER")
+        //     this.hover = true
+        //     this.z = 1000
+        // })
+
+        // this.on('pointerleave', () => {
+        //     this.log('STOP HOVERING')
+        //     this.hover = false
+        //     this.z = 1
+        // })
     }
 
     get title() {
@@ -135,6 +156,8 @@ export class Citizen extends Actor {
     }
 
     get isEvil(): boolean { return !!this.aspects.evil }
+
+    get description() { return this.isEvil ? 'Bad person' : 'Good person' }
 
     update(engine, delta) {
         super.update(engine, delta)
@@ -172,11 +195,18 @@ export class Citizen extends Actor {
             // }
         }
 
-        if (this.hover) {
-            this.log(`working? ${this.isPlanning ? 'yes' : 'no'}`)
-        }
+        // if (this.hover) {
+            // this.log("HOVER")
+            // this.log(`working? ${this.isPlanning ? 'yes' : 'no'}`)
+        // }
 
         // this.z = 1000 + this.y - this.getHeight()/2
+
+        if (engine.debugMode) {
+            this.debugPath = true
+        } else {
+            this.debugPath = false
+        }
     }
 
 
@@ -187,8 +217,13 @@ export class Citizen extends Actor {
 
         ctx.translate(x, y) // - this.getHeight()/2) // - this.getHeight()) // - 5)
         if (this.alive) {
-            let ix = -this.getWidth()/2, iy = -this.getHeight()/2 - 6 //-15, iy = 10 - (this.getHeight() * 0.9)
-            drawText(ctx, this.name, ix, iy - 5) //-14, -20 - this.getHeight())
+            let ix = -this.getWidth(), iy = -this.getHeight()/2 - Scale.minor.first - 6 //-15, iy = 10 - (this.getHeight() * 0.9)
+            if (this.hover) {
+                drawRect(ctx, { x: ix - 2, y: iy - 12, width: 24 + this.getWidth() * 2, height: 18 },
+                    Color.DarkGray.clone().darken(0.8))
+
+                drawText(ctx, this.name, ix, iy - 5) //-14, -20 - this.getHeight())
+            }
 
             if (this.health < this.maxHealth) {
                 let ratio = this.health / this.maxHealth
@@ -196,7 +231,7 @@ export class Citizen extends Actor {
                 if (ratio < 0.34) {
                     healthColor = ratio < 0.1 ? Color.Red : Color.Orange
                 }
-                this.drawBar(ctx, ix+1, iy, 32, 4, ratio, healthColor)
+                this.drawBar(ctx, ix+1, iy-2, this.getWidth()*2, 4, ratio, healthColor)
             }
 
             if (this.guarding) {
@@ -226,12 +261,12 @@ export class Citizen extends Actor {
 
         if (this.workInProgress) {
             ctx.lineWidth = 1
-            let pw = 10 + Math.floor(this.workDuration / 10000), ph = 3
+            let pw = this.getWidth(), ph = 3
             let px = this.x - pw/2, py = this.y - 10;
             this.drawBar(ctx, px, py, pw, ph, this.progress)
         }
 
-        if (this.path && Game.debugPath) {
+        if (this.path && this.debugPath) {
             let c = Color.White.clone()
             // c.a = 0.5
             eachCons(this.path, 2).forEach(([a,b]) => {
@@ -248,6 +283,8 @@ export class Citizen extends Actor {
 
         // this.color = Color.Transparent.clone() //this.hover ? Color.White : Color.Transparent
         // this.color.a = 0.2
+
+        // needed to draw particles?
         super.draw(ctx, delta)
     }
 
@@ -271,13 +308,13 @@ export class Citizen extends Actor {
             ctx,
             0, (halfHeight * 0.15), // this.getHeight()/2,
             halfWidth + this.weight,
-            (halfHeight * 0.85), // - 5,
+            (halfHeight * 0.8), // - 5,
             shirt
         )
 
         // head
         let head = this.skinColor.clone()
-        let headRadius = halfWidth * 0.74
+        let headRadius = halfWidth * 0.85
         drawCircle(
             ctx, 
             0, -halfHeight + headRadius/2, /// - 3,
@@ -301,10 +338,12 @@ export class Citizen extends Actor {
 
     drive(d: Device) {
         this.driving = d
+        this.z = -1
     }
 
     stopDriving() {
         this.driving = null
+        this.z = 1
     }
 
     get isDriving(): boolean { return !!this.driving }
@@ -331,7 +370,9 @@ export class Citizen extends Actor {
     currentBuilding: Building = null
     async visit(device: Device) {
         let target = this.targetForDevice(device)
-        await this.pathTo(target)
+        if (target.distance(this.pos) > Scale.minor.first) {
+            await this.pathTo(target)
+        }
         await this.glideTo(target)
         this.currentBuilding = device.building
     }
@@ -354,22 +395,20 @@ export class Citizen extends Actor {
         return target
     }
 
-    glideTo(pos: Vector) {
+    async glideTo(pos: Vector) {
         if (pos) {
-            return this.actions.moveTo(pos.x, pos.y, this.walkSpeed).asPromise()
+            await this.actions.moveTo(pos.x, pos.y, this.walkSpeed).asPromise()
         }
     }
 
     async followPath(path: Vector[]) {
         if (path.length > 0) {
-            console.log(`${this.name} following path`, { path })
-            this.path = path
-            await Promise.all(
-                path.map(step => {
-                    this.log("glide to next step")
-                    this.glideTo(step)
-                })
-            )
+            this.path = path.map(v => v.sub(new Vector(0,Scale.minor.second)))
+            // console.log(`${this.name} following path`, { path: this.path })
+            // await this.glideTo(path.pop())
+            // await Promise.all(
+                this.path.forEach(async step => await this.glideTo(step))
+            // )
             this.path = []
         }
     }

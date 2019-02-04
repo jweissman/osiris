@@ -8,6 +8,7 @@ import { Device } from '../Device';
 import { Game } from '../../Game';
 
 export class Colony extends Actor {
+    debugMap: boolean = false
     navTree: NavigationTree;
     buildings: Building[] = [];
     currentlyConstructing: Building | Device = null;
@@ -17,10 +18,12 @@ export class Colony extends Actor {
         this.traits = this.traits.filter(trait => !(trait instanceof Traits.OffscreenCulling));
     }
 
+
+
     draw(ctx: CanvasRenderingContext2D, delta: number) {
         super.draw(ctx, delta);
 
-        let debugTree = Game.debugPath
+        let debugTree = this.debugMap //Game.debugPath
         if (this.navTree && debugTree) {
             let edges = this.navTree.graph.edgeList();
             edges.forEach((edge) => {
@@ -38,6 +41,14 @@ export class Colony extends Actor {
                 ctx.lineWidth = 0.5
                 ctx.stroke()
             })
+        }
+    }
+
+    update(engine: Game, delta: number) {
+        if (engine.debugMode) {
+            this.debugMap = true
+        } else {
+            this.debugMap = false
         }
 
     }

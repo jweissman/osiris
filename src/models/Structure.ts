@@ -87,7 +87,7 @@ export class Corridor extends Structure {
     description: string = 'in the hallway'
     view: string = 'CorridorView'
     width: number = minor.fifth
-    height: number = major.second
+    height: number = major.first
     zoom = 0.5
     connections: { [key in Orientation]: (typeof Structure)[] } = {
         [Orientation.Left]: [
@@ -151,7 +151,7 @@ class CommonArea extends Structure {
     name: string = 'Commons'
     description: string = 'hallway cap'
     view: string = 'CommonAreaView'
-    width: number = major.eighth //2 * major.eighth
+    width: number = major.third //2 * major.eighth
     height: number = major.third
 
     connections: { [key in Orientation]: (typeof Structure)[] } = {
@@ -175,8 +175,8 @@ class CommonArea extends Structure {
 export class SmallRoomTwo extends CommonArea {
     name = 'Side Room'
     // width = major.eighth
-    height = major.second - 8
-    width = major.fifth
+    height = major.first
+    width = major.third
     prereqs = [ SmallDome ]
     machines = smallBelow
 }
@@ -188,10 +188,10 @@ export class SmallRoomThree extends CommonArea {
     // width = 2 * major.eighth
     // height = major.eighth
 
-    // width: number = major.seventh
-    height: number = major.third
+    width: number = major.fourth
+    height: number = major.second
 
-    machines = [ ...smallBelow, ...midBelow ]
+    machines = [ ...smallBelow ] //, ...midBelow ]
 }
 
 export class MediumRoom extends CommonArea {
@@ -245,8 +245,8 @@ export class MediumSurfaceRoom extends Dome {
 
     view: string = 'MediumSurfaceRoomView';
 
-    width: number =  major.eighth
-    height: number = major.second
+    width: number =  2 * major.fifth
+    height: number = major.fourth
 
     zoom = 0.1
 
@@ -260,7 +260,7 @@ export class MediumSurfaceRoom extends Dome {
     }
 
     machines = [ 
-        // ...midBelow,
+        ...midBelow,
         ...smallBelow
     ]
 
@@ -269,15 +269,17 @@ export class MediumSurfaceRoom extends Dome {
 
 export class SmallDome extends Dome {
     name = 'Sm. Dome'
-    width = 2 * major.fifth
-    // height = major.seventh
+    width = major.third
+    height = major.third
     machines = smallDome
 }
 
 export class SmallDomeThree extends Dome {
     name = 'Sm. Dome (3)'
     view = 'SmallDomeThreeView'
-    width = 3 * major.fifth
+    width = major.fourth
+    height = major.fourth
+    // width = 3 * major.fifth
     // height = 2*major.fifth
     machines = smallDome
 }
@@ -296,7 +298,7 @@ export class LargeDome extends Dome {
     view = 'BigDomeView'
     width = 4 * major.eighth
     // height = 3 * major.eighth
-    prereqs = [MidDome, LargeRoom]
+    prereqs = [MidDome] //, LargeRoom]
     machines = [ ...largeDome, ...midDome, ...smallDome ]
 }
 
@@ -305,7 +307,7 @@ export class Arcology extends Dome {
     view = 'ArcologyView'
     width = 12 * major.eighth
     height = 36 * major.eighth
-    prereqs = [LargeDome, HugeRoom]
+    prereqs = [LargeDome] //, HugeRoom]
     machines = hugeDome
 
 }

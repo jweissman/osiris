@@ -172,7 +172,7 @@ export class MediumSurfaceRoomView extends Building {
             ctx,
             { x: this.x, y: this.y + this.getHeight() - this.floorHeight - floorEdgeHeight,
               width: this.getWidth(), height: floorEdgeHeight - floorOff },
-              0,
+            //   0,
               floorColor.lighten(0.4)
         )
 
@@ -180,7 +180,7 @@ export class MediumSurfaceRoomView extends Building {
             ctx,
             { x: this.x, y: this.y + this.getHeight() - this.floorHeight - floorOff,
               width: this.getWidth(), height: this.floorHeight + floorOff },
-              0,
+            //   0,
               floorColor
         )
 

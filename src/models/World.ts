@@ -1,6 +1,31 @@
 import { Color } from 'excalibur';
 import { sample } from '../Util';
 
+export class Colors {
+  static primary: Color[] = [
+    Color.Red, Color.Blue, Color.Yellow, // Color.Green,
+  ]
+
+  static secondary: Color[] = [
+    Color.Green, Color.Orange, Color.Violet,
+  ]
+
+  static tertiary: Color[] = [
+    Color.Vermillion, Color.Chartreuse, Color.Magenta, Color.Azure,
+    //Color.Teal,
+    new Color(54, 117, 136),
+
+    //Color.Amber
+    new Color(255, 191, 0),
+  ]
+
+  static process(c: Color): Color {
+    return c.clone()
+      .desaturate(0.68)
+      .lighten(0.14)
+  }
+}
+
 export class World {
     static nameCitizen(): string {
       return sample([
@@ -21,7 +46,7 @@ export class World {
         "Natling", "Dathron", "Dathlax", "Kargill", "Nomandy", "Exactlee", "Terminax", "Exlith", "Lisztia", "Zed", "Alphus", "Quatlewis", "Serenado", "Imma", 
 
         // third-gen
-        "Splender", "Airline", "Phax", "Index", "Tolerable", "Expert", "Tonsil", "Deerhoof", "Coldrain", "Darkwater",
+        "Splendor", "Airline", "Phax", "Index", "Tolerable", "Expert", "Tonsil", "Deerhoof", "Coldrain", "Darkwater",
         "Interzone", "Neverwhen", "Dream", "Really", "Artefax", "Maniple", "Anseb", "Target", "Novim", "Evim", "Lisem", "Nancem",
         "Orligot", "Nolifun", "Deriduh", "Flandor", "Lamplife", "Coldwave", "Oncetold", "Oncebit", "Twiceshy", "Niceguy", "Okay",
 
@@ -35,37 +60,20 @@ export class World {
     }
 
   static colors = [
-    Color.Orange,
-    Color.Blue,
-    Color.Red,
-    Color.Green,
-    Color.Violet,
-    Color.Azure,
-    Color.Magenta.darken(0.2),
-    Color.Cyan.darken(0.2),
+    ...Colors.primary,
   ] 
 
   static skyColors = [
-    Color.Cyan.lighten(0.1),
-    Color.Green.lighten(0.2),
-    Color.Orange.lighten(0.2),
-    Color.Rose.lighten(0.1),
-    Color.Violet.lighten(0.2),
-    Color.Chartreuse.lighten(0.1),
-  ] //b, Color.Vermillion], // Color.Violet, Color.Chartreuse, Color.Orange, Color.Rose]
+    ...Colors.secondary,
+  ]
 
   static pickColor() {
-    return sample(World.colors).
-      clone().
-      darken(0.1).
-      desaturate(0.8);
+    return Colors.process(sample(World.colors)).darken(0.2)
   }
 
   static pickSkyColor() {
-    return sample(World.skyColors).
-      clone().
-      desaturate(0.74).
-      lighten(0.08)
+    return Colors.process(
+      sample(World.skyColors)
+    ).lighten(0.2)
   }
-
 }

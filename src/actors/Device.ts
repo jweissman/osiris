@@ -60,24 +60,26 @@ export class Device extends Actor {
         this.image.onload = () => { this.imageLoaded = true }
         this.image.src = machine.image
 
-        this.on('pointerenter', () => {
-            // console.log("HOVER OVER", { machine: this.machine })
-            this.hover = true
-            let tinyDevices = this.tinyDevices.length > 0 &&
-              this.tinyDevices.some(d => d.hover)
-            if (this.building && !tinyDevices) {
-                this.building.planet.currentlyViewing = this
-            }
-        })
+        // this.on('pointerenter', () => {
+        //     // console.log("HOVER OVER", { machine: this.machine })
+        //     let tinyDevices = this.tinyDevices.length > 0 &&
+        //       this.tinyDevices.some(d => d.hover)
+        //     let people = this.building && this.building.planet.population.citizens.length > 0 &&
+        //         this.building.planet.population.citizens.some(c => c.hover)
+        //     if (this.building && !tinyDevices && !people) {
+        //         this.hover = true
+        //         this.building.planet.currentlyViewing = this
+        //     }
+        // })
 
-        this.on('pointerleave', () => {
-            this.hover = false
-            if (this.building && this.building.planet.currentlyViewing === this) {
-                this.building.planet.currentlyViewing = null
-            }
-        })
+        // this.on('pointerleave', () => {
+        //     this.hover = false
+        //     if (this.building && this.building.planet.currentlyViewing === this) {
+        //         this.building.planet.currentlyViewing = null
+        //     }
+        // })
 
-        this.collisionType = CollisionType.Active
+        this.collisionType = CollisionType.Passive
 
         if (this.machine.powerEffect) {
             this.emitter = makeEmitter(Color.White, Color.Blue)
@@ -161,7 +163,7 @@ export class Device extends Actor {
             drawRect(
                 ctx,
                 { x: ix, y: iy, width: this.getWidth(), height: this.getHeight() },
-                0,
+                // 0,
                 c
             )
             ctx.restore()

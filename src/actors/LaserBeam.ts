@@ -2,14 +2,15 @@ import { Actor, Color, CollisionType, Traits } from "excalibur";
 import { Game } from "../Game";
 import { Citizen } from "./Citizen";
 import { Device } from "./Device";
+import { Scale } from "../values/Scale";
 
 export class LaserBeam extends Actor {
     private evil: boolean
     constructor(private source: Citizen | Device, private targetDirectionSign: number) {
         super(
             source.pos.x + 4 * targetDirectionSign,
-            source.pos.y - 10,
-            12,
+            source.pos.y - (source.getHeight() / 3),
+            Scale.minor.third,
             1 //0.8
         )
 

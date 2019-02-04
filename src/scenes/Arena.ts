@@ -112,6 +112,8 @@ export class Arena extends Scene {
         let pawnName = sample([
             'Jones', 'Smith', 'Ford', 'Abel', 'Thomas',
             'Frost', 'Amos', 'Sandra', 'Cheryl', 'Dominic',
+            'Aomi', 'Cadence', 'Cree', 'Luri', 'Moon', 'Dean',
+            'Sun', 'Lee', 'Fern', 'Tuck',
         ])
         let friendly = new Citizen(pawnName, this.spawnPoint(), this.planet)
         this.planet.population.citizens.push(friendly)

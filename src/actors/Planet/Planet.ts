@@ -26,8 +26,8 @@ export class Planet extends Actor {
 
     constructor(
         public scene: Scene,
-        private w: number = 200000,
-        private depth: number = 40000,
+        private w: number = 60000,
+        private depth: number = 30000,
     ) {
         super(0, depth / 2, w, depth, World.pickColor())
         this.traits = this.traits.filter(trait => !(trait instanceof ex.Traits.OffscreenCulling))
@@ -308,8 +308,8 @@ export class Planet extends Actor {
 
     private async sendRaider() {
         let evil = true
-        let elite = Math.random() > 0.03
-        let large = this.threatLevel > 3 ? Math.random() > 0.1 : Math.random() > 0.03
+        let elite = Math.random() < 0.03
+        let large = this.threatLevel > 3 ? Math.random() < 0.1 : Math.random() < 0.03
         let options = { evil, elite, large }
 
         let origin = this.colony.origin.clone()

@@ -26,6 +26,7 @@ export function pathFromRect(rect: Rectangle): PaintingPath {
 
 // tiny rendering lib
 export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, clr: Color = Color.White, lineWidth: number = 1) {
+  ctx.save()
   let c = clr.clone()
   // c.a = 0.5
   ctx.beginPath()
@@ -33,8 +34,10 @@ export function drawLine(ctx: CanvasRenderingContext2D, a: Vector, b: Vector, cl
   ctx.lineTo(b.x, b.y)
   ctx.strokeStyle = c.toRGBA()
   ctx.lineWidth = lineWidth
+  ctx.closePath()
   ctx.stroke()
-  ctx.lineWidth = 1
+  // ctx.lineWidth = 1
+  ctx.restore()
 }
 
 export function drawPatternedRect(
@@ -86,7 +89,6 @@ export function drawPatternedPoly(
 export function drawRect(
   ctx: CanvasRenderingContext2D,
   rectangle: Rectangle,
-  edgeWidth: number = 0,
   color: Color = Color.White,
   filled: boolean = true,
   dashed: boolean = false
@@ -105,16 +107,16 @@ export function drawRect(
     )
   }
 
-  if (edgeWidth > 0) {
-    let edge = Color.White.clone();
-    ctx.strokeStyle = edge.toRGBA();
-    ctx.lineWidth=edgeWidth
-    if (dashed) { ctx.setLineDash([5, 10]) }
-    else { ctx.setLineDash([]) }
-    ctx.strokeRect(
-      x, y, width, height
-    )
-  }
+  //if (edgeWidth > 0) {
+  //  let edge = Color.White.clone();
+  //  ctx.strokeStyle = edge.toRGBA();
+  //  ctx.lineWidth=edgeWidth
+  //  if (dashed) { ctx.setLineDash([5, 10]) }
+  //  else { ctx.setLineDash([]) }
+  //  ctx.strokeRect(
+  //    x, y, width, height
+  //  )
+  //}
 }
 
 export function drawPoly(

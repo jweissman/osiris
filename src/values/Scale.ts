@@ -2,30 +2,40 @@ import { Game } from "../Game";
 
 const majorUnit = Game.mansheight * 2
 const minorUnit = Math.floor(Game.mansheight / 4)
+// const microUnit = Math.floor(Game.mansheight / 8)
+// const microUnit = Game.man
 
-const majorScale = {
-    first: majorUnit,
-    second: majorUnit * 2,
-    third: majorUnit * 3,
-    fourth: majorUnit * 4,
-    fifth: majorUnit * 5,
-    sixth: majorUnit * 6,
-    seventh: majorUnit * 7,
-    eighth: majorUnit * 8,
+// type ScaleDegree = 'first'
+interface Octave {
+    first: number
+    second: number
+    third: number
+    fourth: number
+    fifth: number
+    sixth: number
+    seventh: number
+    eighth: number
 }
 
-const minorScale = {
-    first:   minorUnit,
-    second:  minorUnit * 2,
-    third:   minorUnit * 3,
-    fourth:  minorUnit * 4,
-    fifth:   minorUnit * 5,
-    sixth:   minorUnit * 6,
-    seventh: minorUnit * 7,
-    eighth:  minorUnit * 8,
+function octave(unit: number): Octave {
+    return {
+        first: unit,
+        second: unit * 2,
+        third: unit * 3,
+        fourth: unit * 4,
+        fifth: unit * 5,
+        sixth: unit * 6,
+        seventh: unit * 7,
+        eighth: unit * 8,
+    }
 }
+
+const majorScale = octave(majorUnit)
+const minorScale = octave(minorUnit) 
+// const nanoScale = octave(microUnit)
 
 export const Scale = {
     major: majorScale,
-    minor: minorScale
+    minor: minorScale,
+    // nano: nanoScale,
 }

@@ -1,3 +1,5 @@
+import { Scale } from "../../values/Scale";
+
 const raisedSquare = require('../../images/raised-square-bg.png')
 const leafy = require('../../images/leafy-bg.png')
 const bookish = require('../../images/books-bg.png')
@@ -61,7 +63,7 @@ export const getBackgroundPattern = (ctx: CanvasRenderingContext2D, p: Backgroun
             // bg.image.scal
             // bg.image.scale
             bg.pattern = ctx.createPattern(bg.image, 'repeat');
-            bg.pattern.setTransform(matrix.scale(pattern.scale)) //0.5))
+            bg.pattern.setTransform(matrix.scale(pattern.scale * (Scale.major.first / 32))) //0.5))
 
         }
         return bg.pattern

@@ -130,7 +130,7 @@ export class CommandCenter extends Machine {
     description = 'commander, we need your help'
     operation = store(
         [ResourceBlock.Mineral, ResourceBlock.Ore], //,ResourceBlock.Biomass],
-        24
+        32
     )
     image = images.megaconsole
     size = DeviceSize.Medium
